@@ -19,6 +19,8 @@ type CrudManagerProps = {
   canCreate?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
+  importUrl?: string;
+  importLabel?: string;
 };
 
 function prettify(value: string) {
@@ -110,6 +112,8 @@ export default function CrudManager({
   canCreate = true,
   canEdit = true,
   canDelete = true,
+  importUrl,
+  importLabel = "Impor CSV",
 }: CrudManagerProps) {
   const [rows, setRows] = useState<Row[]>(initialRows);
   const [query, setQuery] = useState("");
@@ -235,23 +239,37 @@ export default function CrudManager({
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-slate-900">{title}</h1>
           <p className="mt-1 max-w-2xl text-sm text-slate-500">{description}</p>
         </div>
-        {canCreate && (
-          <button
-            type="button"
-            onClick={openCreate}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/25"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="h-4 w-4">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Tambah {singular}
-          </button>
-        )}
+        <div className="flex items-center gap-2 flex-col sm:flex-row">
+          {canCreate && (
+            <button
+              type="button"
+              onClick={openCreate}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/25"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="h-4 w-4">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Tambah {singular}
+            </button>
+          )}
+          {importUrl && (
+            <a
+              href={importUrl}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-600 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-600 shadow-sm transition hover:bg-emerald-100 focus:outline-none focus:ring-4 focus:ring-emerald-200/30"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                <polyline points="14 2 2 12 14 22" />
+                <path d="M2 12h20" />
+              </svg>
+              {importLabel}
+            </a>
+          )}
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

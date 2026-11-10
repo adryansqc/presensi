@@ -50,6 +50,7 @@ export default async function AdminResourcePage({
       canCreate={canCreate}
       canEdit={canEdit}
       canDelete={canDelete}
+      importUrl={resource === "jamaah" ? "/admin/jamaah/import" : undefined}
     />
   );
 }
