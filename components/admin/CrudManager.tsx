@@ -120,6 +120,8 @@ export default function CrudManager({
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState("");
   const swal = useSwal();
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
 
   const filteredRows = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -128,6 +130,9 @@ export default function CrudManager({
       searchKeys.some((key) => String(row[key] ?? "").toLowerCase().includes(needle))
     );
   }, [rows, query, searchKeys]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+  const paginatedRows = filteredRows.slice((page - 1) * pageSize, page * pageSize);
 
   async function refreshRows() {
     const response = await fetch(endpoint, { cache: "no-store" });
@@ -258,7 +263,10 @@ export default function CrudManager({
             </svg>
             <input
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+              setQuery(event.target.value);
+              setPage(1);
+            }}
               placeholder="Cari data..."
               className="w-full rounded-xl border border-slate-300 py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
             />
@@ -281,7 +289,7 @@ export default function CrudManager({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredRows.length === 0 && (
+              {paginatedRows.length === 0 && (
                 <tr>
                   <td colSpan={columns.length + 1} className="px-4 py-12 text-center">
                     <p className="text-sm font-medium text-slate-700">Belum ada data</p>
@@ -291,7 +299,7 @@ export default function CrudManager({
                   </td>
                 </tr>
               )}
-              {filteredRows.map((row) => (
+              {paginatedRows.map((row) => (
                 <tr key={String(row.id)} className="transition hover:bg-slate-50/70">
                   {columns.map((column) => (
                     <td key={column.key} className="px-4 py-3 text-slate-700">
@@ -339,6 +347,37 @@ export default function CrudManager({
           </table>
         </div>
       </div>
+
+      {filteredRows.length > 0 && (
+        <div className="flex items-center justify-between gap-4 border-t border-slate-200 bg-slate-50 px-4 py-3 sm:px-5">
+          <p className="text-xs text-slate-500">
+            Menampilkan{" "}
+            {(page - 1) * pageSize + 1} hingga{" "}
+            {Math.min(page * pageSize, filteredRows.length)} dari {filteredRows.length} data
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition hover:bg-slate-100"
+            >
+              Sebelumnya
+            </button>
+            <span className="text-xs text-slate-500">
+              Halaman {page} dari {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition hover:bg-slate-100"
+            >
+              Berikutnya
+            </button>
+          </div>
+        </div>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
