@@ -1,0 +1,70 @@
+import { getResource } from "@/lib/admin/resources";
+import { requirePermission } from "@/lib/auth-helpers";
+import { NextResponse } from "next/server";
+
+function toErrorMessage(error: unknown) {
+  if (error && typeof error === "object" && "code" in error) {
+    switch ((error as { code?: string }).code) {
+      case "P2002":
+        return "Data dengan nilai tersebut sudah ada. Periksa kembali nama atau email.";
+      case "P2003":
+        return "Data ini masih dipakai oleh data lain sehingga tidak bisa dihapus.";
+      case "P2025":
+        return "Data tidak ditemukan.";
+    }
+  }
+
+  if (error instanceof Error) return error.message;
+  return "Terjadi kesalahan pada server.";
+}
+
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ resource: string; id: string }> }
+) {
+  const { resource, id } = await params;
+  const { error } = await requirePermission(`${resource}.edit`);
+  if (error) return error;
+
+  const config = await getResource(resource);
+  if (!config) {
+    return NextResponse.json({ error: "Resource tidak dikenal." }, { status: 404 });
+  }
+
+  try {
+    const body = await request.json();
+    await config.update(id, body ?? {});
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return NextResponse.json({ error: toErrorMessage(err) }, { status: 400 });
+  }
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ resource: string; id: string }> }
+) {
+  const { resource, id } = await params;
+  const { error, session } = await requirePermission(`${resource}.delete`);
+  if (error) return error;
+
+  const config = await getResource(resource);
+  if (!config) {
+    return NextResponse.json({ error: "Resource tidak dikenal." }, { status: 404 });
+  }
+
+  const currentUserId = (session?.user as { id?: string } | undefined)?.id;
+  if (resource === "pengguna" && currentUserId === id) {
+    return NextResponse.json(
+      { error: "Anda tidak dapat menghapus akun yang sedang digunakan." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await config.remove(id);
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return NextResponse.json({ error: toErrorMessage(err) }, { status: 400 });
+  }
+}

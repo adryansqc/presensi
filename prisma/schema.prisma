@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String    @default("user") // Super_Admin, Admin_CAI, Desa, Kelompok
+  desaId        String?   // untuk user dengan role "Desa"
+  kelompokId    String?   // untuk user dengan role "Kelompok"
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique // Super_Admin, Admin_CAI, Desa, Kelompok
+  permissions String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Kategori {
+  id        String   @id @default(cuid())
+  nama      String   @unique // "Bapak", "Ibu", "Pengurus Kelompok", dll
+  deskripsi String?
+  urutan    Int      @default(0) // untuk sorting di dropdown
+  aktif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jamaah    Jamaah[]
+  presensi  Presensi[]
+}
+
+model Desa {
+  id        String    @id @default(cuid())
+  nama      String    @unique // "PELITA", "KOTA BARU", dll
+  aktif     Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  kelompok  Kelompok[]
+  jamaah    Jamaah[]
+}
+
+model Kelompok {
+  id        String   @id @default(cuid())
+  nama      String // "BHAKTI", "PAGAR DRUM", dll
+  desaId    String
+  aktif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  desa      Desa     @relation(fields: [desaId], references: [id], onDelete: Cascade)
+  jamaah    Jamaah[]
+
+  @@unique([nama, desaId]) // nama kelompok unik per desa
+}
+
+model Jamaah {
+  id          String   @id @default(cuid())
+  nama        String
+  kategoriId  String
+  noWa        String?
+  desaId      String
+  kelompokId  String
+  statusAktif String   @default("Aktif") // Aktif, Pindah, Tidak Aktif
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  kategori    Kategori @relation(fields: [kategoriId], references: [id])
+  desa        Desa     @relation(fields: [desaId], references: [id])
+  kelompok    Kelompok @relation(fields: [kelompokId], references: [id])
+  presensi    Presensi[]
+
+  @@index([nama]) // untuk pencarian cepat
+  @@index([kelompokId])
+  @@index([desaId])
+}
+
+model Jadwal {
+  id             String   @id @default(cuid())
+  tanggal        DateTime
+  jenisPengajian String
+  jamMulai       String
+  jamSelesai     String
+  tingkat        String   // Daerah, Desa, Kelompok
+  desaId         String?
+  kelompokId     String?
+  statusBuka     String   @default("Tutup") // Buka, Tutup
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  presensi       Presensi[]
+
+  @@index([tanggal])
+  @@index([statusBuka])
+}
+
+model Presensi {
+  id          String   @id @default(cuid())
+  jadwalId    String
+  jamaahId    String? // boleh null kalau jamaah baru (belum terdaftar)
+  namaJamaah  String // snapshot nama saat presensi
+  kategoriId  String
+  desaId      String
+  kelompokId  String
+  status      String // Hadir, Izin, Sakit
+  keterangan  String?
+  createdAt   DateTime @default(now())
+
+  jadwal      Jadwal   @relation(fields: [jadwalId], references: [id], onDelete: Cascade)
+  jamaah      Jamaah?  @relation(fields: [jamaahId], references: [id], onDelete: SetNull)
+  kategori    Kategori @relation(fields: [kategoriId], references: [id])
+
+  @@index([jadwalId])
+  @@index([jamaahId])
+  @@index([createdAt])
+}
