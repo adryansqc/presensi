@@ -5,6 +5,8 @@ import SignOutButton from "@/components/SignOutButton";
 import { authOptions } from "@/lib/auth";
 import { getRolePermissions } from "@/lib/permission-store";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   await connection();
   const session = await getServerSession(authOptions);

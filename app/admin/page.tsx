@@ -33,6 +33,8 @@ function statusTone(status: string) {
   return "bg-slate-100 text-slate-600 ring-slate-200";
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboardPage() {
   await connection();
   const session = await getServerSession(authOptions);

@@ -34,6 +34,10 @@ export type JadwalMinAggregateOutputType = {
   desaId: string | null
   kelompokId: string | null
   statusBuka: string | null
+  slugPublik: string | null
+  linkPublikAktif: boolean | null
+  dibuatOleh: string | null
+  ditutupPada: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +52,10 @@ export type JadwalMaxAggregateOutputType = {
   desaId: string | null
   kelompokId: string | null
   statusBuka: string | null
+  slugPublik: string | null
+  linkPublikAktif: boolean | null
+  dibuatOleh: string | null
+  ditutupPada: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +70,10 @@ export type JadwalCountAggregateOutputType = {
   desaId: number
   kelompokId: number
   statusBuka: number
+  slugPublik: number
+  linkPublikAktif: number
+  dibuatOleh: number
+  ditutupPada: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -78,6 +90,10 @@ export type JadwalMinAggregateInputType = {
   desaId?: true
   kelompokId?: true
   statusBuka?: true
+  slugPublik?: true
+  linkPublikAktif?: true
+  dibuatOleh?: true
+  ditutupPada?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -92,6 +108,10 @@ export type JadwalMaxAggregateInputType = {
   desaId?: true
   kelompokId?: true
   statusBuka?: true
+  slugPublik?: true
+  linkPublikAktif?: true
+  dibuatOleh?: true
+  ditutupPada?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +126,10 @@ export type JadwalCountAggregateInputType = {
   desaId?: true
   kelompokId?: true
   statusBuka?: true
+  slugPublik?: true
+  linkPublikAktif?: true
+  dibuatOleh?: true
+  ditutupPada?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -193,6 +217,10 @@ export type JadwalGroupByOutputType = {
   desaId: string | null
   kelompokId: string | null
   statusBuka: string
+  slugPublik: string | null
+  linkPublikAktif: boolean
+  dibuatOleh: string | null
+  ditutupPada: Date | null
   createdAt: Date
   updatedAt: Date
   _count: JadwalCountAggregateOutputType | null
@@ -228,9 +256,14 @@ export type JadwalWhereInput = {
   desaId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
   kelompokId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
   statusBuka?: Prisma.StringFilter<"Jadwal"> | string
+  slugPublik?: Prisma.StringNullableFilter<"Jadwal"> | string | null
+  linkPublikAktif?: Prisma.BoolFilter<"Jadwal"> | boolean
+  dibuatOleh?: Prisma.StringNullableFilter<"Jadwal"> | string | null
+  ditutupPada?: Prisma.DateTimeNullableFilter<"Jadwal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Jadwal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Jadwal"> | Date | string
   presensi?: Prisma.PresensiListRelationFilter
+  dibuatOlehUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type JadwalOrderByWithRelationInput = {
@@ -243,13 +276,19 @@ export type JadwalOrderByWithRelationInput = {
   desaId?: Prisma.SortOrderInput | Prisma.SortOrder
   kelompokId?: Prisma.SortOrderInput | Prisma.SortOrder
   statusBuka?: Prisma.SortOrder
+  slugPublik?: Prisma.SortOrderInput | Prisma.SortOrder
+  linkPublikAktif?: Prisma.SortOrder
+  dibuatOleh?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditutupPada?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   presensi?: Prisma.PresensiOrderByRelationAggregateInput
+  dibuatOlehUser?: Prisma.UserOrderByWithRelationInput
 }
 
 export type JadwalWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  slugPublik?: string
   AND?: Prisma.JadwalWhereInput | Prisma.JadwalWhereInput[]
   OR?: Prisma.JadwalWhereInput[]
   NOT?: Prisma.JadwalWhereInput | Prisma.JadwalWhereInput[]
@@ -261,10 +300,14 @@ export type JadwalWhereUniqueInput = Prisma.AtLeast<{
   desaId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
   kelompokId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
   statusBuka?: Prisma.StringFilter<"Jadwal"> | string
+  linkPublikAktif?: Prisma.BoolFilter<"Jadwal"> | boolean
+  dibuatOleh?: Prisma.StringNullableFilter<"Jadwal"> | string | null
+  ditutupPada?: Prisma.DateTimeNullableFilter<"Jadwal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Jadwal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Jadwal"> | Date | string
   presensi?: Prisma.PresensiListRelationFilter
-}, "id">
+  dibuatOlehUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+}, "id" | "slugPublik">
 
 export type JadwalOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -276,6 +319,10 @@ export type JadwalOrderByWithAggregationInput = {
   desaId?: Prisma.SortOrderInput | Prisma.SortOrder
   kelompokId?: Prisma.SortOrderInput | Prisma.SortOrder
   statusBuka?: Prisma.SortOrder
+  slugPublik?: Prisma.SortOrderInput | Prisma.SortOrder
+  linkPublikAktif?: Prisma.SortOrder
+  dibuatOleh?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditutupPada?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.JadwalCountOrderByAggregateInput
@@ -296,6 +343,10 @@ export type JadwalScalarWhereWithAggregatesInput = {
   desaId?: Prisma.StringNullableWithAggregatesFilter<"Jadwal"> | string | null
   kelompokId?: Prisma.StringNullableWithAggregatesFilter<"Jadwal"> | string | null
   statusBuka?: Prisma.StringWithAggregatesFilter<"Jadwal"> | string
+  slugPublik?: Prisma.StringNullableWithAggregatesFilter<"Jadwal"> | string | null
+  linkPublikAktif?: Prisma.BoolWithAggregatesFilter<"Jadwal"> | boolean
+  dibuatOleh?: Prisma.StringNullableWithAggregatesFilter<"Jadwal"> | string | null
+  ditutupPada?: Prisma.DateTimeNullableWithAggregatesFilter<"Jadwal"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Jadwal"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Jadwal"> | Date | string
 }
@@ -310,9 +361,13 @@ export type JadwalCreateInput = {
   desaId?: string | null
   kelompokId?: string | null
   statusBuka?: string
+  slugPublik?: string | null
+  linkPublikAktif?: boolean
+  ditutupPada?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   presensi?: Prisma.PresensiCreateNestedManyWithoutJadwalInput
+  dibuatOlehUser?: Prisma.UserCreateNestedOneWithoutJadwalDibuatInput
 }
 
 export type JadwalUncheckedCreateInput = {
@@ -325,6 +380,10 @@ export type JadwalUncheckedCreateInput = {
   desaId?: string | null
   kelompokId?: string | null
   statusBuka?: string
+  slugPublik?: string | null
+  linkPublikAktif?: boolean
+  dibuatOleh?: string | null
+  ditutupPada?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   presensi?: Prisma.PresensiUncheckedCreateNestedManyWithoutJadwalInput
@@ -340,9 +399,13 @@ export type JadwalUpdateInput = {
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
+  slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   presensi?: Prisma.PresensiUpdateManyWithoutJadwalNestedInput
+  dibuatOlehUser?: Prisma.UserUpdateOneWithoutJadwalDibuatNestedInput
 }
 
 export type JadwalUncheckedUpdateInput = {
@@ -355,6 +418,10 @@ export type JadwalUncheckedUpdateInput = {
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
+  slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   presensi?: Prisma.PresensiUncheckedUpdateManyWithoutJadwalNestedInput
@@ -370,6 +437,10 @@ export type JadwalCreateManyInput = {
   desaId?: string | null
   kelompokId?: string | null
   statusBuka?: string
+  slugPublik?: string | null
+  linkPublikAktif?: boolean
+  dibuatOleh?: string | null
+  ditutupPada?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -384,6 +455,9 @@ export type JadwalUpdateManyMutationInput = {
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
+  slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -398,8 +472,22 @@ export type JadwalUncheckedUpdateManyInput = {
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
+  slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type JadwalListRelationFilter = {
+  every?: Prisma.JadwalWhereInput
+  some?: Prisma.JadwalWhereInput
+  none?: Prisma.JadwalWhereInput
+}
+
+export type JadwalOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type JadwalCountOrderByAggregateInput = {
@@ -412,6 +500,10 @@ export type JadwalCountOrderByAggregateInput = {
   desaId?: Prisma.SortOrder
   kelompokId?: Prisma.SortOrder
   statusBuka?: Prisma.SortOrder
+  slugPublik?: Prisma.SortOrder
+  linkPublikAktif?: Prisma.SortOrder
+  dibuatOleh?: Prisma.SortOrder
+  ditutupPada?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -426,6 +518,10 @@ export type JadwalMaxOrderByAggregateInput = {
   desaId?: Prisma.SortOrder
   kelompokId?: Prisma.SortOrder
   statusBuka?: Prisma.SortOrder
+  slugPublik?: Prisma.SortOrder
+  linkPublikAktif?: Prisma.SortOrder
+  dibuatOleh?: Prisma.SortOrder
+  ditutupPada?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -440,6 +536,10 @@ export type JadwalMinOrderByAggregateInput = {
   desaId?: Prisma.SortOrder
   kelompokId?: Prisma.SortOrder
   statusBuka?: Prisma.SortOrder
+  slugPublik?: Prisma.SortOrder
+  linkPublikAktif?: Prisma.SortOrder
+  dibuatOleh?: Prisma.SortOrder
+  ditutupPada?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -447,6 +547,48 @@ export type JadwalMinOrderByAggregateInput = {
 export type JadwalScalarRelationFilter = {
   is?: Prisma.JadwalWhereInput
   isNot?: Prisma.JadwalWhereInput
+}
+
+export type JadwalCreateNestedManyWithoutDibuatOlehUserInput = {
+  create?: Prisma.XOR<Prisma.JadwalCreateWithoutDibuatOlehUserInput, Prisma.JadwalUncheckedCreateWithoutDibuatOlehUserInput> | Prisma.JadwalCreateWithoutDibuatOlehUserInput[] | Prisma.JadwalUncheckedCreateWithoutDibuatOlehUserInput[]
+  connectOrCreate?: Prisma.JadwalCreateOrConnectWithoutDibuatOlehUserInput | Prisma.JadwalCreateOrConnectWithoutDibuatOlehUserInput[]
+  createMany?: Prisma.JadwalCreateManyDibuatOlehUserInputEnvelope
+  connect?: Prisma.JadwalWhereUniqueInput | Prisma.JadwalWhereUniqueInput[]
+}
+
+export type JadwalUncheckedCreateNestedManyWithoutDibuatOlehUserInput = {
+  create?: Prisma.XOR<Prisma.JadwalCreateWithoutDibuatOlehUserInput, Prisma.JadwalUncheckedCreateWithoutDibuatOlehUserInput> | Prisma.JadwalCreateWithoutDibuatOlehUserInput[] | Prisma.JadwalUncheckedCreateWithoutDibuatOlehUserInput[]
+  connectOrCreate?: Prisma.JadwalCreateOrConnectWithoutDibuatOlehUserInput | Prisma.JadwalCreateOrConnectWithoutDibuatOlehUserInput[]
+  createMany?: Prisma.JadwalCreateManyDibuatOlehUserInputEnvelope
+  connect?: Prisma.JadwalWhereUniqueInput | Prisma.JadwalWhereUniqueInput[]
+}
+
+export type JadwalUpdateManyWithoutDibuatOlehUserNestedInput = {
+  create?: Prisma.XOR<Prisma.JadwalCreateWithoutDibuatOlehUserInput, Prisma.JadwalUncheckedCreateWithoutDibuatOlehUserInput> | Prisma.JadwalCreateWithoutDibuatOlehUserInput[] | Prisma.JadwalUncheckedCreateWithoutDibuatOlehUserInput[]
+  connectOrCreate?: Prisma.JadwalCreateOrConnectWithoutDibuatOlehUserInput | Prisma.JadwalCreateOrConnectWithoutDibuatOlehUserInput[]
+  upsert?: Prisma.JadwalUpsertWithWhereUniqueWithoutDibuatOlehUserInput | Prisma.JadwalUpsertWithWhereUniqueWithoutDibuatOlehUserInput[]
+  createMany?: Prisma.JadwalCreateManyDibuatOlehUserInputEnvelope
+  set?: Prisma.JadwalWhereUniqueInput | Prisma.JadwalWhereUniqueInput[]
+  disconnect?: Prisma.JadwalWhereUniqueInput | Prisma.JadwalWhereUniqueInput[]
+  delete?: Prisma.JadwalWhereUniqueInput | Prisma.JadwalWhereUniqueInput[]
+  connect?: Prisma.JadwalWhereUniqueInput | Prisma.JadwalWhereUniqueInput[]
+  update?: Prisma.JadwalUpdateWithWhereUniqueWithoutDibuatOlehUserInput | Prisma.JadwalUpdateWithWhereUniqueWithoutDibuatOlehUserInput[]
+  updateMany?: Prisma.JadwalUpdateManyWithWhereWithoutDibuatOlehUserInput | Prisma.JadwalUpdateManyWithWhereWithoutDibuatOlehUserInput[]
+  deleteMany?: Prisma.JadwalScalarWhereInput | Prisma.JadwalScalarWhereInput[]
+}
+
+export type JadwalUncheckedUpdateManyWithoutDibuatOlehUserNestedInput = {
+  create?: Prisma.XOR<Prisma.JadwalCreateWithoutDibuatOlehUserInput, Prisma.JadwalUncheckedCreateWithoutDibuatOlehUserInput> | Prisma.JadwalCreateWithoutDibuatOlehUserInput[] | Prisma.JadwalUncheckedCreateWithoutDibuatOlehUserInput[]
+  connectOrCreate?: Prisma.JadwalCreateOrConnectWithoutDibuatOlehUserInput | Prisma.JadwalCreateOrConnectWithoutDibuatOlehUserInput[]
+  upsert?: Prisma.JadwalUpsertWithWhereUniqueWithoutDibuatOlehUserInput | Prisma.JadwalUpsertWithWhereUniqueWithoutDibuatOlehUserInput[]
+  createMany?: Prisma.JadwalCreateManyDibuatOlehUserInputEnvelope
+  set?: Prisma.JadwalWhereUniqueInput | Prisma.JadwalWhereUniqueInput[]
+  disconnect?: Prisma.JadwalWhereUniqueInput | Prisma.JadwalWhereUniqueInput[]
+  delete?: Prisma.JadwalWhereUniqueInput | Prisma.JadwalWhereUniqueInput[]
+  connect?: Prisma.JadwalWhereUniqueInput | Prisma.JadwalWhereUniqueInput[]
+  update?: Prisma.JadwalUpdateWithWhereUniqueWithoutDibuatOlehUserInput | Prisma.JadwalUpdateWithWhereUniqueWithoutDibuatOlehUserInput[]
+  updateMany?: Prisma.JadwalUpdateManyWithWhereWithoutDibuatOlehUserInput | Prisma.JadwalUpdateManyWithWhereWithoutDibuatOlehUserInput[]
+  deleteMany?: Prisma.JadwalScalarWhereInput | Prisma.JadwalScalarWhereInput[]
 }
 
 export type JadwalCreateNestedOneWithoutPresensiInput = {
@@ -463,6 +605,89 @@ export type JadwalUpdateOneRequiredWithoutPresensiNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.JadwalUpdateToOneWithWhereWithoutPresensiInput, Prisma.JadwalUpdateWithoutPresensiInput>, Prisma.JadwalUncheckedUpdateWithoutPresensiInput>
 }
 
+export type JadwalCreateWithoutDibuatOlehUserInput = {
+  id?: string
+  tanggal: Date | string
+  jenisPengajian: string
+  jamMulai: string
+  jamSelesai: string
+  tingkat: string
+  desaId?: string | null
+  kelompokId?: string | null
+  statusBuka?: string
+  slugPublik?: string | null
+  linkPublikAktif?: boolean
+  ditutupPada?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  presensi?: Prisma.PresensiCreateNestedManyWithoutJadwalInput
+}
+
+export type JadwalUncheckedCreateWithoutDibuatOlehUserInput = {
+  id?: string
+  tanggal: Date | string
+  jenisPengajian: string
+  jamMulai: string
+  jamSelesai: string
+  tingkat: string
+  desaId?: string | null
+  kelompokId?: string | null
+  statusBuka?: string
+  slugPublik?: string | null
+  linkPublikAktif?: boolean
+  ditutupPada?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  presensi?: Prisma.PresensiUncheckedCreateNestedManyWithoutJadwalInput
+}
+
+export type JadwalCreateOrConnectWithoutDibuatOlehUserInput = {
+  where: Prisma.JadwalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JadwalCreateWithoutDibuatOlehUserInput, Prisma.JadwalUncheckedCreateWithoutDibuatOlehUserInput>
+}
+
+export type JadwalCreateManyDibuatOlehUserInputEnvelope = {
+  data: Prisma.JadwalCreateManyDibuatOlehUserInput | Prisma.JadwalCreateManyDibuatOlehUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type JadwalUpsertWithWhereUniqueWithoutDibuatOlehUserInput = {
+  where: Prisma.JadwalWhereUniqueInput
+  update: Prisma.XOR<Prisma.JadwalUpdateWithoutDibuatOlehUserInput, Prisma.JadwalUncheckedUpdateWithoutDibuatOlehUserInput>
+  create: Prisma.XOR<Prisma.JadwalCreateWithoutDibuatOlehUserInput, Prisma.JadwalUncheckedCreateWithoutDibuatOlehUserInput>
+}
+
+export type JadwalUpdateWithWhereUniqueWithoutDibuatOlehUserInput = {
+  where: Prisma.JadwalWhereUniqueInput
+  data: Prisma.XOR<Prisma.JadwalUpdateWithoutDibuatOlehUserInput, Prisma.JadwalUncheckedUpdateWithoutDibuatOlehUserInput>
+}
+
+export type JadwalUpdateManyWithWhereWithoutDibuatOlehUserInput = {
+  where: Prisma.JadwalScalarWhereInput
+  data: Prisma.XOR<Prisma.JadwalUpdateManyMutationInput, Prisma.JadwalUncheckedUpdateManyWithoutDibuatOlehUserInput>
+}
+
+export type JadwalScalarWhereInput = {
+  AND?: Prisma.JadwalScalarWhereInput | Prisma.JadwalScalarWhereInput[]
+  OR?: Prisma.JadwalScalarWhereInput[]
+  NOT?: Prisma.JadwalScalarWhereInput | Prisma.JadwalScalarWhereInput[]
+  id?: Prisma.StringFilter<"Jadwal"> | string
+  tanggal?: Prisma.DateTimeFilter<"Jadwal"> | Date | string
+  jenisPengajian?: Prisma.StringFilter<"Jadwal"> | string
+  jamMulai?: Prisma.StringFilter<"Jadwal"> | string
+  jamSelesai?: Prisma.StringFilter<"Jadwal"> | string
+  tingkat?: Prisma.StringFilter<"Jadwal"> | string
+  desaId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
+  kelompokId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
+  statusBuka?: Prisma.StringFilter<"Jadwal"> | string
+  slugPublik?: Prisma.StringNullableFilter<"Jadwal"> | string | null
+  linkPublikAktif?: Prisma.BoolFilter<"Jadwal"> | boolean
+  dibuatOleh?: Prisma.StringNullableFilter<"Jadwal"> | string | null
+  ditutupPada?: Prisma.DateTimeNullableFilter<"Jadwal"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"Jadwal"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Jadwal"> | Date | string
+}
+
 export type JadwalCreateWithoutPresensiInput = {
   id?: string
   tanggal: Date | string
@@ -473,8 +698,12 @@ export type JadwalCreateWithoutPresensiInput = {
   desaId?: string | null
   kelompokId?: string | null
   statusBuka?: string
+  slugPublik?: string | null
+  linkPublikAktif?: boolean
+  ditutupPada?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  dibuatOlehUser?: Prisma.UserCreateNestedOneWithoutJadwalDibuatInput
 }
 
 export type JadwalUncheckedCreateWithoutPresensiInput = {
@@ -487,6 +716,10 @@ export type JadwalUncheckedCreateWithoutPresensiInput = {
   desaId?: string | null
   kelompokId?: string | null
   statusBuka?: string
+  slugPublik?: string | null
+  linkPublikAktif?: boolean
+  dibuatOleh?: string | null
+  ditutupPada?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -517,8 +750,12 @@ export type JadwalUpdateWithoutPresensiInput = {
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
+  slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dibuatOlehUser?: Prisma.UserUpdateOneWithoutJadwalDibuatNestedInput
 }
 
 export type JadwalUncheckedUpdateWithoutPresensiInput = {
@@ -531,6 +768,80 @@ export type JadwalUncheckedUpdateWithoutPresensiInput = {
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
+  slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type JadwalCreateManyDibuatOlehUserInput = {
+  id?: string
+  tanggal: Date | string
+  jenisPengajian: string
+  jamMulai: string
+  jamSelesai: string
+  tingkat: string
+  desaId?: string | null
+  kelompokId?: string | null
+  statusBuka?: string
+  slugPublik?: string | null
+  linkPublikAktif?: boolean
+  ditutupPada?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type JadwalUpdateWithoutDibuatOlehUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jenisPengajian?: Prisma.StringFieldUpdateOperationsInput | string
+  jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
+  jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
+  tingkat?: Prisma.StringFieldUpdateOperationsInput | string
+  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
+  slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  presensi?: Prisma.PresensiUpdateManyWithoutJadwalNestedInput
+}
+
+export type JadwalUncheckedUpdateWithoutDibuatOlehUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jenisPengajian?: Prisma.StringFieldUpdateOperationsInput | string
+  jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
+  jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
+  tingkat?: Prisma.StringFieldUpdateOperationsInput | string
+  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
+  slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  presensi?: Prisma.PresensiUncheckedUpdateManyWithoutJadwalNestedInput
+}
+
+export type JadwalUncheckedUpdateManyWithoutDibuatOlehUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jenisPengajian?: Prisma.StringFieldUpdateOperationsInput | string
+  jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
+  jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
+  tingkat?: Prisma.StringFieldUpdateOperationsInput | string
+  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
+  slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -576,9 +887,14 @@ export type JadwalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   desaId?: boolean
   kelompokId?: boolean
   statusBuka?: boolean
+  slugPublik?: boolean
+  linkPublikAktif?: boolean
+  dibuatOleh?: boolean
+  ditutupPada?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   presensi?: boolean | Prisma.Jadwal$presensiArgs<ExtArgs>
+  dibuatOlehUser?: boolean | Prisma.Jadwal$dibuatOlehUserArgs<ExtArgs>
   _count?: boolean | Prisma.JadwalCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jadwal"]>
 
@@ -592,8 +908,13 @@ export type JadwalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   desaId?: boolean
   kelompokId?: boolean
   statusBuka?: boolean
+  slugPublik?: boolean
+  linkPublikAktif?: boolean
+  dibuatOleh?: boolean
+  ditutupPada?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  dibuatOlehUser?: boolean | Prisma.Jadwal$dibuatOlehUserArgs<ExtArgs>
 }, ExtArgs["result"]["jadwal"]>
 
 export type JadwalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -606,8 +927,13 @@ export type JadwalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   desaId?: boolean
   kelompokId?: boolean
   statusBuka?: boolean
+  slugPublik?: boolean
+  linkPublikAktif?: boolean
+  dibuatOleh?: boolean
+  ditutupPada?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  dibuatOlehUser?: boolean | Prisma.Jadwal$dibuatOlehUserArgs<ExtArgs>
 }, ExtArgs["result"]["jadwal"]>
 
 export type JadwalSelectScalar = {
@@ -620,22 +946,32 @@ export type JadwalSelectScalar = {
   desaId?: boolean
   kelompokId?: boolean
   statusBuka?: boolean
+  slugPublik?: boolean
+  linkPublikAktif?: boolean
+  dibuatOleh?: boolean
+  ditutupPada?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type JadwalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tanggal" | "jenisPengajian" | "jamMulai" | "jamSelesai" | "tingkat" | "desaId" | "kelompokId" | "statusBuka" | "createdAt" | "updatedAt", ExtArgs["result"]["jadwal"]>
+export type JadwalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tanggal" | "jenisPengajian" | "jamMulai" | "jamSelesai" | "tingkat" | "desaId" | "kelompokId" | "statusBuka" | "slugPublik" | "linkPublikAktif" | "dibuatOleh" | "ditutupPada" | "createdAt" | "updatedAt", ExtArgs["result"]["jadwal"]>
 export type JadwalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   presensi?: boolean | Prisma.Jadwal$presensiArgs<ExtArgs>
+  dibuatOlehUser?: boolean | Prisma.Jadwal$dibuatOlehUserArgs<ExtArgs>
   _count?: boolean | Prisma.JadwalCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type JadwalIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type JadwalIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type JadwalIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  dibuatOlehUser?: boolean | Prisma.Jadwal$dibuatOlehUserArgs<ExtArgs>
+}
+export type JadwalIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  dibuatOlehUser?: boolean | Prisma.Jadwal$dibuatOlehUserArgs<ExtArgs>
+}
 
 export type $JadwalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Jadwal"
   objects: {
     presensi: Prisma.$PresensiPayload<ExtArgs>[]
+    dibuatOlehUser: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -647,6 +983,10 @@ export type $JadwalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     desaId: string | null
     kelompokId: string | null
     statusBuka: string
+    slugPublik: string | null
+    linkPublikAktif: boolean
+    dibuatOleh: string | null
+    ditutupPada: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["jadwal"]>
@@ -1044,6 +1384,7 @@ readonly fields: JadwalFieldRefs;
 export interface Prisma__JadwalClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   presensi<T extends Prisma.Jadwal$presensiArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jadwal$presensiArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PresensiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dibuatOlehUser<T extends Prisma.Jadwal$dibuatOlehUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jadwal$dibuatOlehUserArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1082,6 +1423,10 @@ export interface JadwalFieldRefs {
   readonly desaId: Prisma.FieldRef<"Jadwal", 'String'>
   readonly kelompokId: Prisma.FieldRef<"Jadwal", 'String'>
   readonly statusBuka: Prisma.FieldRef<"Jadwal", 'String'>
+  readonly slugPublik: Prisma.FieldRef<"Jadwal", 'String'>
+  readonly linkPublikAktif: Prisma.FieldRef<"Jadwal", 'Boolean'>
+  readonly dibuatOleh: Prisma.FieldRef<"Jadwal", 'String'>
+  readonly ditutupPada: Prisma.FieldRef<"Jadwal", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Jadwal", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Jadwal", 'DateTime'>
 }
@@ -1338,6 +1683,10 @@ export type JadwalCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensio
    */
   data: Prisma.JadwalCreateManyInput | Prisma.JadwalCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JadwalIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1408,6 +1757,10 @@ export type JadwalUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensio
    * Limit how many Jadwals to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JadwalIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1498,6 +1851,25 @@ export type Jadwal$presensiArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.PresensiScalarFieldEnum | Prisma.PresensiScalarFieldEnum[]
+}
+
+/**
+ * Jadwal.dibuatOlehUser
+ */
+export type Jadwal$dibuatOlehUserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

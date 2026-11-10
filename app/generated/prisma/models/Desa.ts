@@ -184,6 +184,7 @@ export type DesaWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Desa"> | Date | string
   kelompok?: Prisma.KelompokListRelationFilter
   jamaah?: Prisma.JamaahListRelationFilter
+  users?: Prisma.UserListRelationFilter
 }
 
 export type DesaOrderByWithRelationInput = {
@@ -194,6 +195,7 @@ export type DesaOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   kelompok?: Prisma.KelompokOrderByRelationAggregateInput
   jamaah?: Prisma.JamaahOrderByRelationAggregateInput
+  users?: Prisma.UserOrderByRelationAggregateInput
 }
 
 export type DesaWhereUniqueInput = Prisma.AtLeast<{
@@ -207,6 +209,7 @@ export type DesaWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Desa"> | Date | string
   kelompok?: Prisma.KelompokListRelationFilter
   jamaah?: Prisma.JamaahListRelationFilter
+  users?: Prisma.UserListRelationFilter
 }, "id" | "nama">
 
 export type DesaOrderByWithAggregationInput = {
@@ -239,6 +242,7 @@ export type DesaCreateInput = {
   updatedAt?: Date | string
   kelompok?: Prisma.KelompokCreateNestedManyWithoutDesaInput
   jamaah?: Prisma.JamaahCreateNestedManyWithoutDesaInput
+  users?: Prisma.UserCreateNestedManyWithoutDesaInput
 }
 
 export type DesaUncheckedCreateInput = {
@@ -249,6 +253,7 @@ export type DesaUncheckedCreateInput = {
   updatedAt?: Date | string
   kelompok?: Prisma.KelompokUncheckedCreateNestedManyWithoutDesaInput
   jamaah?: Prisma.JamaahUncheckedCreateNestedManyWithoutDesaInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDesaInput
 }
 
 export type DesaUpdateInput = {
@@ -259,6 +264,7 @@ export type DesaUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokUpdateManyWithoutDesaNestedInput
   jamaah?: Prisma.JamaahUpdateManyWithoutDesaNestedInput
+  users?: Prisma.UserUpdateManyWithoutDesaNestedInput
 }
 
 export type DesaUncheckedUpdateInput = {
@@ -269,6 +275,7 @@ export type DesaUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokUncheckedUpdateManyWithoutDesaNestedInput
   jamaah?: Prisma.JamaahUncheckedUpdateManyWithoutDesaNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDesaNestedInput
 }
 
 export type DesaCreateManyInput = {
@@ -293,6 +300,11 @@ export type DesaUncheckedUpdateManyInput = {
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type DesaNullableScalarRelationFilter = {
+  is?: Prisma.DesaWhereInput | null
+  isNot?: Prisma.DesaWhereInput | null
 }
 
 export type DesaCountOrderByAggregateInput = {
@@ -324,6 +336,22 @@ export type DesaScalarRelationFilter = {
   isNot?: Prisma.DesaWhereInput
 }
 
+export type DesaCreateNestedOneWithoutUsersInput = {
+  create?: Prisma.XOR<Prisma.DesaCreateWithoutUsersInput, Prisma.DesaUncheckedCreateWithoutUsersInput>
+  connectOrCreate?: Prisma.DesaCreateOrConnectWithoutUsersInput
+  connect?: Prisma.DesaWhereUniqueInput
+}
+
+export type DesaUpdateOneWithoutUsersNestedInput = {
+  create?: Prisma.XOR<Prisma.DesaCreateWithoutUsersInput, Prisma.DesaUncheckedCreateWithoutUsersInput>
+  connectOrCreate?: Prisma.DesaCreateOrConnectWithoutUsersInput
+  upsert?: Prisma.DesaUpsertWithoutUsersInput
+  disconnect?: Prisma.DesaWhereInput | boolean
+  delete?: Prisma.DesaWhereInput | boolean
+  connect?: Prisma.DesaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DesaUpdateToOneWithWhereWithoutUsersInput, Prisma.DesaUpdateWithoutUsersInput>, Prisma.DesaUncheckedUpdateWithoutUsersInput>
+}
+
 export type DesaCreateNestedOneWithoutKelompokInput = {
   create?: Prisma.XOR<Prisma.DesaCreateWithoutKelompokInput, Prisma.DesaUncheckedCreateWithoutKelompokInput>
   connectOrCreate?: Prisma.DesaCreateOrConnectWithoutKelompokInput
@@ -352,6 +380,62 @@ export type DesaUpdateOneRequiredWithoutJamaahNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.DesaUpdateToOneWithWhereWithoutJamaahInput, Prisma.DesaUpdateWithoutJamaahInput>, Prisma.DesaUncheckedUpdateWithoutJamaahInput>
 }
 
+export type DesaCreateWithoutUsersInput = {
+  id?: string
+  nama: string
+  aktif?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  kelompok?: Prisma.KelompokCreateNestedManyWithoutDesaInput
+  jamaah?: Prisma.JamaahCreateNestedManyWithoutDesaInput
+}
+
+export type DesaUncheckedCreateWithoutUsersInput = {
+  id?: string
+  nama: string
+  aktif?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  kelompok?: Prisma.KelompokUncheckedCreateNestedManyWithoutDesaInput
+  jamaah?: Prisma.JamaahUncheckedCreateNestedManyWithoutDesaInput
+}
+
+export type DesaCreateOrConnectWithoutUsersInput = {
+  where: Prisma.DesaWhereUniqueInput
+  create: Prisma.XOR<Prisma.DesaCreateWithoutUsersInput, Prisma.DesaUncheckedCreateWithoutUsersInput>
+}
+
+export type DesaUpsertWithoutUsersInput = {
+  update: Prisma.XOR<Prisma.DesaUpdateWithoutUsersInput, Prisma.DesaUncheckedUpdateWithoutUsersInput>
+  create: Prisma.XOR<Prisma.DesaCreateWithoutUsersInput, Prisma.DesaUncheckedCreateWithoutUsersInput>
+  where?: Prisma.DesaWhereInput
+}
+
+export type DesaUpdateToOneWithWhereWithoutUsersInput = {
+  where?: Prisma.DesaWhereInput
+  data: Prisma.XOR<Prisma.DesaUpdateWithoutUsersInput, Prisma.DesaUncheckedUpdateWithoutUsersInput>
+}
+
+export type DesaUpdateWithoutUsersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kelompok?: Prisma.KelompokUpdateManyWithoutDesaNestedInput
+  jamaah?: Prisma.JamaahUpdateManyWithoutDesaNestedInput
+}
+
+export type DesaUncheckedUpdateWithoutUsersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kelompok?: Prisma.KelompokUncheckedUpdateManyWithoutDesaNestedInput
+  jamaah?: Prisma.JamaahUncheckedUpdateManyWithoutDesaNestedInput
+}
+
 export type DesaCreateWithoutKelompokInput = {
   id?: string
   nama: string
@@ -359,6 +443,7 @@ export type DesaCreateWithoutKelompokInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   jamaah?: Prisma.JamaahCreateNestedManyWithoutDesaInput
+  users?: Prisma.UserCreateNestedManyWithoutDesaInput
 }
 
 export type DesaUncheckedCreateWithoutKelompokInput = {
@@ -368,6 +453,7 @@ export type DesaUncheckedCreateWithoutKelompokInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   jamaah?: Prisma.JamaahUncheckedCreateNestedManyWithoutDesaInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDesaInput
 }
 
 export type DesaCreateOrConnectWithoutKelompokInput = {
@@ -393,6 +479,7 @@ export type DesaUpdateWithoutKelompokInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jamaah?: Prisma.JamaahUpdateManyWithoutDesaNestedInput
+  users?: Prisma.UserUpdateManyWithoutDesaNestedInput
 }
 
 export type DesaUncheckedUpdateWithoutKelompokInput = {
@@ -402,6 +489,7 @@ export type DesaUncheckedUpdateWithoutKelompokInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jamaah?: Prisma.JamaahUncheckedUpdateManyWithoutDesaNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDesaNestedInput
 }
 
 export type DesaCreateWithoutJamaahInput = {
@@ -411,6 +499,7 @@ export type DesaCreateWithoutJamaahInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   kelompok?: Prisma.KelompokCreateNestedManyWithoutDesaInput
+  users?: Prisma.UserCreateNestedManyWithoutDesaInput
 }
 
 export type DesaUncheckedCreateWithoutJamaahInput = {
@@ -420,6 +509,7 @@ export type DesaUncheckedCreateWithoutJamaahInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   kelompok?: Prisma.KelompokUncheckedCreateNestedManyWithoutDesaInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDesaInput
 }
 
 export type DesaCreateOrConnectWithoutJamaahInput = {
@@ -445,6 +535,7 @@ export type DesaUpdateWithoutJamaahInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokUpdateManyWithoutDesaNestedInput
+  users?: Prisma.UserUpdateManyWithoutDesaNestedInput
 }
 
 export type DesaUncheckedUpdateWithoutJamaahInput = {
@@ -454,6 +545,7 @@ export type DesaUncheckedUpdateWithoutJamaahInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokUncheckedUpdateManyWithoutDesaNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDesaNestedInput
 }
 
 
@@ -464,11 +556,13 @@ export type DesaUncheckedUpdateWithoutJamaahInput = {
 export type DesaCountOutputType = {
   kelompok: number
   jamaah: number
+  users: number
 }
 
 export type DesaCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   kelompok?: boolean | DesaCountOutputTypeCountKelompokArgs
   jamaah?: boolean | DesaCountOutputTypeCountJamaahArgs
+  users?: boolean | DesaCountOutputTypeCountUsersArgs
 }
 
 /**
@@ -495,6 +589,13 @@ export type DesaCountOutputTypeCountJamaahArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.JamaahWhereInput
 }
 
+/**
+ * DesaCountOutputType without action
+ */
+export type DesaCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserWhereInput
+}
+
 
 export type DesaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -504,6 +605,7 @@ export type DesaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   kelompok?: boolean | Prisma.Desa$kelompokArgs<ExtArgs>
   jamaah?: boolean | Prisma.Desa$jamaahArgs<ExtArgs>
+  users?: boolean | Prisma.Desa$usersArgs<ExtArgs>
   _count?: boolean | Prisma.DesaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["desa"]>
 
@@ -535,6 +637,7 @@ export type DesaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type DesaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   kelompok?: boolean | Prisma.Desa$kelompokArgs<ExtArgs>
   jamaah?: boolean | Prisma.Desa$jamaahArgs<ExtArgs>
+  users?: boolean | Prisma.Desa$usersArgs<ExtArgs>
   _count?: boolean | Prisma.DesaCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DesaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -545,6 +648,7 @@ export type $DesaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     kelompok: Prisma.$KelompokPayload<ExtArgs>[]
     jamaah: Prisma.$JamaahPayload<ExtArgs>[]
+    users: Prisma.$UserPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -948,6 +1052,7 @@ export interface Prisma__DesaClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   kelompok<T extends Prisma.Desa$kelompokArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Desa$kelompokArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KelompokPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   jamaah<T extends Prisma.Desa$jamaahArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Desa$jamaahArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JamaahPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  users<T extends Prisma.Desa$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Desa$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1420,6 +1525,30 @@ export type Desa$jamaahArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.JamaahScalarFieldEnum | Prisma.JamaahScalarFieldEnum[]
+}
+
+/**
+ * Desa.users
+ */
+export type Desa$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
+  cursor?: Prisma.UserWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
 }
 
 /**

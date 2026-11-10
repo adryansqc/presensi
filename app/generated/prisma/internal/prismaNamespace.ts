@@ -1406,6 +1406,10 @@ export const JadwalScalarFieldEnum = {
   desaId: 'desaId',
   kelompokId: 'kelompokId',
   statusBuka: 'statusBuka',
+  slugPublik: 'slugPublik',
+  linkPublikAktif: 'linkPublikAktif',
+  dibuatOleh: 'dibuatOleh',
+  ditutupPada: 'ditutupPada',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1423,6 +1427,9 @@ export const PresensiScalarFieldEnum = {
   kelompokId: 'kelompokId',
   status: 'status',
   keterangan: 'keterangan',
+  sumber: 'sumber',
+  dicatatOleh: 'dicatatOleh',
+  lintasKelompok: 'lintasKelompok',
   createdAt: 'createdAt'
 } as const
 

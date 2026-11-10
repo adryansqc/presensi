@@ -34,6 +34,9 @@ export type PresensiMinAggregateOutputType = {
   kelompokId: string | null
   status: string | null
   keterangan: string | null
+  sumber: string | null
+  dicatatOleh: string | null
+  lintasKelompok: boolean | null
   createdAt: Date | null
 }
 
@@ -47,6 +50,9 @@ export type PresensiMaxAggregateOutputType = {
   kelompokId: string | null
   status: string | null
   keterangan: string | null
+  sumber: string | null
+  dicatatOleh: string | null
+  lintasKelompok: boolean | null
   createdAt: Date | null
 }
 
@@ -60,6 +66,9 @@ export type PresensiCountAggregateOutputType = {
   kelompokId: number
   status: number
   keterangan: number
+  sumber: number
+  dicatatOleh: number
+  lintasKelompok: number
   createdAt: number
   _all: number
 }
@@ -75,6 +84,9 @@ export type PresensiMinAggregateInputType = {
   kelompokId?: true
   status?: true
   keterangan?: true
+  sumber?: true
+  dicatatOleh?: true
+  lintasKelompok?: true
   createdAt?: true
 }
 
@@ -88,6 +100,9 @@ export type PresensiMaxAggregateInputType = {
   kelompokId?: true
   status?: true
   keterangan?: true
+  sumber?: true
+  dicatatOleh?: true
+  lintasKelompok?: true
   createdAt?: true
 }
 
@@ -101,6 +116,9 @@ export type PresensiCountAggregateInputType = {
   kelompokId?: true
   status?: true
   keterangan?: true
+  sumber?: true
+  dicatatOleh?: true
+  lintasKelompok?: true
   createdAt?: true
   _all?: true
 }
@@ -187,6 +205,9 @@ export type PresensiGroupByOutputType = {
   kelompokId: string
   status: string
   keterangan: string | null
+  sumber: string
+  dicatatOleh: string | null
+  lintasKelompok: boolean
   createdAt: Date
   _count: PresensiCountAggregateOutputType | null
   _min: PresensiMinAggregateOutputType | null
@@ -221,10 +242,14 @@ export type PresensiWhereInput = {
   kelompokId?: Prisma.StringFilter<"Presensi"> | string
   status?: Prisma.StringFilter<"Presensi"> | string
   keterangan?: Prisma.StringNullableFilter<"Presensi"> | string | null
+  sumber?: Prisma.StringFilter<"Presensi"> | string
+  dicatatOleh?: Prisma.StringNullableFilter<"Presensi"> | string | null
+  lintasKelompok?: Prisma.BoolFilter<"Presensi"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Presensi"> | Date | string
   jadwal?: Prisma.XOR<Prisma.JadwalScalarRelationFilter, Prisma.JadwalWhereInput>
   jamaah?: Prisma.XOR<Prisma.JamaahNullableScalarRelationFilter, Prisma.JamaahWhereInput> | null
   kategori?: Prisma.XOR<Prisma.KategoriScalarRelationFilter, Prisma.KategoriWhereInput>
+  dicatatOlehUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type PresensiOrderByWithRelationInput = {
@@ -237,10 +262,14 @@ export type PresensiOrderByWithRelationInput = {
   kelompokId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
+  sumber?: Prisma.SortOrder
+  dicatatOleh?: Prisma.SortOrderInput | Prisma.SortOrder
+  lintasKelompok?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   jadwal?: Prisma.JadwalOrderByWithRelationInput
   jamaah?: Prisma.JamaahOrderByWithRelationInput
   kategori?: Prisma.KategoriOrderByWithRelationInput
+  dicatatOlehUser?: Prisma.UserOrderByWithRelationInput
 }
 
 export type PresensiWhereUniqueInput = Prisma.AtLeast<{
@@ -256,10 +285,14 @@ export type PresensiWhereUniqueInput = Prisma.AtLeast<{
   kelompokId?: Prisma.StringFilter<"Presensi"> | string
   status?: Prisma.StringFilter<"Presensi"> | string
   keterangan?: Prisma.StringNullableFilter<"Presensi"> | string | null
+  sumber?: Prisma.StringFilter<"Presensi"> | string
+  dicatatOleh?: Prisma.StringNullableFilter<"Presensi"> | string | null
+  lintasKelompok?: Prisma.BoolFilter<"Presensi"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Presensi"> | Date | string
   jadwal?: Prisma.XOR<Prisma.JadwalScalarRelationFilter, Prisma.JadwalWhereInput>
   jamaah?: Prisma.XOR<Prisma.JamaahNullableScalarRelationFilter, Prisma.JamaahWhereInput> | null
   kategori?: Prisma.XOR<Prisma.KategoriScalarRelationFilter, Prisma.KategoriWhereInput>
+  dicatatOlehUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
 export type PresensiOrderByWithAggregationInput = {
@@ -272,6 +305,9 @@ export type PresensiOrderByWithAggregationInput = {
   kelompokId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
+  sumber?: Prisma.SortOrder
+  dicatatOleh?: Prisma.SortOrderInput | Prisma.SortOrder
+  lintasKelompok?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.PresensiCountOrderByAggregateInput
   _max?: Prisma.PresensiMaxOrderByAggregateInput
@@ -291,6 +327,9 @@ export type PresensiScalarWhereWithAggregatesInput = {
   kelompokId?: Prisma.StringWithAggregatesFilter<"Presensi"> | string
   status?: Prisma.StringWithAggregatesFilter<"Presensi"> | string
   keterangan?: Prisma.StringNullableWithAggregatesFilter<"Presensi"> | string | null
+  sumber?: Prisma.StringWithAggregatesFilter<"Presensi"> | string
+  dicatatOleh?: Prisma.StringNullableWithAggregatesFilter<"Presensi"> | string | null
+  lintasKelompok?: Prisma.BoolWithAggregatesFilter<"Presensi"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Presensi"> | Date | string
 }
 
@@ -301,10 +340,13 @@ export type PresensiCreateInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  lintasKelompok?: boolean
   createdAt?: Date | string
   jadwal: Prisma.JadwalCreateNestedOneWithoutPresensiInput
   jamaah?: Prisma.JamaahCreateNestedOneWithoutPresensiInput
   kategori: Prisma.KategoriCreateNestedOneWithoutPresensiInput
+  dicatatOlehUser?: Prisma.UserCreateNestedOneWithoutPresensiDicatatInput
 }
 
 export type PresensiUncheckedCreateInput = {
@@ -317,6 +359,9 @@ export type PresensiUncheckedCreateInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  dicatatOleh?: string | null
+  lintasKelompok?: boolean
   createdAt?: Date | string
 }
 
@@ -327,10 +372,13 @@ export type PresensiUpdateInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jadwal?: Prisma.JadwalUpdateOneRequiredWithoutPresensiNestedInput
   jamaah?: Prisma.JamaahUpdateOneWithoutPresensiNestedInput
   kategori?: Prisma.KategoriUpdateOneRequiredWithoutPresensiNestedInput
+  dicatatOlehUser?: Prisma.UserUpdateOneWithoutPresensiDicatatNestedInput
 }
 
 export type PresensiUncheckedUpdateInput = {
@@ -343,6 +391,9 @@ export type PresensiUncheckedUpdateInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  dicatatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -356,6 +407,9 @@ export type PresensiCreateManyInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  dicatatOleh?: string | null
+  lintasKelompok?: boolean
   createdAt?: Date | string
 }
 
@@ -366,6 +420,8 @@ export type PresensiUpdateManyMutationInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -379,6 +435,9 @@ export type PresensiUncheckedUpdateManyInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  dicatatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -402,6 +461,9 @@ export type PresensiCountOrderByAggregateInput = {
   kelompokId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
+  sumber?: Prisma.SortOrder
+  dicatatOleh?: Prisma.SortOrder
+  lintasKelompok?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -415,6 +477,9 @@ export type PresensiMaxOrderByAggregateInput = {
   kelompokId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
+  sumber?: Prisma.SortOrder
+  dicatatOleh?: Prisma.SortOrder
+  lintasKelompok?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -428,7 +493,52 @@ export type PresensiMinOrderByAggregateInput = {
   kelompokId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
+  sumber?: Prisma.SortOrder
+  dicatatOleh?: Prisma.SortOrder
+  lintasKelompok?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type PresensiCreateNestedManyWithoutDicatatOlehUserInput = {
+  create?: Prisma.XOR<Prisma.PresensiCreateWithoutDicatatOlehUserInput, Prisma.PresensiUncheckedCreateWithoutDicatatOlehUserInput> | Prisma.PresensiCreateWithoutDicatatOlehUserInput[] | Prisma.PresensiUncheckedCreateWithoutDicatatOlehUserInput[]
+  connectOrCreate?: Prisma.PresensiCreateOrConnectWithoutDicatatOlehUserInput | Prisma.PresensiCreateOrConnectWithoutDicatatOlehUserInput[]
+  createMany?: Prisma.PresensiCreateManyDicatatOlehUserInputEnvelope
+  connect?: Prisma.PresensiWhereUniqueInput | Prisma.PresensiWhereUniqueInput[]
+}
+
+export type PresensiUncheckedCreateNestedManyWithoutDicatatOlehUserInput = {
+  create?: Prisma.XOR<Prisma.PresensiCreateWithoutDicatatOlehUserInput, Prisma.PresensiUncheckedCreateWithoutDicatatOlehUserInput> | Prisma.PresensiCreateWithoutDicatatOlehUserInput[] | Prisma.PresensiUncheckedCreateWithoutDicatatOlehUserInput[]
+  connectOrCreate?: Prisma.PresensiCreateOrConnectWithoutDicatatOlehUserInput | Prisma.PresensiCreateOrConnectWithoutDicatatOlehUserInput[]
+  createMany?: Prisma.PresensiCreateManyDicatatOlehUserInputEnvelope
+  connect?: Prisma.PresensiWhereUniqueInput | Prisma.PresensiWhereUniqueInput[]
+}
+
+export type PresensiUpdateManyWithoutDicatatOlehUserNestedInput = {
+  create?: Prisma.XOR<Prisma.PresensiCreateWithoutDicatatOlehUserInput, Prisma.PresensiUncheckedCreateWithoutDicatatOlehUserInput> | Prisma.PresensiCreateWithoutDicatatOlehUserInput[] | Prisma.PresensiUncheckedCreateWithoutDicatatOlehUserInput[]
+  connectOrCreate?: Prisma.PresensiCreateOrConnectWithoutDicatatOlehUserInput | Prisma.PresensiCreateOrConnectWithoutDicatatOlehUserInput[]
+  upsert?: Prisma.PresensiUpsertWithWhereUniqueWithoutDicatatOlehUserInput | Prisma.PresensiUpsertWithWhereUniqueWithoutDicatatOlehUserInput[]
+  createMany?: Prisma.PresensiCreateManyDicatatOlehUserInputEnvelope
+  set?: Prisma.PresensiWhereUniqueInput | Prisma.PresensiWhereUniqueInput[]
+  disconnect?: Prisma.PresensiWhereUniqueInput | Prisma.PresensiWhereUniqueInput[]
+  delete?: Prisma.PresensiWhereUniqueInput | Prisma.PresensiWhereUniqueInput[]
+  connect?: Prisma.PresensiWhereUniqueInput | Prisma.PresensiWhereUniqueInput[]
+  update?: Prisma.PresensiUpdateWithWhereUniqueWithoutDicatatOlehUserInput | Prisma.PresensiUpdateWithWhereUniqueWithoutDicatatOlehUserInput[]
+  updateMany?: Prisma.PresensiUpdateManyWithWhereWithoutDicatatOlehUserInput | Prisma.PresensiUpdateManyWithWhereWithoutDicatatOlehUserInput[]
+  deleteMany?: Prisma.PresensiScalarWhereInput | Prisma.PresensiScalarWhereInput[]
+}
+
+export type PresensiUncheckedUpdateManyWithoutDicatatOlehUserNestedInput = {
+  create?: Prisma.XOR<Prisma.PresensiCreateWithoutDicatatOlehUserInput, Prisma.PresensiUncheckedCreateWithoutDicatatOlehUserInput> | Prisma.PresensiCreateWithoutDicatatOlehUserInput[] | Prisma.PresensiUncheckedCreateWithoutDicatatOlehUserInput[]
+  connectOrCreate?: Prisma.PresensiCreateOrConnectWithoutDicatatOlehUserInput | Prisma.PresensiCreateOrConnectWithoutDicatatOlehUserInput[]
+  upsert?: Prisma.PresensiUpsertWithWhereUniqueWithoutDicatatOlehUserInput | Prisma.PresensiUpsertWithWhereUniqueWithoutDicatatOlehUserInput[]
+  createMany?: Prisma.PresensiCreateManyDicatatOlehUserInputEnvelope
+  set?: Prisma.PresensiWhereUniqueInput | Prisma.PresensiWhereUniqueInput[]
+  disconnect?: Prisma.PresensiWhereUniqueInput | Prisma.PresensiWhereUniqueInput[]
+  delete?: Prisma.PresensiWhereUniqueInput | Prisma.PresensiWhereUniqueInput[]
+  connect?: Prisma.PresensiWhereUniqueInput | Prisma.PresensiWhereUniqueInput[]
+  update?: Prisma.PresensiUpdateWithWhereUniqueWithoutDicatatOlehUserInput | Prisma.PresensiUpdateWithWhereUniqueWithoutDicatatOlehUserInput[]
+  updateMany?: Prisma.PresensiUpdateManyWithWhereWithoutDicatatOlehUserInput | Prisma.PresensiUpdateManyWithWhereWithoutDicatatOlehUserInput[]
+  deleteMany?: Prisma.PresensiScalarWhereInput | Prisma.PresensiScalarWhereInput[]
 }
 
 export type PresensiCreateNestedManyWithoutKategoriInput = {
@@ -557,6 +667,81 @@ export type PresensiUncheckedUpdateManyWithoutJadwalNestedInput = {
   deleteMany?: Prisma.PresensiScalarWhereInput | Prisma.PresensiScalarWhereInput[]
 }
 
+export type PresensiCreateWithoutDicatatOlehUserInput = {
+  id?: string
+  namaJamaah: string
+  desaId: string
+  kelompokId: string
+  status: string
+  keterangan?: string | null
+  sumber?: string
+  lintasKelompok?: boolean
+  createdAt?: Date | string
+  jadwal: Prisma.JadwalCreateNestedOneWithoutPresensiInput
+  jamaah?: Prisma.JamaahCreateNestedOneWithoutPresensiInput
+  kategori: Prisma.KategoriCreateNestedOneWithoutPresensiInput
+}
+
+export type PresensiUncheckedCreateWithoutDicatatOlehUserInput = {
+  id?: string
+  jadwalId: string
+  jamaahId?: string | null
+  namaJamaah: string
+  kategoriId: string
+  desaId: string
+  kelompokId: string
+  status: string
+  keterangan?: string | null
+  sumber?: string
+  lintasKelompok?: boolean
+  createdAt?: Date | string
+}
+
+export type PresensiCreateOrConnectWithoutDicatatOlehUserInput = {
+  where: Prisma.PresensiWhereUniqueInput
+  create: Prisma.XOR<Prisma.PresensiCreateWithoutDicatatOlehUserInput, Prisma.PresensiUncheckedCreateWithoutDicatatOlehUserInput>
+}
+
+export type PresensiCreateManyDicatatOlehUserInputEnvelope = {
+  data: Prisma.PresensiCreateManyDicatatOlehUserInput | Prisma.PresensiCreateManyDicatatOlehUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type PresensiUpsertWithWhereUniqueWithoutDicatatOlehUserInput = {
+  where: Prisma.PresensiWhereUniqueInput
+  update: Prisma.XOR<Prisma.PresensiUpdateWithoutDicatatOlehUserInput, Prisma.PresensiUncheckedUpdateWithoutDicatatOlehUserInput>
+  create: Prisma.XOR<Prisma.PresensiCreateWithoutDicatatOlehUserInput, Prisma.PresensiUncheckedCreateWithoutDicatatOlehUserInput>
+}
+
+export type PresensiUpdateWithWhereUniqueWithoutDicatatOlehUserInput = {
+  where: Prisma.PresensiWhereUniqueInput
+  data: Prisma.XOR<Prisma.PresensiUpdateWithoutDicatatOlehUserInput, Prisma.PresensiUncheckedUpdateWithoutDicatatOlehUserInput>
+}
+
+export type PresensiUpdateManyWithWhereWithoutDicatatOlehUserInput = {
+  where: Prisma.PresensiScalarWhereInput
+  data: Prisma.XOR<Prisma.PresensiUpdateManyMutationInput, Prisma.PresensiUncheckedUpdateManyWithoutDicatatOlehUserInput>
+}
+
+export type PresensiScalarWhereInput = {
+  AND?: Prisma.PresensiScalarWhereInput | Prisma.PresensiScalarWhereInput[]
+  OR?: Prisma.PresensiScalarWhereInput[]
+  NOT?: Prisma.PresensiScalarWhereInput | Prisma.PresensiScalarWhereInput[]
+  id?: Prisma.StringFilter<"Presensi"> | string
+  jadwalId?: Prisma.StringFilter<"Presensi"> | string
+  jamaahId?: Prisma.StringNullableFilter<"Presensi"> | string | null
+  namaJamaah?: Prisma.StringFilter<"Presensi"> | string
+  kategoriId?: Prisma.StringFilter<"Presensi"> | string
+  desaId?: Prisma.StringFilter<"Presensi"> | string
+  kelompokId?: Prisma.StringFilter<"Presensi"> | string
+  status?: Prisma.StringFilter<"Presensi"> | string
+  keterangan?: Prisma.StringNullableFilter<"Presensi"> | string | null
+  sumber?: Prisma.StringFilter<"Presensi"> | string
+  dicatatOleh?: Prisma.StringNullableFilter<"Presensi"> | string | null
+  lintasKelompok?: Prisma.BoolFilter<"Presensi"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"Presensi"> | Date | string
+}
+
 export type PresensiCreateWithoutKategoriInput = {
   id?: string
   namaJamaah: string
@@ -564,9 +749,12 @@ export type PresensiCreateWithoutKategoriInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  lintasKelompok?: boolean
   createdAt?: Date | string
   jadwal: Prisma.JadwalCreateNestedOneWithoutPresensiInput
   jamaah?: Prisma.JamaahCreateNestedOneWithoutPresensiInput
+  dicatatOlehUser?: Prisma.UserCreateNestedOneWithoutPresensiDicatatInput
 }
 
 export type PresensiUncheckedCreateWithoutKategoriInput = {
@@ -578,6 +766,9 @@ export type PresensiUncheckedCreateWithoutKategoriInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  dicatatOleh?: string | null
+  lintasKelompok?: boolean
   createdAt?: Date | string
 }
 
@@ -607,22 +798,6 @@ export type PresensiUpdateManyWithWhereWithoutKategoriInput = {
   data: Prisma.XOR<Prisma.PresensiUpdateManyMutationInput, Prisma.PresensiUncheckedUpdateManyWithoutKategoriInput>
 }
 
-export type PresensiScalarWhereInput = {
-  AND?: Prisma.PresensiScalarWhereInput | Prisma.PresensiScalarWhereInput[]
-  OR?: Prisma.PresensiScalarWhereInput[]
-  NOT?: Prisma.PresensiScalarWhereInput | Prisma.PresensiScalarWhereInput[]
-  id?: Prisma.StringFilter<"Presensi"> | string
-  jadwalId?: Prisma.StringFilter<"Presensi"> | string
-  jamaahId?: Prisma.StringNullableFilter<"Presensi"> | string | null
-  namaJamaah?: Prisma.StringFilter<"Presensi"> | string
-  kategoriId?: Prisma.StringFilter<"Presensi"> | string
-  desaId?: Prisma.StringFilter<"Presensi"> | string
-  kelompokId?: Prisma.StringFilter<"Presensi"> | string
-  status?: Prisma.StringFilter<"Presensi"> | string
-  keterangan?: Prisma.StringNullableFilter<"Presensi"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"Presensi"> | Date | string
-}
-
 export type PresensiCreateWithoutJamaahInput = {
   id?: string
   namaJamaah: string
@@ -630,9 +805,12 @@ export type PresensiCreateWithoutJamaahInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  lintasKelompok?: boolean
   createdAt?: Date | string
   jadwal: Prisma.JadwalCreateNestedOneWithoutPresensiInput
   kategori: Prisma.KategoriCreateNestedOneWithoutPresensiInput
+  dicatatOlehUser?: Prisma.UserCreateNestedOneWithoutPresensiDicatatInput
 }
 
 export type PresensiUncheckedCreateWithoutJamaahInput = {
@@ -644,6 +822,9 @@ export type PresensiUncheckedCreateWithoutJamaahInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  dicatatOleh?: string | null
+  lintasKelompok?: boolean
   createdAt?: Date | string
 }
 
@@ -680,9 +861,12 @@ export type PresensiCreateWithoutJadwalInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  lintasKelompok?: boolean
   createdAt?: Date | string
   jamaah?: Prisma.JamaahCreateNestedOneWithoutPresensiInput
   kategori: Prisma.KategoriCreateNestedOneWithoutPresensiInput
+  dicatatOlehUser?: Prisma.UserCreateNestedOneWithoutPresensiDicatatInput
 }
 
 export type PresensiUncheckedCreateWithoutJadwalInput = {
@@ -694,6 +878,9 @@ export type PresensiUncheckedCreateWithoutJadwalInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  dicatatOleh?: string | null
+  lintasKelompok?: boolean
   createdAt?: Date | string
 }
 
@@ -723,6 +910,66 @@ export type PresensiUpdateManyWithWhereWithoutJadwalInput = {
   data: Prisma.XOR<Prisma.PresensiUpdateManyMutationInput, Prisma.PresensiUncheckedUpdateManyWithoutJadwalInput>
 }
 
+export type PresensiCreateManyDicatatOlehUserInput = {
+  id?: string
+  jadwalId: string
+  jamaahId?: string | null
+  namaJamaah: string
+  kategoriId: string
+  desaId: string
+  kelompokId: string
+  status: string
+  keterangan?: string | null
+  sumber?: string
+  lintasKelompok?: boolean
+  createdAt?: Date | string
+}
+
+export type PresensiUpdateWithoutDicatatOlehUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaJamaah?: Prisma.StringFieldUpdateOperationsInput | string
+  desaId?: Prisma.StringFieldUpdateOperationsInput | string
+  kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jadwal?: Prisma.JadwalUpdateOneRequiredWithoutPresensiNestedInput
+  jamaah?: Prisma.JamaahUpdateOneWithoutPresensiNestedInput
+  kategori?: Prisma.KategoriUpdateOneRequiredWithoutPresensiNestedInput
+}
+
+export type PresensiUncheckedUpdateWithoutDicatatOlehUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jadwalId?: Prisma.StringFieldUpdateOperationsInput | string
+  jamaahId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaJamaah?: Prisma.StringFieldUpdateOperationsInput | string
+  kategoriId?: Prisma.StringFieldUpdateOperationsInput | string
+  desaId?: Prisma.StringFieldUpdateOperationsInput | string
+  kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PresensiUncheckedUpdateManyWithoutDicatatOlehUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jadwalId?: Prisma.StringFieldUpdateOperationsInput | string
+  jamaahId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaJamaah?: Prisma.StringFieldUpdateOperationsInput | string
+  kategoriId?: Prisma.StringFieldUpdateOperationsInput | string
+  desaId?: Prisma.StringFieldUpdateOperationsInput | string
+  kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type PresensiCreateManyKategoriInput = {
   id?: string
   jadwalId: string
@@ -732,6 +979,9 @@ export type PresensiCreateManyKategoriInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  dicatatOleh?: string | null
+  lintasKelompok?: boolean
   createdAt?: Date | string
 }
 
@@ -742,9 +992,12 @@ export type PresensiUpdateWithoutKategoriInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jadwal?: Prisma.JadwalUpdateOneRequiredWithoutPresensiNestedInput
   jamaah?: Prisma.JamaahUpdateOneWithoutPresensiNestedInput
+  dicatatOlehUser?: Prisma.UserUpdateOneWithoutPresensiDicatatNestedInput
 }
 
 export type PresensiUncheckedUpdateWithoutKategoriInput = {
@@ -756,6 +1009,9 @@ export type PresensiUncheckedUpdateWithoutKategoriInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  dicatatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -768,6 +1024,9 @@ export type PresensiUncheckedUpdateManyWithoutKategoriInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  dicatatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -780,6 +1039,9 @@ export type PresensiCreateManyJamaahInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  dicatatOleh?: string | null
+  lintasKelompok?: boolean
   createdAt?: Date | string
 }
 
@@ -790,9 +1052,12 @@ export type PresensiUpdateWithoutJamaahInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jadwal?: Prisma.JadwalUpdateOneRequiredWithoutPresensiNestedInput
   kategori?: Prisma.KategoriUpdateOneRequiredWithoutPresensiNestedInput
+  dicatatOlehUser?: Prisma.UserUpdateOneWithoutPresensiDicatatNestedInput
 }
 
 export type PresensiUncheckedUpdateWithoutJamaahInput = {
@@ -804,6 +1069,9 @@ export type PresensiUncheckedUpdateWithoutJamaahInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  dicatatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -816,6 +1084,9 @@ export type PresensiUncheckedUpdateManyWithoutJamaahInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  dicatatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -828,6 +1099,9 @@ export type PresensiCreateManyJadwalInput = {
   kelompokId: string
   status: string
   keterangan?: string | null
+  sumber?: string
+  dicatatOleh?: string | null
+  lintasKelompok?: boolean
   createdAt?: Date | string
 }
 
@@ -838,9 +1112,12 @@ export type PresensiUpdateWithoutJadwalInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jamaah?: Prisma.JamaahUpdateOneWithoutPresensiNestedInput
   kategori?: Prisma.KategoriUpdateOneRequiredWithoutPresensiNestedInput
+  dicatatOlehUser?: Prisma.UserUpdateOneWithoutPresensiDicatatNestedInput
 }
 
 export type PresensiUncheckedUpdateWithoutJadwalInput = {
@@ -852,6 +1129,9 @@ export type PresensiUncheckedUpdateWithoutJadwalInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  dicatatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -864,6 +1144,9 @@ export type PresensiUncheckedUpdateManyWithoutJadwalInput = {
   kelompokId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.StringFieldUpdateOperationsInput | string
+  dicatatOleh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lintasKelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -879,10 +1162,14 @@ export type PresensiSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   kelompokId?: boolean
   status?: boolean
   keterangan?: boolean
+  sumber?: boolean
+  dicatatOleh?: boolean
+  lintasKelompok?: boolean
   createdAt?: boolean
   jadwal?: boolean | Prisma.JadwalDefaultArgs<ExtArgs>
   jamaah?: boolean | Prisma.Presensi$jamaahArgs<ExtArgs>
   kategori?: boolean | Prisma.KategoriDefaultArgs<ExtArgs>
+  dicatatOlehUser?: boolean | Prisma.Presensi$dicatatOlehUserArgs<ExtArgs>
 }, ExtArgs["result"]["presensi"]>
 
 export type PresensiSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -895,10 +1182,14 @@ export type PresensiSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   kelompokId?: boolean
   status?: boolean
   keterangan?: boolean
+  sumber?: boolean
+  dicatatOleh?: boolean
+  lintasKelompok?: boolean
   createdAt?: boolean
   jadwal?: boolean | Prisma.JadwalDefaultArgs<ExtArgs>
   jamaah?: boolean | Prisma.Presensi$jamaahArgs<ExtArgs>
   kategori?: boolean | Prisma.KategoriDefaultArgs<ExtArgs>
+  dicatatOlehUser?: boolean | Prisma.Presensi$dicatatOlehUserArgs<ExtArgs>
 }, ExtArgs["result"]["presensi"]>
 
 export type PresensiSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -911,10 +1202,14 @@ export type PresensiSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   kelompokId?: boolean
   status?: boolean
   keterangan?: boolean
+  sumber?: boolean
+  dicatatOleh?: boolean
+  lintasKelompok?: boolean
   createdAt?: boolean
   jadwal?: boolean | Prisma.JadwalDefaultArgs<ExtArgs>
   jamaah?: boolean | Prisma.Presensi$jamaahArgs<ExtArgs>
   kategori?: boolean | Prisma.KategoriDefaultArgs<ExtArgs>
+  dicatatOlehUser?: boolean | Prisma.Presensi$dicatatOlehUserArgs<ExtArgs>
 }, ExtArgs["result"]["presensi"]>
 
 export type PresensiSelectScalar = {
@@ -927,24 +1222,30 @@ export type PresensiSelectScalar = {
   kelompokId?: boolean
   status?: boolean
   keterangan?: boolean
+  sumber?: boolean
+  dicatatOleh?: boolean
+  lintasKelompok?: boolean
   createdAt?: boolean
 }
 
-export type PresensiOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jadwalId" | "jamaahId" | "namaJamaah" | "kategoriId" | "desaId" | "kelompokId" | "status" | "keterangan" | "createdAt", ExtArgs["result"]["presensi"]>
+export type PresensiOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jadwalId" | "jamaahId" | "namaJamaah" | "kategoriId" | "desaId" | "kelompokId" | "status" | "keterangan" | "sumber" | "dicatatOleh" | "lintasKelompok" | "createdAt", ExtArgs["result"]["presensi"]>
 export type PresensiInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jadwal?: boolean | Prisma.JadwalDefaultArgs<ExtArgs>
   jamaah?: boolean | Prisma.Presensi$jamaahArgs<ExtArgs>
   kategori?: boolean | Prisma.KategoriDefaultArgs<ExtArgs>
+  dicatatOlehUser?: boolean | Prisma.Presensi$dicatatOlehUserArgs<ExtArgs>
 }
 export type PresensiIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jadwal?: boolean | Prisma.JadwalDefaultArgs<ExtArgs>
   jamaah?: boolean | Prisma.Presensi$jamaahArgs<ExtArgs>
   kategori?: boolean | Prisma.KategoriDefaultArgs<ExtArgs>
+  dicatatOlehUser?: boolean | Prisma.Presensi$dicatatOlehUserArgs<ExtArgs>
 }
 export type PresensiIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jadwal?: boolean | Prisma.JadwalDefaultArgs<ExtArgs>
   jamaah?: boolean | Prisma.Presensi$jamaahArgs<ExtArgs>
   kategori?: boolean | Prisma.KategoriDefaultArgs<ExtArgs>
+  dicatatOlehUser?: boolean | Prisma.Presensi$dicatatOlehUserArgs<ExtArgs>
 }
 
 export type $PresensiPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -953,6 +1254,7 @@ export type $PresensiPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     jadwal: Prisma.$JadwalPayload<ExtArgs>
     jamaah: Prisma.$JamaahPayload<ExtArgs> | null
     kategori: Prisma.$KategoriPayload<ExtArgs>
+    dicatatOlehUser: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -964,6 +1266,9 @@ export type $PresensiPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     kelompokId: string
     status: string
     keterangan: string | null
+    sumber: string
+    dicatatOleh: string | null
+    lintasKelompok: boolean
     createdAt: Date
   }, ExtArgs["result"]["presensi"]>
   composites: {}
@@ -1362,6 +1667,7 @@ export interface Prisma__PresensiClient<T, Null = never, ExtArgs extends runtime
   jadwal<T extends Prisma.JadwalDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JadwalDefaultArgs<ExtArgs>>): Prisma.Prisma__JadwalClient<runtime.Types.Result.GetResult<Prisma.$JadwalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   jamaah<T extends Prisma.Presensi$jamaahArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Presensi$jamaahArgs<ExtArgs>>): Prisma.Prisma__JamaahClient<runtime.Types.Result.GetResult<Prisma.$JamaahPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   kategori<T extends Prisma.KategoriDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KategoriDefaultArgs<ExtArgs>>): Prisma.Prisma__KategoriClient<runtime.Types.Result.GetResult<Prisma.$KategoriPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  dicatatOlehUser<T extends Prisma.Presensi$dicatatOlehUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Presensi$dicatatOlehUserArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1400,6 +1706,9 @@ export interface PresensiFieldRefs {
   readonly kelompokId: Prisma.FieldRef<"Presensi", 'String'>
   readonly status: Prisma.FieldRef<"Presensi", 'String'>
   readonly keterangan: Prisma.FieldRef<"Presensi", 'String'>
+  readonly sumber: Prisma.FieldRef<"Presensi", 'String'>
+  readonly dicatatOleh: Prisma.FieldRef<"Presensi", 'String'>
+  readonly lintasKelompok: Prisma.FieldRef<"Presensi", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Presensi", 'DateTime'>
 }
     
@@ -1818,6 +2127,25 @@ export type Presensi$jamaahArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.JamaahInclude<ExtArgs> | null
   where?: Prisma.JamaahWhereInput
+}
+
+/**
+ * Presensi.dicatatOlehUser
+ */
+export type Presensi$dicatatOlehUserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

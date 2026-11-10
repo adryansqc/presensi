@@ -21,6 +21,10 @@ model User {
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
+  desa          Desa?     @relation(fields: [desaId], references: [id])
+  kelompok      Kelompok? @relation(fields: [kelompokId], references: [id])
+  presensiDicatat Presensi[] @relation("PresensiDicatat")
+  jadwalDibuat    Jadwal[]   @relation("JadwalDibuat")
 }
 
 model Role {
@@ -85,6 +89,7 @@ model Desa {
 
   kelompok  Kelompok[]
   jamaah    Jamaah[]
+  users     User[]
 }
 
 model Kelompok {
@@ -97,6 +102,7 @@ model Kelompok {
 
   desa      Desa     @relation(fields: [desaId], references: [id], onDelete: Cascade)
   jamaah    Jamaah[]
+  users     User[]
 
   @@unique([nama, desaId]) // nama kelompok unik per desa
 }
@@ -132,10 +138,15 @@ model Jadwal {
   desaId         String?
   kelompokId     String?
   statusBuka     String   @default("Tutup") // Buka, Tutup
+  slugPublik     String?   @unique
+  linkPublikAktif  Boolean   @default(false)
+  dibuatOleh       String?
+  ditutupPada      DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   presensi       Presensi[]
+  dibuatOlehUser   User?     @relation("JadwalDibuat", fields: [dibuatOleh], references: [id])
 
   @@index([tanggal])
   @@index([statusBuka])
@@ -151,11 +162,15 @@ model Presensi {
   kelompokId  String
   status      String // Hadir, Izin, Sakit
   keterangan  String?
+  sumber      String   @default("PENGURUS") // PENGURUS, PUBLIK
+  dicatatOleh String?
+  lintasKelompok Boolean   @default(false)
   createdAt   DateTime @default(now())
 
   jadwal      Jadwal   @relation(fields: [jadwalId], references: [id], onDelete: Cascade)
   jamaah      Jamaah?  @relation(fields: [jamaahId], references: [id], onDelete: SetNull)
   kategori    Kategori @relation(fields: [kategoriId], references: [id])
+  dicatatOlehUser   User?     @relation("PresensiDicatat", fields: [dicatatOleh], references: [id])
 
   @@index([jadwalId])
   @@index([jamaahId])

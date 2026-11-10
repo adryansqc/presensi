@@ -4,6 +4,8 @@ import RolePermissionManager from "@/components/admin/RolePermissionManager";
 import { authOptions } from "@/lib/auth";
 import { getAllRolesWithPermissions, roleHasPermission } from "@/lib/permission-store";
 
+export const dynamic = "force-dynamic";
+
 export default async function RolePermissionPage() {
   await connection();
   const session = await getServerSession(authOptions);

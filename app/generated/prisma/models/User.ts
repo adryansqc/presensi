@@ -232,6 +232,10 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
+  desa?: Prisma.XOR<Prisma.DesaNullableScalarRelationFilter, Prisma.DesaWhereInput> | null
+  kelompok?: Prisma.XOR<Prisma.KelompokNullableScalarRelationFilter, Prisma.KelompokWhereInput> | null
+  presensiDicatat?: Prisma.PresensiListRelationFilter
+  jadwalDibuat?: Prisma.JadwalListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -248,6 +252,10 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
+  desa?: Prisma.DesaOrderByWithRelationInput
+  kelompok?: Prisma.KelompokOrderByWithRelationInput
+  presensiDicatat?: Prisma.PresensiOrderByRelationAggregateInput
+  jadwalDibuat?: Prisma.JadwalOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -267,6 +275,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
+  desa?: Prisma.XOR<Prisma.DesaNullableScalarRelationFilter, Prisma.DesaWhereInput> | null
+  kelompok?: Prisma.XOR<Prisma.KelompokNullableScalarRelationFilter, Prisma.KelompokWhereInput> | null
+  presensiDicatat?: Prisma.PresensiListRelationFilter
+  jadwalDibuat?: Prisma.JadwalListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -311,12 +323,14 @@ export type UserCreateInput = {
   image?: string | null
   password?: string | null
   role?: string
-  desaId?: string | null
-  kelompokId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  desa?: Prisma.DesaCreateNestedOneWithoutUsersInput
+  kelompok?: Prisma.KelompokCreateNestedOneWithoutUsersInput
+  presensiDicatat?: Prisma.PresensiCreateNestedManyWithoutDicatatOlehUserInput
+  jadwalDibuat?: Prisma.JadwalCreateNestedManyWithoutDibuatOlehUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -333,6 +347,8 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  presensiDicatat?: Prisma.PresensiUncheckedCreateNestedManyWithoutDicatatOlehUserInput
+  jadwalDibuat?: Prisma.JadwalUncheckedCreateNestedManyWithoutDibuatOlehUserInput
 }
 
 export type UserUpdateInput = {
@@ -343,12 +359,14 @@ export type UserUpdateInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  desa?: Prisma.DesaUpdateOneWithoutUsersNestedInput
+  kelompok?: Prisma.KelompokUpdateOneWithoutUsersNestedInput
+  presensiDicatat?: Prisma.PresensiUpdateManyWithoutDicatatOlehUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUpdateManyWithoutDibuatOlehUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -365,6 +383,8 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  presensiDicatat?: Prisma.PresensiUncheckedUpdateManyWithoutDicatatOlehUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUncheckedUpdateManyWithoutDibuatOlehUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -389,8 +409,6 @@ export type UserUpdateManyMutationInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -456,6 +474,21 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserListRelationFilter = {
+  every?: Prisma.UserWhereInput
+  some?: Prisma.UserWhereInput
+  none?: Prisma.UserWhereInput
+}
+
+export type UserOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -500,6 +533,122 @@ export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>, Prisma.UserUncheckedUpdateWithoutSessionsInput>
 }
 
+export type UserCreateNestedManyWithoutDesaInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDesaInput, Prisma.UserUncheckedCreateWithoutDesaInput> | Prisma.UserCreateWithoutDesaInput[] | Prisma.UserUncheckedCreateWithoutDesaInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDesaInput | Prisma.UserCreateOrConnectWithoutDesaInput[]
+  createMany?: Prisma.UserCreateManyDesaInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutDesaInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDesaInput, Prisma.UserUncheckedCreateWithoutDesaInput> | Prisma.UserCreateWithoutDesaInput[] | Prisma.UserUncheckedCreateWithoutDesaInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDesaInput | Prisma.UserCreateOrConnectWithoutDesaInput[]
+  createMany?: Prisma.UserCreateManyDesaInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUpdateManyWithoutDesaNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDesaInput, Prisma.UserUncheckedCreateWithoutDesaInput> | Prisma.UserCreateWithoutDesaInput[] | Prisma.UserUncheckedCreateWithoutDesaInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDesaInput | Prisma.UserCreateOrConnectWithoutDesaInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutDesaInput | Prisma.UserUpsertWithWhereUniqueWithoutDesaInput[]
+  createMany?: Prisma.UserCreateManyDesaInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutDesaInput | Prisma.UserUpdateWithWhereUniqueWithoutDesaInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutDesaInput | Prisma.UserUpdateManyWithWhereWithoutDesaInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutDesaNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDesaInput, Prisma.UserUncheckedCreateWithoutDesaInput> | Prisma.UserCreateWithoutDesaInput[] | Prisma.UserUncheckedCreateWithoutDesaInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDesaInput | Prisma.UserCreateOrConnectWithoutDesaInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutDesaInput | Prisma.UserUpsertWithWhereUniqueWithoutDesaInput[]
+  createMany?: Prisma.UserCreateManyDesaInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutDesaInput | Prisma.UserUpdateWithWhereUniqueWithoutDesaInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutDesaInput | Prisma.UserUpdateManyWithWhereWithoutDesaInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserCreateNestedManyWithoutKelompokInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutKelompokInput, Prisma.UserUncheckedCreateWithoutKelompokInput> | Prisma.UserCreateWithoutKelompokInput[] | Prisma.UserUncheckedCreateWithoutKelompokInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutKelompokInput | Prisma.UserCreateOrConnectWithoutKelompokInput[]
+  createMany?: Prisma.UserCreateManyKelompokInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutKelompokInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutKelompokInput, Prisma.UserUncheckedCreateWithoutKelompokInput> | Prisma.UserCreateWithoutKelompokInput[] | Prisma.UserUncheckedCreateWithoutKelompokInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutKelompokInput | Prisma.UserCreateOrConnectWithoutKelompokInput[]
+  createMany?: Prisma.UserCreateManyKelompokInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUpdateManyWithoutKelompokNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutKelompokInput, Prisma.UserUncheckedCreateWithoutKelompokInput> | Prisma.UserCreateWithoutKelompokInput[] | Prisma.UserUncheckedCreateWithoutKelompokInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutKelompokInput | Prisma.UserCreateOrConnectWithoutKelompokInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutKelompokInput | Prisma.UserUpsertWithWhereUniqueWithoutKelompokInput[]
+  createMany?: Prisma.UserCreateManyKelompokInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutKelompokInput | Prisma.UserUpdateWithWhereUniqueWithoutKelompokInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutKelompokInput | Prisma.UserUpdateManyWithWhereWithoutKelompokInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutKelompokNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutKelompokInput, Prisma.UserUncheckedCreateWithoutKelompokInput> | Prisma.UserCreateWithoutKelompokInput[] | Prisma.UserUncheckedCreateWithoutKelompokInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutKelompokInput | Prisma.UserCreateOrConnectWithoutKelompokInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutKelompokInput | Prisma.UserUpsertWithWhereUniqueWithoutKelompokInput[]
+  createMany?: Prisma.UserCreateManyKelompokInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutKelompokInput | Prisma.UserUpdateWithWhereUniqueWithoutKelompokInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutKelompokInput | Prisma.UserUpdateManyWithWhereWithoutKelompokInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserCreateNestedOneWithoutJadwalDibuatInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutJadwalDibuatInput, Prisma.UserUncheckedCreateWithoutJadwalDibuatInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutJadwalDibuatInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutJadwalDibuatNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutJadwalDibuatInput, Prisma.UserUncheckedCreateWithoutJadwalDibuatInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutJadwalDibuatInput
+  upsert?: Prisma.UserUpsertWithoutJadwalDibuatInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutJadwalDibuatInput, Prisma.UserUpdateWithoutJadwalDibuatInput>, Prisma.UserUncheckedUpdateWithoutJadwalDibuatInput>
+}
+
+export type UserCreateNestedOneWithoutPresensiDicatatInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPresensiDicatatInput, Prisma.UserUncheckedCreateWithoutPresensiDicatatInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPresensiDicatatInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutPresensiDicatatNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPresensiDicatatInput, Prisma.UserUncheckedCreateWithoutPresensiDicatatInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPresensiDicatatInput
+  upsert?: Prisma.UserUpsertWithoutPresensiDicatatInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPresensiDicatatInput, Prisma.UserUpdateWithoutPresensiDicatatInput>, Prisma.UserUncheckedUpdateWithoutPresensiDicatatInput>
+}
+
 export type UserCreateWithoutAccountsInput = {
   id?: string
   name?: string | null
@@ -508,11 +657,13 @@ export type UserCreateWithoutAccountsInput = {
   image?: string | null
   password?: string | null
   role?: string
-  desaId?: string | null
-  kelompokId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  desa?: Prisma.DesaCreateNestedOneWithoutUsersInput
+  kelompok?: Prisma.KelompokCreateNestedOneWithoutUsersInput
+  presensiDicatat?: Prisma.PresensiCreateNestedManyWithoutDicatatOlehUserInput
+  jadwalDibuat?: Prisma.JadwalCreateNestedManyWithoutDibuatOlehUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -528,6 +679,8 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  presensiDicatat?: Prisma.PresensiUncheckedCreateNestedManyWithoutDicatatOlehUserInput
+  jadwalDibuat?: Prisma.JadwalUncheckedCreateNestedManyWithoutDibuatOlehUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -554,11 +707,13 @@ export type UserUpdateWithoutAccountsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  desa?: Prisma.DesaUpdateOneWithoutUsersNestedInput
+  kelompok?: Prisma.KelompokUpdateOneWithoutUsersNestedInput
+  presensiDicatat?: Prisma.PresensiUpdateManyWithoutDicatatOlehUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUpdateManyWithoutDibuatOlehUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -574,6 +729,8 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  presensiDicatat?: Prisma.PresensiUncheckedUpdateManyWithoutDicatatOlehUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUncheckedUpdateManyWithoutDibuatOlehUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -584,11 +741,13 @@ export type UserCreateWithoutSessionsInput = {
   image?: string | null
   password?: string | null
   role?: string
-  desaId?: string | null
-  kelompokId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  desa?: Prisma.DesaCreateNestedOneWithoutUsersInput
+  kelompok?: Prisma.KelompokCreateNestedOneWithoutUsersInput
+  presensiDicatat?: Prisma.PresensiCreateNestedManyWithoutDicatatOlehUserInput
+  jadwalDibuat?: Prisma.JadwalCreateNestedManyWithoutDibuatOlehUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -604,6 +763,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  presensiDicatat?: Prisma.PresensiUncheckedCreateNestedManyWithoutDicatatOlehUserInput
+  jadwalDibuat?: Prisma.JadwalUncheckedCreateNestedManyWithoutDibuatOlehUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -630,11 +791,13 @@ export type UserUpdateWithoutSessionsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  desa?: Prisma.DesaUpdateOneWithoutUsersNestedInput
+  kelompok?: Prisma.KelompokUpdateOneWithoutUsersNestedInput
+  presensiDicatat?: Prisma.PresensiUpdateManyWithoutDicatatOlehUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUpdateManyWithoutDibuatOlehUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -650,6 +813,433 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  presensiDicatat?: Prisma.PresensiUncheckedUpdateManyWithoutDicatatOlehUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUncheckedUpdateManyWithoutDibuatOlehUserNestedInput
+}
+
+export type UserCreateWithoutDesaInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  role?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  kelompok?: Prisma.KelompokCreateNestedOneWithoutUsersInput
+  presensiDicatat?: Prisma.PresensiCreateNestedManyWithoutDicatatOlehUserInput
+  jadwalDibuat?: Prisma.JadwalCreateNestedManyWithoutDibuatOlehUserInput
+}
+
+export type UserUncheckedCreateWithoutDesaInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  role?: string
+  kelompokId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  presensiDicatat?: Prisma.PresensiUncheckedCreateNestedManyWithoutDicatatOlehUserInput
+  jadwalDibuat?: Prisma.JadwalUncheckedCreateNestedManyWithoutDibuatOlehUserInput
+}
+
+export type UserCreateOrConnectWithoutDesaInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDesaInput, Prisma.UserUncheckedCreateWithoutDesaInput>
+}
+
+export type UserCreateManyDesaInputEnvelope = {
+  data: Prisma.UserCreateManyDesaInput | Prisma.UserCreateManyDesaInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserUpsertWithWhereUniqueWithoutDesaInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDesaInput, Prisma.UserUncheckedUpdateWithoutDesaInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDesaInput, Prisma.UserUncheckedCreateWithoutDesaInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutDesaInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDesaInput, Prisma.UserUncheckedUpdateWithoutDesaInput>
+}
+
+export type UserUpdateManyWithWhereWithoutDesaInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutDesaInput>
+}
+
+export type UserScalarWhereInput = {
+  AND?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  OR?: Prisma.UserScalarWhereInput[]
+  NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  id?: Prisma.StringFilter<"User"> | string
+  name?: Prisma.StringNullableFilter<"User"> | string | null
+  email?: Prisma.StringNullableFilter<"User"> | string | null
+  emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  image?: Prisma.StringNullableFilter<"User"> | string | null
+  password?: Prisma.StringNullableFilter<"User"> | string | null
+  role?: Prisma.StringFilter<"User"> | string
+  desaId?: Prisma.StringNullableFilter<"User"> | string | null
+  kelompokId?: Prisma.StringNullableFilter<"User"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+}
+
+export type UserCreateWithoutKelompokInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  role?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  desa?: Prisma.DesaCreateNestedOneWithoutUsersInput
+  presensiDicatat?: Prisma.PresensiCreateNestedManyWithoutDicatatOlehUserInput
+  jadwalDibuat?: Prisma.JadwalCreateNestedManyWithoutDibuatOlehUserInput
+}
+
+export type UserUncheckedCreateWithoutKelompokInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  role?: string
+  desaId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  presensiDicatat?: Prisma.PresensiUncheckedCreateNestedManyWithoutDicatatOlehUserInput
+  jadwalDibuat?: Prisma.JadwalUncheckedCreateNestedManyWithoutDibuatOlehUserInput
+}
+
+export type UserCreateOrConnectWithoutKelompokInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutKelompokInput, Prisma.UserUncheckedCreateWithoutKelompokInput>
+}
+
+export type UserCreateManyKelompokInputEnvelope = {
+  data: Prisma.UserCreateManyKelompokInput | Prisma.UserCreateManyKelompokInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserUpsertWithWhereUniqueWithoutKelompokInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutKelompokInput, Prisma.UserUncheckedUpdateWithoutKelompokInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutKelompokInput, Prisma.UserUncheckedCreateWithoutKelompokInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutKelompokInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutKelompokInput, Prisma.UserUncheckedUpdateWithoutKelompokInput>
+}
+
+export type UserUpdateManyWithWhereWithoutKelompokInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutKelompokInput>
+}
+
+export type UserCreateWithoutJadwalDibuatInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  role?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  desa?: Prisma.DesaCreateNestedOneWithoutUsersInput
+  kelompok?: Prisma.KelompokCreateNestedOneWithoutUsersInput
+  presensiDicatat?: Prisma.PresensiCreateNestedManyWithoutDicatatOlehUserInput
+}
+
+export type UserUncheckedCreateWithoutJadwalDibuatInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  role?: string
+  desaId?: string | null
+  kelompokId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  presensiDicatat?: Prisma.PresensiUncheckedCreateNestedManyWithoutDicatatOlehUserInput
+}
+
+export type UserCreateOrConnectWithoutJadwalDibuatInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutJadwalDibuatInput, Prisma.UserUncheckedCreateWithoutJadwalDibuatInput>
+}
+
+export type UserUpsertWithoutJadwalDibuatInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutJadwalDibuatInput, Prisma.UserUncheckedUpdateWithoutJadwalDibuatInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutJadwalDibuatInput, Prisma.UserUncheckedCreateWithoutJadwalDibuatInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutJadwalDibuatInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutJadwalDibuatInput, Prisma.UserUncheckedUpdateWithoutJadwalDibuatInput>
+}
+
+export type UserUpdateWithoutJadwalDibuatInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  desa?: Prisma.DesaUpdateOneWithoutUsersNestedInput
+  kelompok?: Prisma.KelompokUpdateOneWithoutUsersNestedInput
+  presensiDicatat?: Prisma.PresensiUpdateManyWithoutDicatatOlehUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutJadwalDibuatInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  presensiDicatat?: Prisma.PresensiUncheckedUpdateManyWithoutDicatatOlehUserNestedInput
+}
+
+export type UserCreateWithoutPresensiDicatatInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  role?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  desa?: Prisma.DesaCreateNestedOneWithoutUsersInput
+  kelompok?: Prisma.KelompokCreateNestedOneWithoutUsersInput
+  jadwalDibuat?: Prisma.JadwalCreateNestedManyWithoutDibuatOlehUserInput
+}
+
+export type UserUncheckedCreateWithoutPresensiDicatatInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  role?: string
+  desaId?: string | null
+  kelompokId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  jadwalDibuat?: Prisma.JadwalUncheckedCreateNestedManyWithoutDibuatOlehUserInput
+}
+
+export type UserCreateOrConnectWithoutPresensiDicatatInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPresensiDicatatInput, Prisma.UserUncheckedCreateWithoutPresensiDicatatInput>
+}
+
+export type UserUpsertWithoutPresensiDicatatInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPresensiDicatatInput, Prisma.UserUncheckedUpdateWithoutPresensiDicatatInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPresensiDicatatInput, Prisma.UserUncheckedCreateWithoutPresensiDicatatInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPresensiDicatatInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPresensiDicatatInput, Prisma.UserUncheckedUpdateWithoutPresensiDicatatInput>
+}
+
+export type UserUpdateWithoutPresensiDicatatInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  desa?: Prisma.DesaUpdateOneWithoutUsersNestedInput
+  kelompok?: Prisma.KelompokUpdateOneWithoutUsersNestedInput
+  jadwalDibuat?: Prisma.JadwalUpdateManyWithoutDibuatOlehUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPresensiDicatatInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUncheckedUpdateManyWithoutDibuatOlehUserNestedInput
+}
+
+export type UserCreateManyDesaInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  role?: string
+  kelompokId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserUpdateWithoutDesaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  kelompok?: Prisma.KelompokUpdateOneWithoutUsersNestedInput
+  presensiDicatat?: Prisma.PresensiUpdateManyWithoutDicatatOlehUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUpdateManyWithoutDibuatOlehUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDesaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  presensiDicatat?: Prisma.PresensiUncheckedUpdateManyWithoutDicatatOlehUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUncheckedUpdateManyWithoutDibuatOlehUserNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutDesaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UserCreateManyKelompokInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  role?: string
+  desaId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserUpdateWithoutKelompokInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  desa?: Prisma.DesaUpdateOneWithoutUsersNestedInput
+  presensiDicatat?: Prisma.PresensiUpdateManyWithoutDicatatOlehUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUpdateManyWithoutDibuatOlehUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutKelompokInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  presensiDicatat?: Prisma.PresensiUncheckedUpdateManyWithoutDicatatOlehUserNestedInput
+  jadwalDibuat?: Prisma.JadwalUncheckedUpdateManyWithoutDibuatOlehUserNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutKelompokInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -660,11 +1250,15 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
 export type UserCountOutputType = {
   accounts: number
   sessions: number
+  presensiDicatat: number
+  jadwalDibuat: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
+  presensiDicatat?: boolean | UserCountOutputTypeCountPresensiDicatatArgs
+  jadwalDibuat?: boolean | UserCountOutputTypeCountJadwalDibuatArgs
 }
 
 /**
@@ -691,6 +1285,20 @@ export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.SessionWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPresensiDicatatArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PresensiWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountJadwalDibuatArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JadwalWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -706,6 +1314,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  desa?: boolean | Prisma.User$desaArgs<ExtArgs>
+  kelompok?: boolean | Prisma.User$kelompokArgs<ExtArgs>
+  presensiDicatat?: boolean | Prisma.User$presensiDicatatArgs<ExtArgs>
+  jadwalDibuat?: boolean | Prisma.User$jadwalDibuatArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -721,6 +1333,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   kelompokId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  desa?: boolean | Prisma.User$desaArgs<ExtArgs>
+  kelompok?: boolean | Prisma.User$kelompokArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -735,6 +1349,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   kelompokId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  desa?: boolean | Prisma.User$desaArgs<ExtArgs>
+  kelompok?: boolean | Prisma.User$kelompokArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -755,16 +1371,30 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  desa?: boolean | Prisma.User$desaArgs<ExtArgs>
+  kelompok?: boolean | Prisma.User$kelompokArgs<ExtArgs>
+  presensiDicatat?: boolean | Prisma.User$presensiDicatatArgs<ExtArgs>
+  jadwalDibuat?: boolean | Prisma.User$jadwalDibuatArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  desa?: boolean | Prisma.User$desaArgs<ExtArgs>
+  kelompok?: boolean | Prisma.User$kelompokArgs<ExtArgs>
+}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  desa?: boolean | Prisma.User$desaArgs<ExtArgs>
+  kelompok?: boolean | Prisma.User$kelompokArgs<ExtArgs>
+}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
+    desa: Prisma.$DesaPayload<ExtArgs> | null
+    kelompok: Prisma.$KelompokPayload<ExtArgs> | null
+    presensiDicatat: Prisma.$PresensiPayload<ExtArgs>[]
+    jadwalDibuat: Prisma.$JadwalPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1174,6 +1804,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  desa<T extends Prisma.User$desaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$desaArgs<ExtArgs>>): Prisma.Prisma__DesaClient<runtime.Types.Result.GetResult<Prisma.$DesaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  kelompok<T extends Prisma.User$kelompokArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$kelompokArgs<ExtArgs>>): Prisma.Prisma__KelompokClient<runtime.Types.Result.GetResult<Prisma.$KelompokPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  presensiDicatat<T extends Prisma.User$presensiDicatatArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$presensiDicatatArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PresensiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  jadwalDibuat<T extends Prisma.User$jadwalDibuatArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$jadwalDibuatArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JadwalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1468,6 +2102,10 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1538,6 +2176,10 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1652,6 +2294,92 @@ export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
+}
+
+/**
+ * User.desa
+ */
+export type User$desaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Desa
+   */
+  select?: Prisma.DesaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Desa
+   */
+  omit?: Prisma.DesaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DesaInclude<ExtArgs> | null
+  where?: Prisma.DesaWhereInput
+}
+
+/**
+ * User.kelompok
+ */
+export type User$kelompokArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Kelompok
+   */
+  select?: Prisma.KelompokSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Kelompok
+   */
+  omit?: Prisma.KelompokOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KelompokInclude<ExtArgs> | null
+  where?: Prisma.KelompokWhereInput
+}
+
+/**
+ * User.presensiDicatat
+ */
+export type User$presensiDicatatArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Presensi
+   */
+  select?: Prisma.PresensiSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Presensi
+   */
+  omit?: Prisma.PresensiOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PresensiInclude<ExtArgs> | null
+  where?: Prisma.PresensiWhereInput
+  orderBy?: Prisma.PresensiOrderByWithRelationInput | Prisma.PresensiOrderByWithRelationInput[]
+  cursor?: Prisma.PresensiWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PresensiScalarFieldEnum | Prisma.PresensiScalarFieldEnum[]
+}
+
+/**
+ * User.jadwalDibuat
+ */
+export type User$jadwalDibuatArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Jadwal
+   */
+  select?: Prisma.JadwalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Jadwal
+   */
+  omit?: Prisma.JadwalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JadwalInclude<ExtArgs> | null
+  where?: Prisma.JadwalWhereInput
+  orderBy?: Prisma.JadwalOrderByWithRelationInput | Prisma.JadwalOrderByWithRelationInput[]
+  cursor?: Prisma.JadwalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JadwalScalarFieldEnum | Prisma.JadwalScalarFieldEnum[]
 }
 
 /**

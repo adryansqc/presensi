@@ -7,6 +7,8 @@ import { getResource } from "@/lib/admin/resources";
 import { authOptions } from "@/lib/auth";
 import { roleHasPermission } from "@/lib/permission-store";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminResourcePage({
   params,
 }: {
