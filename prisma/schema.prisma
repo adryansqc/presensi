@@ -135,8 +135,9 @@ model Jadwal {
   jamMulai       String
   jamSelesai     String
   tingkat        String   // Daerah, Desa, Kelompok
-  desaId         String?
-  kelompokId     String?
+  desaIds        String[]   @default([]) // untuk tingkat Desa
+  kelompokIds    String[]   @default([]) // untuk tingkat Kelompok
+  kategoriIds    String[]   @default([]) // kategori jamaah (Ibu, Bapak, dll)
   statusBuka     String   @default("Tutup") // Buka, Tutup
   slugPublik     String?   @unique
   linkPublikAktif  Boolean   @default(false)

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSwal } from "@/components/ui/SwalProvider";
+import CheckboxSearch from "@/components/admin/CheckboxSearch";
 
 type Jadwal = {
   id: string;
@@ -10,8 +11,9 @@ type Jadwal = {
   jamMulai: string;
   jamSelesai: string;
   tingkat: string;
-  desaId: string | null;
-  kelompokId: string | null;
+  desaIds: string[];
+  kelompokIds: string[];
+  kategoriIds: string[];
   statusBuka: string;
   slugPublik: string | null;
   linkPublikAktif: boolean;
@@ -19,60 +21,98 @@ type Jadwal = {
   dibuatOlehUser: { name: string | null; email: string | null } | null;
   presensi: Array<{ id: string; jamaah: { nama: string } | null }>;
   createdAt: string;
+  lokasi: string;
+};
+
+type Desa = { id: string; nama: string };
+type Kelompok = { id: string; nama: string; desaId: string; desaNama: string };
+type Kategori = { id: string; nama: string };
+
+type CreateForm = {
+  tanggal: string;
+  jenisPengajian: string;
+  jamMulai: string;
+  jamSelesai: string;
+  tingkat: string;
+  kategoriIds: string[];
+  desaIds: string[];
+  kelompokIds: string[];
 };
 
 export default function JadwalManager() {
   const [jadwalList, setJadwalList] = useState<Jadwal[]>([]);
+  const [daftarDesa, setDaftarDesa] = useState<Desa[]>([]);
+  const [daftarKelompok, setDaftarKelompok] = useState<Kelompok[]>([]);
+  const [daftarKategori, setDaftarKategori] = useState<Kategori[]>([]);
   const [openCreate, setOpenCreate] = useState(false);
-  const [createForm, setCreateForm] = useState({
+  const [createForm, setCreateForm] = useState<CreateForm>({
     tanggal: "",
     jenisPengajian: "",
     jamMulai: "",
     jamSelesai: "",
-    tingkat: "Desa" as string,
-    desaId: "",
-    kelompokId: "",
+    tingkat: "Kelompok",
+    kategoriIds: [],
+    desaIds: [],
+    kelompokIds: [],
   });
   const [createSaving, setCreateSaving] = useState(false);
   const [createError, setCreateError] = useState("");
   const swal = useSwal();
 
-  async function refreshJadwal() {
+  // Kelompok yang tersedia berdasarkan desa yang dipilih (hanya untuk tingkat Desa)
+  const kelompokFiltered = useMemo(() => {
+    if (createForm.tingkat === "Desa" && createForm.desaIds.length > 0) {
+      return daftarKelompok.filter((k) => createForm.desaIds.includes(k.desaId));
+    }
+    if (createForm.tingkat === "Kelompok") {
+      return daftarKelompok;
+    }
+    return [];
+  }, [createForm.tingkat, createForm.desaIds, daftarKelompok]);
+
+  async function refreshData() {
     try {
-      const res = await fetch("/api/admin/jadwal", { cache: "no-store" });
-      const data = await res.json();
-      if (res.ok) {
-        setJadwalList(Array.isArray(data) ? data : []);
-      } else {
-        await swal.error("Gagal memuat jadwal", typeof data?.error === "string" ? data.error : "");
-      }
+      const [jRes, dRes, kRes, cRes] = await Promise.all([
+        fetch("/api/admin/jadwal", { cache: "no-store" }),
+        fetch("/api/admin/desa", { cache: "no-store" }),
+        fetch("/api/admin/kelompok", { cache: "no-store" }),
+        fetch("/api/admin/kategori", { cache: "no-store" }),
+      ]);
+      const jData = await jRes.json();
+      const dData = await dRes.json();
+      const kData = await kRes.json();
+      const cData = await cRes.json();
+
+      if (jRes.ok) setJadwalList(Array.isArray(jData) ? jData : []);
+      if (dRes.ok) setDaftarDesa(Array.isArray(dData) ? dData : []);
+      if (kRes.ok) setDaftarKelompok(Array.isArray(kData) ? kData : []);
+      if (cRes.ok) setDaftarKategori(Array.isArray(cData) ? cData : []);
     } catch {
-      await swal.error("Gagal memuat jadwal", "Tidak dapat menghubungi server.");
+      await swal.error("Gagal memuat data", "Tidak dapat menghubungi server.");
     }
   }
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/admin/jadwal", { cache: "no-store" });
-        const data = await res.json();
-        if (!mounted) return;
-        if (res.ok) {
-          setJadwalList(Array.isArray(data) ? data : []);
-        } else {
-          await swal.error("Gagal memuat jadwal", typeof data?.error === "string" ? data.error : "");
-        }
-      } catch {
-        if (mounted) {
-          await swal.error("Gagal memuat jadwal", "Tidak dapat menghubungi server.");
-        }
-      }
-    })();
+    refreshData();
     return () => {
       mounted = false;
     };
   }, [swal]);
+
+  function resetCreateForm() {
+    setCreateForm({
+      tanggal: "",
+      jenisPengajian: "",
+      jamMulai: "",
+      jamSelesai: "",
+      tingkat: "Kelompok",
+      kategoriIds: [],
+      desaIds: [],
+      kelompokIds: [],
+    });
+    setCreateError("");
+  }
 
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
@@ -83,10 +123,14 @@ export default function JadwalManager() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...createForm,
           tanggal: createForm.tanggal || undefined,
-          desaId: createForm.desaId || undefined,
-          kelompokId: createForm.kelompokId || undefined,
+          jenisPengajian: createForm.jenisPengajian,
+          jamMulai: createForm.jamMulai,
+          jamSelesai: createForm.jamSelesai,
+          tingkat: createForm.tingkat,
+          desaIds: createForm.desaIds,
+          kelompokIds: createForm.kelompokIds,
+          kategoriIds: createForm.kategoriIds,
         }),
       });
       const data = await res.json();
@@ -95,9 +139,9 @@ export default function JadwalManager() {
         return;
       }
       setOpenCreate(false);
-      setCreateForm({ tanggal: "", jenisPengajian: "", jamMulai: "", jamSelesai: "", tingkat: "Desa", desaId: "", kelompokId: "" });
+      resetCreateForm();
       await swal.success("Berhasil dibuat", "Jadwal baru telah ditambahkan.");
-      await refreshJadwal();
+      await refreshData();
     } catch {
       setCreateError("Tidak dapat menghubungi server.");
     } finally {
@@ -113,7 +157,7 @@ export default function JadwalManager() {
       return;
     }
     await swal.success("Sesi dibuka", "Jadwal telah dibuka untuk absensi.");
-    await refreshJadwal();
+    await refreshData();
   }
 
   async function handleTutup(id: string) {
@@ -132,7 +176,7 @@ export default function JadwalManager() {
       return;
     }
     await swal.success("Sesi ditutup", "Absensi telah terkunci.");
-    await refreshJadwal();
+    await refreshData();
   }
 
   async function handleBagikan(id: string) {
@@ -147,7 +191,7 @@ export default function JadwalManager() {
       text: data.link,
       confirmText: "Salin",
     });
-    await refreshJadwal();
+    await refreshData();
   }
 
   const formatDate = (iso: string) => {
@@ -155,7 +199,37 @@ export default function JadwalManager() {
     return d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
   };
 
-  const isOpen = jadwalList.some((j) => j.statusBuka === "Buka");
+  const tampilkanKelompok = (jadwal: Jadwal) => {
+    if (jadwal.kelompokIds.length > 0) {
+      return jadwal.kelompokIds
+        .map((id) => {
+          const k = daftarKelompok.find((x) => x.id === id);
+          return k ? k.nama : id;
+        })
+        .join(", ");
+    }
+    if (jadwal.desaIds.length > 0) {
+      return jadwal.desaIds
+        .map((id) => {
+          const d = daftarDesa.find((x) => x.id === id);
+          return d ? d.nama : id;
+        })
+        .join(", ");
+    }
+    return "Daerah";
+  };
+
+  const tampilkanKategori = (jadwal: Jadwal) => {
+    if (jadwal.kategoriIds.length > 0) {
+      return jadwal.kategoriIds
+        .map((id) => {
+          const k = daftarKategori.find((x) => x.id === id);
+          return k ? k.nama : id;
+        })
+        .join(", ");
+    }
+    return "-";
+  };
 
   return (
     <div className="space-y-5">
@@ -163,7 +237,7 @@ export default function JadwalManager() {
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-slate-900">Kelola Jadwal</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Buat jadwal pengajian, buka/tutup sesi absensi, dan bagikan link publik untuk jamaah.
+            Buat jadwal pengajian, pilih kategori jamaah (Bapak/Ibu), atur cakupan desa/kelompok, buka/tutup sesi absensi, dan bagikan link publik.
           </p>
         </div>
         <button
@@ -268,41 +342,91 @@ export default function JadwalManager() {
                     <select
                       id="jadwal-tingkat"
                       value={createForm.tingkat}
-                      onChange={(e) => setCreateForm({ ...createForm, tingkat: e.target.value })}
+                      onChange={(e) => {
+                        const nilai = e.target.value;
+                        setCreateForm((prev) => ({
+                          ...prev,
+                          tingkat: nilai,
+                          desaIds: nilai === "Desa" ? prev.desaIds : [],
+                          kelompokIds: nilai === "Kelompok" ? prev.kelompokIds : [],
+                        }));
+                      }}
                       required
                       className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
                     >
-                      <option value="Daerah">Daerah</option>
-                      <option value="Desa">Desa</option>
-                      <option value="Kelompok">Kelompok</option>
+                      <option value="Daerah">Daerah (semua wilayah)</option>
+                      <option value="Desa">Desa (pilih desa, lalu kelompok)</option>
+                      <option value="Kelompok">Kelompok (pilih kelompok langsung)</option>
                     </select>
                   </div>
-                  <div>
-                    <label htmlFor="jadwal-desa" className="mb-1.5 block text-sm font-medium text-slate-700">
-                      Desa (opsional)
-                    </label>
-                    <input
-                      id="jadwal-desa"
-                      type="text"
-                      value={createForm.desaId}
-                      onChange={(e) => setCreateForm({ ...createForm, desaId: e.target.value })}
-                      placeholder="ID desa"
-                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+
+                  {/* Kategori Jamaah - selalu ditampilkan */}
+                  <div className="sm:col-span-2">
+                    <CheckboxSearch
+                      items={daftarKategori.map((kat) => ({ id: kat.id, label: kat.nama }))}
+                      selected={createForm.kategoriIds}
+                      onChange={(ids) => setCreateForm({ ...createForm, kategoriIds: ids })}
+                      label="Kategori Jamaah"
+                      placeholder="Cari kategori (Bapak, Ibu, dll)..."
+                      required
+                      maxHeight="180px"
                     />
+                    <p className="mt-1 text-xs text-slate-500">
+                      Pilih satu atau lebih kategori jamaah (contoh: Bapak, Ibu).
+                    </p>
                   </div>
-                  <div>
-                    <label htmlFor="jadwal-kelompok" className="mb-1.5 block text-sm font-medium text-slate-700">
-                      Kelompok (opsional)
-                    </label>
-                    <input
-                      id="jadwal-kelompok"
-                      type="text"
-                      value={createForm.kelompokId}
-                      onChange={(e) => setCreateForm({ ...createForm, kelompokId: e.target.value })}
-                      placeholder="ID kelompok"
-                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
-                    />
-                  </div>
+
+                  {/* Desa - hanya untuk tingkat Desa */}
+                  {createForm.tingkat === "Desa" && (
+                    <div className="sm:col-span-2">
+                      <CheckboxSearch
+                        items={daftarDesa.map((d) => ({ id: d.id, label: d.nama }))}
+                        selected={createForm.desaIds}
+                        onChange={(ids) =>
+                          setCreateForm({ ...createForm, desaIds: ids, kelompokIds: [] })
+                        }
+                        label="Desa"
+                        placeholder="Cari desa..."
+                        required
+                        maxHeight="180px"
+                      />
+                      <p className="mt-1 text-xs text-slate-500">
+                        Pilih satu atau lebih desa. Kelompok akan muncul berdasarkan desa yang dipilih.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Kelompok - untuk tingkat Desa (berdasarkan desa terpilih) atau Kelompok (semua) */}
+                  {(createForm.tingkat === "Desa" || createForm.tingkat === "Kelompok") && (
+                    <div className="sm:col-span-2">
+                      <CheckboxSearch
+                        items={kelompokFiltered.map((k) => ({
+                          id: k.id,
+                          label: `${k.desaNama} — ${k.nama}`,
+                        }))}
+                        selected={createForm.kelompokIds}
+                        onChange={(ids) => setCreateForm({ ...createForm, kelompokIds: ids })}
+                        label="Kelompok"
+                        placeholder="Cari kelompok..."
+                        required
+                        disabled={kelompokFiltered.length === 0}
+                        maxHeight="180px"
+                      />
+                      {kelompokFiltered.length === 0 && createForm.tingkat === "Desa" && createForm.desaIds.length === 0 ? (
+                        <p className="mt-1 text-xs text-slate-500">
+                          Pilih desa terlebih dahulu untuk menampilkan kelompok.
+                        </p>
+                      ) : kelompokFiltered.length === 0 ? (
+                        <p className="mt-1 text-xs text-slate-500">
+                          Tidak ada kelompok yang tersedia.
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-xs text-slate-500">
+                          Pilih satu atau lebih kelompok.
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-center justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3.5">
@@ -336,6 +460,8 @@ export default function JadwalManager() {
                 <th className="px-4 py-3">Jenis Pengajian</th>
                 <th className="px-4 py-3">Waktu</th>
                 <th className="px-4 py-3">Tingkat</th>
+                <th className="px-4 py-3">Kategori</th>
+                <th className="px-4 py-3">Lokasi</th>
                 <th className="px-4 py-3 text-center">Status</th>
                 <th className="px-4 py-3 text-right">Aksi</th>
               </tr>
@@ -343,7 +469,7 @@ export default function JadwalManager() {
             <tbody className="divide-y divide-slate-100">
               {jadwalList.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center">
+                  <td colSpan={8} className="px-4 py-12 text-center">
                     <p className="text-sm font-medium text-slate-700">Belum ada jadwal</p>
                     <p className="mt-1 text-sm text-slate-500">Buat jadwal pertama Anda.</p>
                   </td>
@@ -355,6 +481,8 @@ export default function JadwalManager() {
                   <td className="px-4 py-3 text-slate-700">{j.jenisPengajian}</td>
                   <td className="px-4 py-3 text-slate-700">{j.jamMulai} - {j.jamSelesai}</td>
                   <td className="px-4 py-3 text-slate-700">{j.tingkat}</td>
+                  <td className="px-4 py-3 text-slate-700 text-sm">{tampilkanKategori(j)}</td>
+                  <td className="px-4 py-3 text-slate-700 text-sm">{tampilkanKelompok(j)}</td>
                   <td className="px-4 py-3 text-center">
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ${
@@ -368,7 +496,7 @@ export default function JadwalManager() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1.5">
-                      {j.statusBuka === "Tutup" && !isOpen && (
+                      {j.statusBuka === "Tutup" && (
                         <button
                           type="button"
                           onClick={() => handleBuka(j.id)}
@@ -436,8 +564,8 @@ export default function JadwalManager() {
           <div className="border-t border-slate-200 bg-slate-50 px-4 py-3">
             <p className="text-xs text-slate-500">
               Jadwal buka:{" "}
-              <span className={`font-medium ${isOpen ? "text-emerald-600" : "text-slate-600"}`}>
-                {isOpen ? "Ada 1 sesi buka" : "Tidak ada"}
+              <span className={`font-medium ${jadwalList.filter((j) => j.statusBuka === "Buka").length > 0 ? "text-emerald-600" : "text-slate-600"}`}>
+                {jadwalList.filter((j) => j.statusBuka === "Buka").length} sesi buka
               </span>
             </p>
           </div>

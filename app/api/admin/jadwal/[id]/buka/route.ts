@@ -12,12 +12,6 @@ export async function POST(
   try {
     const { id } = await params;
 
-    // Tutup semua jadwal yang masih buka terlebih dahulu (hanya satu yang buka)
-    await prisma.jadwal.updateMany({
-      where: { statusBuka: "Buka" },
-      data: { statusBuka: "Tutup", ditutupPada: new Date() },
-    });
-
     const jadwal = await prisma.jadwal.update({
       where: { id },
       data: { statusBuka: "Buka", ditutupPada: null },

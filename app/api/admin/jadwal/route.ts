@@ -7,6 +7,8 @@ export async function GET() {
   if (error) return error;
 
   const userRole = (session!.user as unknown as { role?: string }).role ?? "";
+  const userDesaId = (session!.user as unknown as { desaId?: string }).desaId ?? null;
+  const userKelompokId = (session!.user as unknown as { kelompokId?: string }).kelompokId ?? null;
 
   try {
     const jadwal = await prisma.jadwal.findMany({
@@ -23,10 +25,10 @@ export async function GET() {
 
     // Filter by cakupan wilayah
     let filtered = jadwal;
-    if (userRole === "Desa") {
-      filtered = jadwal.filter((j) => j.desaId !== undefined);
-    } else if (userRole === "Kelompok") {
-      filtered = jadwal.filter((j) => j.kelompokId !== undefined);
+    if (userRole === "Desa" && userDesaId) {
+      filtered = jadwal.filter((j) => Array.isArray(j.desaIds) && j.desaIds.includes(userDesaId));
+    } else if (userRole === "Kelompok" && userKelompokId) {
+      filtered = jadwal.filter((j) => Array.isArray(j.kelompokIds) && j.kelompokIds.includes(userKelompokId));
     }
 
     return NextResponse.json(filtered);
@@ -44,7 +46,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { tanggal, jenisPengajian, jamMulai, jamSelesai, tingkat, desaId, kelompokId } = body;
+    const { tanggal, jenisPengajian, jamMulai, jamSelesai, tingkat, desaIds, kelompokIds, kategoriIds } = body;
 
     if (!tanggal || !jenisPengajian || !jamMulai || !jamSelesai || !tingkat) {
       throw new Error("Semua field wajib diisi.");
@@ -57,8 +59,9 @@ export async function POST(request: Request) {
         jamMulai,
         jamSelesai,
         tingkat,
-        desaId: desaId || null,
-        kelompokId: kelompokId || null,
+        desaIds: Array.isArray(desaIds) ? desaIds : [],
+        kelompokIds: Array.isArray(kelompokIds) ? kelompokIds : [],
+        kategoriIds: Array.isArray(kategoriIds) ? kategoriIds : [],
         statusBuka: "Tutup",
         dibuatOleh: userId,
       },

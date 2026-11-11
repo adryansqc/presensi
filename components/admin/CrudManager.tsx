@@ -70,7 +70,7 @@ function emptyForm(fields: FieldDef[], row?: Row) {
     } else if (field.type === "checkbox") {
       form[field.name] = field.defaultValue ?? true;
     } else {
-      form[field.name] = field.defaultValue ?? "";
+      form[field.name] = field.defaultValue ?? (field.multiSelect ? [] : "");
     }
   }
   return form;
@@ -237,6 +237,42 @@ export default function CrudManager({
     }
   }
 
+  const renderRowActions = (row: Row) => (
+    <>
+      {canEdit && (
+        <button
+          type="button"
+          onClick={() => openEdit(row)}
+          className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+          title="Ubah"
+          aria-label={`Ubah ${singular}`}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </svg>
+        </button>
+      )}
+      {canDelete && (
+        <button
+          type="button"
+          onClick={() => handleDelete(row)}
+          disabled={deleting === String(row.id)}
+          className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
+          title="Hapus"
+          aria-label={`Hapus ${singular}`}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+            <path d="M4 7h16" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M6 7V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v2" />
+            <path d="M19 7v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7" />
+          </svg>
+        </button>
+      )}
+    </>
+  );
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
@@ -244,12 +280,12 @@ export default function CrudManager({
           <h1 className="text-xl font-semibold tracking-tight text-slate-900">{title}</h1>
           <p className="mt-1 max-w-2xl text-sm text-slate-500">{description}</p>
         </div>
-        <div className="flex items-center gap-2 flex-col sm:flex-row">
+        <div className="flex w-full flex-col sm:flex-row sm:items-end sm:justify-end gap-3">
           {canCreate && (
             <button
               type="button"
               onClick={openCreate}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/25"
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/25"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="h-4 w-4">
                 <path d="M12 5v14M5 12h14" />
@@ -260,7 +296,7 @@ export default function CrudManager({
           {importUrl && (
             <a
               href={importUrl}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-600 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-600 shadow-sm transition hover:bg-emerald-100 focus:outline-none focus:ring-4 focus:ring-emerald-200/30"
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto rounded-xl border border-emerald-600 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-600 shadow-sm transition hover:bg-emerald-100 focus:outline-none focus:ring-4 focus:ring-emerald-200/30"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
                 <polyline points="14 2 2 12 14 22" />
@@ -282,9 +318,9 @@ export default function CrudManager({
             <input
               value={query}
               onChange={(event) => {
-              setQuery(event.target.value);
-              setPage(1);
-            }}
+                setQuery(event.target.value);
+                setPage(1);
+              }}
               placeholder="Cari data..."
               className="w-full rounded-xl border border-slate-300 py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
             />
@@ -326,37 +362,7 @@ export default function CrudManager({
                   ))}
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1.5">
-                      {canEdit && (
-                        <button
-                          type="button"
-                          onClick={() => openEdit(row)}
-                          className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
-                          title="Ubah"
-                          aria-label={`Ubah ${singular}`}
-                        >
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                            <path d="M12 20h9" />
-                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                          </svg>
-                        </button>
-                      )}
-                      {canDelete && (
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(row)}
-                          disabled={deleting === String(row.id)}
-                          className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
-                          title="Hapus"
-                          aria-label={`Hapus ${singular}`}
-                        >
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                            <path d="M4 7h16" />
-                            <path d="M10 11v6M14 11v6" />
-                            <path d="M6 7V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v2" />
-                            <path d="M19 7v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7" />
-                          </svg>
-                        </button>
-                      )}
+                      {renderRowActions(row)}
                     </div>
                   </td>
                 </tr>
@@ -496,20 +502,43 @@ export default function CrudManager({
                             className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
                           />
                         ) : field.type === "select" ? (
-                          <select
-                            id={id}
-                            value={String(value ?? "")}
-                            onChange={(event) => updateField(field.name, event.target.value)}
-                            required={required}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
-                          >
-                            <option value="">{field.placeholder ?? "-- Pilih --"}</option>
-                            {field.options?.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </select>
+                          field.multiSelect ? (
+                            <select
+                              id={id}
+                              multiple
+                              value={Array.isArray(value) ? value : []}
+                              onChange={(event) => {
+                                const selected = Array.from(event.target.selectedOptions).map(
+                                  (o) => o.value
+                                );
+                                updateField(field.name, selected);
+                              }}
+                              required={required}
+                              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                            >
+                              <option value="">{field.placeholder ?? "-- Pilih --"}</option>
+                              {field.options?.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <select
+                              id={id}
+                              value={String(value ?? "")}
+                              onChange={(event) => updateField(field.name, event.target.value)}
+                              required={required}
+                              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                            >
+                              <option value="">{field.placeholder ?? "-- Pilih --"}</option>
+                              {field.options?.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          )
                         ) : (
                           <input
                             id={id}

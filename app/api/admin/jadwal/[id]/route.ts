@@ -12,7 +12,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { tanggal, jenisPengajian, jamMulai, jamSelesai, tingkat, desaId, kelompokId, statusBuka } = body;
+    const { tanggal, jenisPengajian, jamMulai, jamSelesai, tingkat, desaIds, kelompokIds, kategoriIds, statusBuka } = body;
 
     const jadwal = await prisma.jadwal.update({
       where: { id },
@@ -22,8 +22,9 @@ export async function PUT(
         jamMulai,
         jamSelesai,
         tingkat,
-        desaId: desaId || null,
-        kelompokId: kelompokId || null,
+        desaIds: Array.isArray(desaIds) ? desaIds : undefined,
+        kelompokIds: Array.isArray(kelompokIds) ? kelompokIds : undefined,
+        kategoriIds: Array.isArray(kategoriIds) ? kategoriIds : undefined,
         statusBuka,
       },
     });

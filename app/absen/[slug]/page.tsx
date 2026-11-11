@@ -27,6 +27,16 @@ type RekapData = {
   sakit: number;
   total: number;
   sumberPublik: number;
+  rincianDesa: Array<{
+    desa: string;
+    kelompok: Array<{
+      kelompok: string;
+      hadir: number;
+      izin: number;
+      sakit: number;
+      total: number;
+    }>;
+  }>;
 };
 
 export default function PublicAbsenPage({
@@ -48,7 +58,7 @@ export default function PublicAbsenPage({
   const loadRekap = useCallback(async (jadwalId: string) => {
     try {
       const res = await fetch(
-        `/api/admin/presensi/rekap?jadwalId=${jadwalId}`,
+        `/api/public/presensi/${jadwalId}/rekap`,
         { cache: "no-store" }
       );
       const data = await res.json();
@@ -56,7 +66,7 @@ export default function PublicAbsenPage({
         setRekap(data as RekapData);
       }
     } catch {
-      // Rekap API requires auth, may fail publicly - ignore
+      // Rekap may fail publicly - ignore
     }
   }, []);
 
@@ -200,6 +210,13 @@ export default function PublicAbsenPage({
                         setSelectedJamaahLabel(e.target.value);
                         searchJamaah(e.target.value);
                       }}
+                      onBlur={() => {
+                        const match = jamaahOptions.find((j) => j.nama === selectedJamaahLabel);
+                        if (match) {
+                          setSelectedJamaah(match.id);
+                          setSelectedJamaahLabel(match.nama);
+                        }
+                      }}
                       placeholder="Cari nama jamaah..."
                       className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500"
                       list="jamaah-list"
@@ -212,11 +229,9 @@ export default function PublicAbsenPage({
                       ))}
                     </datalist>
                   </div>
-                  <input
-                    type="hidden"
-                    value={selectedJamaah}
-                    onChange={(e) => setSelectedJamaah(e.target.value)}
-                  />
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Pilih nama dari daftar saran yang muncul saat mengetik.
+                  </p>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -225,28 +240,28 @@ export default function PublicAbsenPage({
                       Status
                     </label>
                     <div className="flex gap-2">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="status"
-                          value="Izin"
-                          checked={status === "Izin"}
-                          onChange={() => setStatus("Izin")}
-                          className="rounded text-emerald-600 focus:ring-emerald-500"
-                        />
+                      <button
+                        type="button"
+                        onClick={() => setStatus("Izin")}
+                        className={`flex h-10 items-center justify-center rounded-xl text-sm font-medium transition border px-3 ${
+                          status === "Izin"
+                            ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
+                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                        }`}
+                      >
                         Izin
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="status"
-                          value="Sakit"
-                          checked={status === "Sakit"}
-                          onChange={() => setStatus("Sakit")}
-                          className="rounded text-emerald-600 focus:ring-emerald-500"
-                        />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStatus("Sakit")}
+                        className={`flex h-10 items-center justify-center rounded-xl text-sm font-medium transition border px-3 ${
+                          status === "Sakit"
+                            ? "bg-red-50 text-red-700 border-red-200 shadow-sm"
+                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                        }`}
+                      >
                         Sakit
-                      </label>
+                      </button>
                     </div>
                   </div>
                   <div className="flex items-end">
@@ -280,7 +295,7 @@ export default function PublicAbsenPage({
           {rekap && (
             <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-sm font-semibold text-slate-900 mb-4">Rekap Kehadiran Acara</h2>
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-3 mb-6">
                 <div className="p-3 rounded-xl bg-emerald-50 text-center">
                   <div className="text-xs text-emerald-600 font-medium uppercase">Hadir</div>
                   <div className="text-2xl font-bold text-slate-900">{rekap.hadir}</div>
@@ -294,9 +309,71 @@ export default function PublicAbsenPage({
                   <div className="text-2xl font-bold text-slate-900">{rekap.sakit}</div>
                 </div>
               </div>
-              <p className="mt-3 text-xs text-slate-500 text-center">
+              <p className="text-xs text-slate-500 text-center mb-6">
                 Total: {rekap.total} data • Sumber publik: {rekap.sumberPublik}
               </p>
+
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
+                Rincian per Desa → Kelompok
+              </h3>
+              <div className="space-y-2">
+                {rekap.rincianDesa.length === 0 ? (
+                  <p className="text-sm text-slate-500 text-center py-4">Belum ada data rincian.</p>
+                ) : (
+                  rekap.rincianDesa.map((d) => {
+                    const desaHadir = d.kelompok.reduce((acc, k) => acc + k.hadir, 0);
+                    const desaIzin = d.kelompok.reduce((acc, k) => acc + k.izin, 0);
+                    const desaSakit = d.kelompok.reduce((acc, k) => acc + k.sakit, 0);
+                    const desaTotal = d.kelompok.reduce((acc, k) => acc + k.total, 0);
+                    return (
+                      <div key={d.desa} className="overflow-hidden rounded-xl border border-slate-200">
+                        <div className="bg-emerald-50 px-4 py-3 border-b border-emerald-100">
+                          <div className="flex items-center justify-between">
+                            <div className="font-semibold text-sm text-slate-900">{d.desa}</div>
+                            <div className="flex gap-3 text-xs">
+                              <span className="flex items-center gap-1">
+                                <span className="text-emerald-600 font-bold">Hadir {desaHadir}</span>
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="text-amber-600 font-bold">Izin {desaIzin}</span>
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="text-red-600 font-bold">Sakit {desaSakit}</span>
+                              </span>
+                              <span className="flex items-center gap-1 text-slate-500">
+                                <span className="font-bold">Total {desaTotal}</span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="divide-y divide-slate-100">
+                          {d.kelompok.map((k) => (
+                            <div key={k.kelompok} className="flex items-center justify-between px-4 py-3 text-sm">
+                              <div>
+                                <span className="text-slate-700 font-medium">{k.kelompok}</span>
+                              </div>
+                              <div className="flex gap-3 text-xs font-medium">
+                                <span className="flex items-center gap-1">
+                                  <span className="text-emerald-600">Hadir {k.hadir}</span>
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <span className="text-amber-600">Izin {k.izin}</span>
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <span className="text-red-600">Sakit {k.sakit}</span>
+                                </span>
+                                <span className="flex items-center gap-1 text-slate-500">
+                                  <span className="font-bold">Total {k.total}</span>
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             </div>
           )}
         </div>

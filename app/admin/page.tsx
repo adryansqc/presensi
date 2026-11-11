@@ -243,9 +243,11 @@ export default async function AdminDashboardPage() {
                       {dateFormatter.format(jadwal.tanggal)} • {jadwal.jamMulai}–{jadwal.jamSelesai}
                     </p>
                     <p className="mt-0.5 truncate text-xs text-slate-400">
-                      {(jadwal.kelompokId && kelompokMap.get(jadwal.kelompokId)) ??
-                        (jadwal.desaId && desaMap.get(jadwal.desaId)) ??
-                        "Tingkat daerah"}
+                      {jadwal.kelompokIds.length > 0
+                        ? jadwal.kelompokIds.map((id) => kelompokMap.get(id)).filter(Boolean).join(", ")
+                        : jadwal.desaIds.length > 0
+                          ? jadwal.desaIds.map((id) => desaMap.get(id)).filter(Boolean).join(", ")
+                          : "Tingkat daerah"}
                     </p>
                   </div>
                   <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset ${statusTone(jadwal.statusBuka)}`}>

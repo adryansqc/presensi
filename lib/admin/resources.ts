@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { getAllRoleDefinitions } from "@/lib/permission-store";
 
 export type FieldType =
   | "text"
@@ -22,7 +23,8 @@ export type FieldDef = {
   placeholder?: string;
   help?: string;
   options?: FieldOption[];
-  defaultValue?: string | boolean | number;
+  defaultValue?: string | boolean | number | string[];
+  multiSelect?: boolean;
 };
 
 export type ColumnType = "text" | "badge" | "date" | "datetime" | "number";
@@ -454,7 +456,7 @@ async function jamaahResource(): Promise<ResourceConfig> {
 }
 
 async function jadwalResource(): Promise<ResourceConfig> {
-  const [daftarDesa, daftarKelompok] = await Promise.all([
+  const [daftarDesa, daftarKelompok, daftarKategori] = await Promise.all([
     prisma.desa.findMany({
       where: { aktif: true },
       orderBy: { nama: "asc" },
@@ -465,9 +467,14 @@ async function jadwalResource(): Promise<ResourceConfig> {
       orderBy: [{ desa: { nama: "asc" } }, { nama: "asc" }],
       select: { id: true, nama: true, desa: { select: { nama: true } } },
     }),
+    prisma.kategori.findMany({
+      where: { aktif: true },
+      orderBy: [{ urutan: "asc" }, { nama: "asc" }],
+      select: { id: true, nama: true },
+    }),
   ]);
 
-  const desaMap = new Map(daftarDesa.map((desa) => [desa.id, desa.nama]));
+  const desaMap = new Map(daftarDesa.map((desa) => [desa.id, desa]));
   const kelompokMap = new Map(daftarKelompok.map((item) => [item.id, item]));
 
   const fields: FieldDef[] = [
@@ -508,21 +515,35 @@ async function jadwalResource(): Promise<ResourceConfig> {
       })),
     },
     {
-      name: "desaId",
-      label: "Desa (opsional)",
+      name: "kategoriIds",
+      label: "Kategori Jamaah",
       type: "select",
-      placeholder: "Semua desa",
-      options: daftarDesa.map((desa) => ({ value: desa.id, label: desa.nama })),
+      required: true,
+      defaultValue: [],
+      multiSelect: true,
+      options: daftarKategori.map((kat) => ({ value: kat.id, label: kat.nama })),
+      help: "Pilih kategori jamaah yang boleh mengikuti pengajian ini (Bapak, Ibu, dll).",
     },
     {
-      name: "kelompokId",
-      label: "Kelompok (opsional)",
+      name: "desaIds",
+      label: "Desa",
       type: "select",
-      placeholder: "Semua kelompok",
+      placeholder: "Pilih desa",
+      multiSelect: true,
+      options: daftarDesa.map((desa) => ({ value: desa.id, label: desa.nama })),
+      help: "Hanya untuk tingkat Desa. Kosongkan jika tingkat Daerah atau Kelompok.",
+    },
+    {
+      name: "kelompokIds",
+      label: "Kelompok",
+      type: "select",
+      placeholder: "Pilih kelompok",
+      multiSelect: true,
       options: daftarKelompok.map((item) => ({
         value: item.id,
         label: `${item.desa.nama} — ${item.nama}`,
       })),
+      help: "Pilih satu atau lebih kelompok.",
     },
     {
       name: "statusBuka",
@@ -558,8 +579,15 @@ async function jadwalResource(): Promise<ResourceConfig> {
         orderBy: { tanggal: "desc" },
       });
       return rows.map((row) => {
-        const kelompok = row.kelompokId ? kelompokMap.get(row.kelompokId) : undefined;
-        const desaNama = row.desaId ? desaMap.get(row.desaId) : undefined;
+        const lokasiNama =
+          row.kelompokIds?.length
+            ? row.kelompokIds
+                .map((id) => kelompokMap.get(id)?.nama)
+                .filter(Boolean)
+                .join(", ")
+            : row.desaIds?.length
+              ? row.desaIds.map((id) => desaMap.get(id)?.nama).filter(Boolean).join(", ")
+              : "Daerah";
         return {
           id: row.id,
           tanggal: isoDate(row.tanggal),
@@ -568,9 +596,10 @@ async function jadwalResource(): Promise<ResourceConfig> {
           jamSelesai: row.jamSelesai,
           waktu: `${row.jamMulai} - ${row.jamSelesai}`,
           tingkat: row.tingkat,
-          desaId: row.desaId,
-          kelompokId: row.kelompokId,
-          lokasi: kelompok?.nama ?? desaNama ?? "Daerah",
+          desaIds: row.desaIds ?? [],
+          kelompokIds: row.kelompokIds ?? [],
+          kategoriIds: row.kategoriIds ?? [],
+          lokasi: lokasiNama,
           statusBuka: row.statusBuka,
         };
       });
@@ -583,8 +612,9 @@ async function jadwalResource(): Promise<ResourceConfig> {
           jamMulai: requireString(input, "jamMulai", "Jam mulai"),
           jamSelesai: requireString(input, "jamSelesai", "Jam selesai"),
           tingkat: requireString(input, "tingkat", "Tingkat"),
-          desaId: optionalString(input, "desaId"),
-          kelompokId: optionalString(input, "kelompokId"),
+          desaIds: Array.isArray(input.desaIds) ? input.desaIds : [],
+          kelompokIds: Array.isArray(input.kelompokIds) ? input.kelompokIds : [],
+          kategoriIds: Array.isArray(input.kategoriIds) ? input.kategoriIds : [],
           statusBuka: optionalString(input, "statusBuka") ?? "Tutup",
         },
       }),
@@ -597,8 +627,9 @@ async function jadwalResource(): Promise<ResourceConfig> {
           jamMulai: requireString(input, "jamMulai", "Jam mulai"),
           jamSelesai: requireString(input, "jamSelesai", "Jam selesai"),
           tingkat: requireString(input, "tingkat", "Tingkat"),
-          desaId: optionalString(input, "desaId"),
-          kelompokId: optionalString(input, "kelompokId"),
+          desaIds: Array.isArray(input.desaIds) ? input.desaIds : [],
+          kelompokIds: Array.isArray(input.kelompokIds) ? input.kelompokIds : [],
+          kategoriIds: Array.isArray(input.kategoriIds) ? input.kategoriIds : [],
           statusBuka: optionalString(input, "statusBuka") ?? "Tutup",
         },
       }),
@@ -750,6 +781,8 @@ async function presensiResource(): Promise<ResourceConfig> {
 }
 
 async function penggunaResource(): Promise<ResourceConfig> {
+  const roleDefinitions = await getAllRoleDefinitions();
+
   const fields: FieldDef[] = [
     {
       name: "name",
@@ -780,9 +813,9 @@ async function penggunaResource(): Promise<ResourceConfig> {
       type: "select",
       required: true,
       defaultValue: "Admin_CAI",
-      options: ["Super_Admin", "Admin_CAI", "Desa", "Kelompok"].map((role) => ({
-        value: role,
-        label: role.replace("_", " "),
+      options: roleDefinitions.map((role) => ({
+        value: role.value,
+        label: role.label,
       })),
     },
   ];

@@ -31,8 +31,6 @@ export type JadwalMinAggregateOutputType = {
   jamMulai: string | null
   jamSelesai: string | null
   tingkat: string | null
-  desaId: string | null
-  kelompokId: string | null
   statusBuka: string | null
   slugPublik: string | null
   linkPublikAktif: boolean | null
@@ -49,8 +47,6 @@ export type JadwalMaxAggregateOutputType = {
   jamMulai: string | null
   jamSelesai: string | null
   tingkat: string | null
-  desaId: string | null
-  kelompokId: string | null
   statusBuka: string | null
   slugPublik: string | null
   linkPublikAktif: boolean | null
@@ -67,8 +63,9 @@ export type JadwalCountAggregateOutputType = {
   jamMulai: number
   jamSelesai: number
   tingkat: number
-  desaId: number
-  kelompokId: number
+  desaIds: number
+  kelompokIds: number
+  kategoriIds: number
   statusBuka: number
   slugPublik: number
   linkPublikAktif: number
@@ -87,8 +84,6 @@ export type JadwalMinAggregateInputType = {
   jamMulai?: true
   jamSelesai?: true
   tingkat?: true
-  desaId?: true
-  kelompokId?: true
   statusBuka?: true
   slugPublik?: true
   linkPublikAktif?: true
@@ -105,8 +100,6 @@ export type JadwalMaxAggregateInputType = {
   jamMulai?: true
   jamSelesai?: true
   tingkat?: true
-  desaId?: true
-  kelompokId?: true
   statusBuka?: true
   slugPublik?: true
   linkPublikAktif?: true
@@ -123,8 +116,9 @@ export type JadwalCountAggregateInputType = {
   jamMulai?: true
   jamSelesai?: true
   tingkat?: true
-  desaId?: true
-  kelompokId?: true
+  desaIds?: true
+  kelompokIds?: true
+  kategoriIds?: true
   statusBuka?: true
   slugPublik?: true
   linkPublikAktif?: true
@@ -214,8 +208,9 @@ export type JadwalGroupByOutputType = {
   jamMulai: string
   jamSelesai: string
   tingkat: string
-  desaId: string | null
-  kelompokId: string | null
+  desaIds: string[]
+  kelompokIds: string[]
+  kategoriIds: string[]
   statusBuka: string
   slugPublik: string | null
   linkPublikAktif: boolean
@@ -253,8 +248,9 @@ export type JadwalWhereInput = {
   jamMulai?: Prisma.StringFilter<"Jadwal"> | string
   jamSelesai?: Prisma.StringFilter<"Jadwal"> | string
   tingkat?: Prisma.StringFilter<"Jadwal"> | string
-  desaId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
-  kelompokId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
+  desaIds?: Prisma.StringNullableListFilter<"Jadwal">
+  kelompokIds?: Prisma.StringNullableListFilter<"Jadwal">
+  kategoriIds?: Prisma.StringNullableListFilter<"Jadwal">
   statusBuka?: Prisma.StringFilter<"Jadwal"> | string
   slugPublik?: Prisma.StringNullableFilter<"Jadwal"> | string | null
   linkPublikAktif?: Prisma.BoolFilter<"Jadwal"> | boolean
@@ -273,8 +269,9 @@ export type JadwalOrderByWithRelationInput = {
   jamMulai?: Prisma.SortOrder
   jamSelesai?: Prisma.SortOrder
   tingkat?: Prisma.SortOrder
-  desaId?: Prisma.SortOrderInput | Prisma.SortOrder
-  kelompokId?: Prisma.SortOrderInput | Prisma.SortOrder
+  desaIds?: Prisma.SortOrder
+  kelompokIds?: Prisma.SortOrder
+  kategoriIds?: Prisma.SortOrder
   statusBuka?: Prisma.SortOrder
   slugPublik?: Prisma.SortOrderInput | Prisma.SortOrder
   linkPublikAktif?: Prisma.SortOrder
@@ -297,8 +294,9 @@ export type JadwalWhereUniqueInput = Prisma.AtLeast<{
   jamMulai?: Prisma.StringFilter<"Jadwal"> | string
   jamSelesai?: Prisma.StringFilter<"Jadwal"> | string
   tingkat?: Prisma.StringFilter<"Jadwal"> | string
-  desaId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
-  kelompokId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
+  desaIds?: Prisma.StringNullableListFilter<"Jadwal">
+  kelompokIds?: Prisma.StringNullableListFilter<"Jadwal">
+  kategoriIds?: Prisma.StringNullableListFilter<"Jadwal">
   statusBuka?: Prisma.StringFilter<"Jadwal"> | string
   linkPublikAktif?: Prisma.BoolFilter<"Jadwal"> | boolean
   dibuatOleh?: Prisma.StringNullableFilter<"Jadwal"> | string | null
@@ -316,8 +314,9 @@ export type JadwalOrderByWithAggregationInput = {
   jamMulai?: Prisma.SortOrder
   jamSelesai?: Prisma.SortOrder
   tingkat?: Prisma.SortOrder
-  desaId?: Prisma.SortOrderInput | Prisma.SortOrder
-  kelompokId?: Prisma.SortOrderInput | Prisma.SortOrder
+  desaIds?: Prisma.SortOrder
+  kelompokIds?: Prisma.SortOrder
+  kategoriIds?: Prisma.SortOrder
   statusBuka?: Prisma.SortOrder
   slugPublik?: Prisma.SortOrderInput | Prisma.SortOrder
   linkPublikAktif?: Prisma.SortOrder
@@ -340,8 +339,9 @@ export type JadwalScalarWhereWithAggregatesInput = {
   jamMulai?: Prisma.StringWithAggregatesFilter<"Jadwal"> | string
   jamSelesai?: Prisma.StringWithAggregatesFilter<"Jadwal"> | string
   tingkat?: Prisma.StringWithAggregatesFilter<"Jadwal"> | string
-  desaId?: Prisma.StringNullableWithAggregatesFilter<"Jadwal"> | string | null
-  kelompokId?: Prisma.StringNullableWithAggregatesFilter<"Jadwal"> | string | null
+  desaIds?: Prisma.StringNullableListFilter<"Jadwal">
+  kelompokIds?: Prisma.StringNullableListFilter<"Jadwal">
+  kategoriIds?: Prisma.StringNullableListFilter<"Jadwal">
   statusBuka?: Prisma.StringWithAggregatesFilter<"Jadwal"> | string
   slugPublik?: Prisma.StringNullableWithAggregatesFilter<"Jadwal"> | string | null
   linkPublikAktif?: Prisma.BoolWithAggregatesFilter<"Jadwal"> | boolean
@@ -358,8 +358,9 @@ export type JadwalCreateInput = {
   jamMulai: string
   jamSelesai: string
   tingkat: string
-  desaId?: string | null
-  kelompokId?: string | null
+  desaIds?: Prisma.JadwalCreatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalCreatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalCreatekategoriIdsInput | string[]
   statusBuka?: string
   slugPublik?: string | null
   linkPublikAktif?: boolean
@@ -377,8 +378,9 @@ export type JadwalUncheckedCreateInput = {
   jamMulai: string
   jamSelesai: string
   tingkat: string
-  desaId?: string | null
-  kelompokId?: string | null
+  desaIds?: Prisma.JadwalCreatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalCreatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalCreatekategoriIdsInput | string[]
   statusBuka?: string
   slugPublik?: string | null
   linkPublikAktif?: boolean
@@ -396,8 +398,9 @@ export type JadwalUpdateInput = {
   jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
   jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
   tingkat?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  desaIds?: Prisma.JadwalUpdatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalUpdatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalUpdatekategoriIdsInput | string[]
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
   slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -415,8 +418,9 @@ export type JadwalUncheckedUpdateInput = {
   jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
   jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
   tingkat?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  desaIds?: Prisma.JadwalUpdatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalUpdatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalUpdatekategoriIdsInput | string[]
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
   slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -434,8 +438,9 @@ export type JadwalCreateManyInput = {
   jamMulai: string
   jamSelesai: string
   tingkat: string
-  desaId?: string | null
-  kelompokId?: string | null
+  desaIds?: Prisma.JadwalCreatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalCreatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalCreatekategoriIdsInput | string[]
   statusBuka?: string
   slugPublik?: string | null
   linkPublikAktif?: boolean
@@ -452,8 +457,9 @@ export type JadwalUpdateManyMutationInput = {
   jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
   jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
   tingkat?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  desaIds?: Prisma.JadwalUpdatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalUpdatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalUpdatekategoriIdsInput | string[]
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
   slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -469,8 +475,9 @@ export type JadwalUncheckedUpdateManyInput = {
   jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
   jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
   tingkat?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  desaIds?: Prisma.JadwalUpdatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalUpdatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalUpdatekategoriIdsInput | string[]
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
   slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -497,8 +504,9 @@ export type JadwalCountOrderByAggregateInput = {
   jamMulai?: Prisma.SortOrder
   jamSelesai?: Prisma.SortOrder
   tingkat?: Prisma.SortOrder
-  desaId?: Prisma.SortOrder
-  kelompokId?: Prisma.SortOrder
+  desaIds?: Prisma.SortOrder
+  kelompokIds?: Prisma.SortOrder
+  kategoriIds?: Prisma.SortOrder
   statusBuka?: Prisma.SortOrder
   slugPublik?: Prisma.SortOrder
   linkPublikAktif?: Prisma.SortOrder
@@ -515,8 +523,6 @@ export type JadwalMaxOrderByAggregateInput = {
   jamMulai?: Prisma.SortOrder
   jamSelesai?: Prisma.SortOrder
   tingkat?: Prisma.SortOrder
-  desaId?: Prisma.SortOrder
-  kelompokId?: Prisma.SortOrder
   statusBuka?: Prisma.SortOrder
   slugPublik?: Prisma.SortOrder
   linkPublikAktif?: Prisma.SortOrder
@@ -533,8 +539,6 @@ export type JadwalMinOrderByAggregateInput = {
   jamMulai?: Prisma.SortOrder
   jamSelesai?: Prisma.SortOrder
   tingkat?: Prisma.SortOrder
-  desaId?: Prisma.SortOrder
-  kelompokId?: Prisma.SortOrder
   statusBuka?: Prisma.SortOrder
   slugPublik?: Prisma.SortOrder
   linkPublikAktif?: Prisma.SortOrder
@@ -591,6 +595,33 @@ export type JadwalUncheckedUpdateManyWithoutDibuatOlehUserNestedInput = {
   deleteMany?: Prisma.JadwalScalarWhereInput | Prisma.JadwalScalarWhereInput[]
 }
 
+export type JadwalCreatedesaIdsInput = {
+  set: string[]
+}
+
+export type JadwalCreatekelompokIdsInput = {
+  set: string[]
+}
+
+export type JadwalCreatekategoriIdsInput = {
+  set: string[]
+}
+
+export type JadwalUpdatedesaIdsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type JadwalUpdatekelompokIdsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type JadwalUpdatekategoriIdsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type JadwalCreateNestedOneWithoutPresensiInput = {
   create?: Prisma.XOR<Prisma.JadwalCreateWithoutPresensiInput, Prisma.JadwalUncheckedCreateWithoutPresensiInput>
   connectOrCreate?: Prisma.JadwalCreateOrConnectWithoutPresensiInput
@@ -612,8 +643,9 @@ export type JadwalCreateWithoutDibuatOlehUserInput = {
   jamMulai: string
   jamSelesai: string
   tingkat: string
-  desaId?: string | null
-  kelompokId?: string | null
+  desaIds?: Prisma.JadwalCreatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalCreatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalCreatekategoriIdsInput | string[]
   statusBuka?: string
   slugPublik?: string | null
   linkPublikAktif?: boolean
@@ -630,8 +662,9 @@ export type JadwalUncheckedCreateWithoutDibuatOlehUserInput = {
   jamMulai: string
   jamSelesai: string
   tingkat: string
-  desaId?: string | null
-  kelompokId?: string | null
+  desaIds?: Prisma.JadwalCreatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalCreatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalCreatekategoriIdsInput | string[]
   statusBuka?: string
   slugPublik?: string | null
   linkPublikAktif?: boolean
@@ -677,8 +710,9 @@ export type JadwalScalarWhereInput = {
   jamMulai?: Prisma.StringFilter<"Jadwal"> | string
   jamSelesai?: Prisma.StringFilter<"Jadwal"> | string
   tingkat?: Prisma.StringFilter<"Jadwal"> | string
-  desaId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
-  kelompokId?: Prisma.StringNullableFilter<"Jadwal"> | string | null
+  desaIds?: Prisma.StringNullableListFilter<"Jadwal">
+  kelompokIds?: Prisma.StringNullableListFilter<"Jadwal">
+  kategoriIds?: Prisma.StringNullableListFilter<"Jadwal">
   statusBuka?: Prisma.StringFilter<"Jadwal"> | string
   slugPublik?: Prisma.StringNullableFilter<"Jadwal"> | string | null
   linkPublikAktif?: Prisma.BoolFilter<"Jadwal"> | boolean
@@ -695,8 +729,9 @@ export type JadwalCreateWithoutPresensiInput = {
   jamMulai: string
   jamSelesai: string
   tingkat: string
-  desaId?: string | null
-  kelompokId?: string | null
+  desaIds?: Prisma.JadwalCreatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalCreatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalCreatekategoriIdsInput | string[]
   statusBuka?: string
   slugPublik?: string | null
   linkPublikAktif?: boolean
@@ -713,8 +748,9 @@ export type JadwalUncheckedCreateWithoutPresensiInput = {
   jamMulai: string
   jamSelesai: string
   tingkat: string
-  desaId?: string | null
-  kelompokId?: string | null
+  desaIds?: Prisma.JadwalCreatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalCreatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalCreatekategoriIdsInput | string[]
   statusBuka?: string
   slugPublik?: string | null
   linkPublikAktif?: boolean
@@ -747,8 +783,9 @@ export type JadwalUpdateWithoutPresensiInput = {
   jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
   jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
   tingkat?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  desaIds?: Prisma.JadwalUpdatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalUpdatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalUpdatekategoriIdsInput | string[]
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
   slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -765,8 +802,9 @@ export type JadwalUncheckedUpdateWithoutPresensiInput = {
   jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
   jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
   tingkat?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  desaIds?: Prisma.JadwalUpdatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalUpdatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalUpdatekategoriIdsInput | string[]
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
   slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -783,8 +821,9 @@ export type JadwalCreateManyDibuatOlehUserInput = {
   jamMulai: string
   jamSelesai: string
   tingkat: string
-  desaId?: string | null
-  kelompokId?: string | null
+  desaIds?: Prisma.JadwalCreatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalCreatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalCreatekategoriIdsInput | string[]
   statusBuka?: string
   slugPublik?: string | null
   linkPublikAktif?: boolean
@@ -800,8 +839,9 @@ export type JadwalUpdateWithoutDibuatOlehUserInput = {
   jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
   jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
   tingkat?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  desaIds?: Prisma.JadwalUpdatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalUpdatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalUpdatekategoriIdsInput | string[]
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
   slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -818,8 +858,9 @@ export type JadwalUncheckedUpdateWithoutDibuatOlehUserInput = {
   jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
   jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
   tingkat?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  desaIds?: Prisma.JadwalUpdatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalUpdatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalUpdatekategoriIdsInput | string[]
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
   slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -836,8 +877,9 @@ export type JadwalUncheckedUpdateManyWithoutDibuatOlehUserInput = {
   jamMulai?: Prisma.StringFieldUpdateOperationsInput | string
   jamSelesai?: Prisma.StringFieldUpdateOperationsInput | string
   tingkat?: Prisma.StringFieldUpdateOperationsInput | string
-  desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  desaIds?: Prisma.JadwalUpdatedesaIdsInput | string[]
+  kelompokIds?: Prisma.JadwalUpdatekelompokIdsInput | string[]
+  kategoriIds?: Prisma.JadwalUpdatekategoriIdsInput | string[]
   statusBuka?: Prisma.StringFieldUpdateOperationsInput | string
   slugPublik?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   linkPublikAktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -884,8 +926,9 @@ export type JadwalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   jamMulai?: boolean
   jamSelesai?: boolean
   tingkat?: boolean
-  desaId?: boolean
-  kelompokId?: boolean
+  desaIds?: boolean
+  kelompokIds?: boolean
+  kategoriIds?: boolean
   statusBuka?: boolean
   slugPublik?: boolean
   linkPublikAktif?: boolean
@@ -905,8 +948,9 @@ export type JadwalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   jamMulai?: boolean
   jamSelesai?: boolean
   tingkat?: boolean
-  desaId?: boolean
-  kelompokId?: boolean
+  desaIds?: boolean
+  kelompokIds?: boolean
+  kategoriIds?: boolean
   statusBuka?: boolean
   slugPublik?: boolean
   linkPublikAktif?: boolean
@@ -924,8 +968,9 @@ export type JadwalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   jamMulai?: boolean
   jamSelesai?: boolean
   tingkat?: boolean
-  desaId?: boolean
-  kelompokId?: boolean
+  desaIds?: boolean
+  kelompokIds?: boolean
+  kategoriIds?: boolean
   statusBuka?: boolean
   slugPublik?: boolean
   linkPublikAktif?: boolean
@@ -943,8 +988,9 @@ export type JadwalSelectScalar = {
   jamMulai?: boolean
   jamSelesai?: boolean
   tingkat?: boolean
-  desaId?: boolean
-  kelompokId?: boolean
+  desaIds?: boolean
+  kelompokIds?: boolean
+  kategoriIds?: boolean
   statusBuka?: boolean
   slugPublik?: boolean
   linkPublikAktif?: boolean
@@ -954,7 +1000,7 @@ export type JadwalSelectScalar = {
   updatedAt?: boolean
 }
 
-export type JadwalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tanggal" | "jenisPengajian" | "jamMulai" | "jamSelesai" | "tingkat" | "desaId" | "kelompokId" | "statusBuka" | "slugPublik" | "linkPublikAktif" | "dibuatOleh" | "ditutupPada" | "createdAt" | "updatedAt", ExtArgs["result"]["jadwal"]>
+export type JadwalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tanggal" | "jenisPengajian" | "jamMulai" | "jamSelesai" | "tingkat" | "desaIds" | "kelompokIds" | "kategoriIds" | "statusBuka" | "slugPublik" | "linkPublikAktif" | "dibuatOleh" | "ditutupPada" | "createdAt" | "updatedAt", ExtArgs["result"]["jadwal"]>
 export type JadwalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   presensi?: boolean | Prisma.Jadwal$presensiArgs<ExtArgs>
   dibuatOlehUser?: boolean | Prisma.Jadwal$dibuatOlehUserArgs<ExtArgs>
@@ -980,8 +1026,9 @@ export type $JadwalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     jamMulai: string
     jamSelesai: string
     tingkat: string
-    desaId: string | null
-    kelompokId: string | null
+    desaIds: string[]
+    kelompokIds: string[]
+    kategoriIds: string[]
     statusBuka: string
     slugPublik: string | null
     linkPublikAktif: boolean
@@ -1420,8 +1467,9 @@ export interface JadwalFieldRefs {
   readonly jamMulai: Prisma.FieldRef<"Jadwal", 'String'>
   readonly jamSelesai: Prisma.FieldRef<"Jadwal", 'String'>
   readonly tingkat: Prisma.FieldRef<"Jadwal", 'String'>
-  readonly desaId: Prisma.FieldRef<"Jadwal", 'String'>
-  readonly kelompokId: Prisma.FieldRef<"Jadwal", 'String'>
+  readonly desaIds: Prisma.FieldRef<"Jadwal", 'String[]'>
+  readonly kelompokIds: Prisma.FieldRef<"Jadwal", 'String[]'>
+  readonly kategoriIds: Prisma.FieldRef<"Jadwal", 'String[]'>
   readonly statusBuka: Prisma.FieldRef<"Jadwal", 'String'>
   readonly slugPublik: Prisma.FieldRef<"Jadwal", 'String'>
   readonly linkPublikAktif: Prisma.FieldRef<"Jadwal", 'Boolean'>
