@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type CheckboxItem = {
   id: string;
@@ -29,6 +29,7 @@ export default function CheckboxSearch({
   maxHeight = "200px",
 }: CheckboxSearchProps) {
   const [query, setQuery] = useState("");
+  const [selectAll, setSelectAll] = useState<'none' | 'partial' | 'all'>('none');
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -36,14 +37,48 @@ export default function CheckboxSearch({
     return items.filter((i) => i.label.toLowerCase().includes(needle));
   }, [items, query]);
 
+  // Hitung status pilih semua otomatis terhadap item yang terfilter
+  const isAllSelected = useMemo(() => {
+    if (filtered.length === 0) return false;
+    return filtered.every((i) => selected.includes(i.id));
+  }, [filtered, selected]);
+
+  const isNoneSelected = useMemo(() => {
+    return filtered.every((i) => !selected.includes(i.id));
+  }, [filtered, selected]);
+
+  // Sinkronkan selectAll saat daftar terfilter berubah (misal saat pencarian)
+  useEffect(() => {
+    if (isAllSelected) {
+      setSelectAll('all');
+    } else if (isNoneSelected) {
+      setSelectAll('none');
+    } else {
+      setSelectAll('partial');
+    }
+  }, [isAllSelected, isNoneSelected]);
+
   const isSelected = (id: string) => selected.includes(id);
 
-  const toggle = (id: string) => {
-    if (disabled) return;
-    onChange(
-      isSelected(id) ? selected.filter((x) => x !== id) : [...selected, id]
-    );
-  };
+  const toggle = useCallback(
+    (id: string) => {
+      if (disabled) return;
+      onChange(
+        isSelected(id) ? selected.filter((x) => x !== id) : [...selected, id]
+      );
+    },
+    [disabled, isSelected, selected, onChange]
+  );
+
+  const handleSelectAll = useCallback(() => {
+    if (selectAll === 'all') {
+      onChange([]);
+      setSelectAll('none');
+    } else {
+      onChange(filtered.map((i) => i.id));
+      setSelectAll('all');
+    }
+  }, [selectAll, filtered, onChange]);
 
   const selectedLabels = selected
     .map((id) => items.find((i) => i.id === id)?.label)
@@ -55,6 +90,33 @@ export default function CheckboxSearch({
         {label}
         {required && <span className="ml-0.5 text-red-500">*</span>}
       </label>
+
+      {/* Baris Pilih Semua */}
+      <div className="flex items-center gap-2 cursor-pointer transition hover:bg-slate-50/50 rounded-lg p-2">
+        <input
+          type="checkbox"
+          checked={selectAll === 'all'}
+          defaultChecked={selectAll === 'all'}
+          onChange={handleSelectAll}
+          disabled={disabled || filtered.length === 0}
+          className={`h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 shrink-0 ${
+            selectAll === 'partial'
+              ? 'bg-white'
+              : selectAll === 'all'
+                ? 'bg-emerald-600 border-emerald-600 text-emerald-600'
+                : 'bg-white border-slate-300 text-slate-500'
+          }`}
+          style={{ appearance: 'none' }}
+        />
+        <span className="text-sm font-medium text-slate-700">
+          {selectAll === 'all' ? 'Batal Semua' : 'Pilih Semua'}
+        </span>
+        {selectAll === 'partial' && (
+          <span className="ml-1 text-[10px] bg-amber-100 text-amber-700 rounded px-1.5 py-0">
+            sebagian
+          </span>
+        )}
+      </div>
 
       <div className="relative">
         <input
