@@ -57,6 +57,20 @@ export default function JadwalManager() {
   });
   const [createSaving, setCreateSaving] = useState(false);
   const [createError, setCreateError] = useState("");
+  const [openEdit, setOpenEdit] = useState(false);
+  const [editForm, setEditForm] = useState<CreateForm>({
+    tanggal: "",
+    jenisPengajian: "",
+    jamMulai: "",
+    jamSelesai: "",
+    tingkat: "Kelompok",
+    kategoriIds: [],
+    desaIds: [],
+    kelompokIds: [],
+  });
+  const [editId, setEditId] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState("");
   const swal = useSwal();
 
   // Kelompok yang tersedia berdasarkan desa yang dipilih (hanya untuk tingkat Desa)
@@ -69,6 +83,17 @@ export default function JadwalManager() {
     }
     return [];
   }, [createForm.tingkat, createForm.desaIds, daftarKelompok]);
+
+  // Kelompok yang tersedia untuk edit form berdasarkan desa yang dipilih
+  const kelompokFilteredEdit = useMemo(() => {
+    if (editForm.tingkat === "Desa" && editForm.desaIds.length > 0) {
+      return daftarKelompok.filter((k) => editForm.desaIds.includes(k.desaId));
+    }
+    if (editForm.tingkat === "Kelompok") {
+      return daftarKelompok;
+    }
+    return [];
+  }, [editForm.tingkat, editForm.desaIds, daftarKelompok]);
 
   async function refreshData() {
     try {
@@ -114,6 +139,20 @@ export default function JadwalManager() {
     setCreateError("");
   }
 
+  function resetEditForm() {
+    setEditForm({
+      tanggal: "",
+      jenisPengajian: "",
+      jamMulai: "",
+      jamSelesai: "",
+      tingkat: "Kelompok",
+      kategoriIds: [],
+      desaIds: [],
+      kelompokIds: [],
+    });
+    setEditError("");
+  }
+
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
     setCreateError("");
@@ -146,6 +185,57 @@ export default function JadwalManager() {
       setCreateError("Tidak dapat menghubungi server.");
     } finally {
       setCreateSaving(false);
+    }
+  }
+
+  async function handleEdit(jadwal: Jadwal) {
+    setEditId(jadwal.id);
+    setEditForm({
+      tanggal: jadwal.tanggal,
+      jenisPengajian: jadwal.jenisPengajian,
+      jamMulai: jadwal.jamMulai,
+      jamSelesai: jadwal.jamSelesai,
+      tingkat: jadwal.tingkat,
+      kategoriIds: jadwal.kategoriIds,
+      desaIds: jadwal.desaIds,
+      kelompokIds: jadwal.kelompokIds,
+    });
+    setEditError("");
+    setOpenEdit(true);
+  }
+
+  async function handleUpdate(event: React.FormEvent) {
+    event.preventDefault();
+    setEditError("");
+    setEditSaving(true);
+    try {
+      const res = await fetch(`/api/admin/jadwal/${editId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tanggal: editForm.tanggal || undefined,
+          jenisPengajian: editForm.jenisPengajian,
+          jamMulai: editForm.jamMulai,
+          jamSelesai: editForm.jamSelesai,
+          tingkat: editForm.tingkat,
+          desaIds: editForm.desaIds,
+          kelompokIds: editForm.kelompokIds,
+          kategoriIds: editForm.kategoriIds,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setEditError(typeof data?.error === "string" ? data.error : "Gagal mengubah jadwal.");
+        return;
+      }
+      setOpenEdit(false);
+      resetEditForm();
+      await swal.success("Berhasil diubah", "Jadwal telah diperbarui.");
+      await refreshData();
+    } catch {
+      setEditError("Tidak dapat menghubungi server.");
+    } finally {
+      setEditSaving(false);
     }
   }
 
@@ -451,6 +541,207 @@ export default function JadwalManager() {
         </div>
       )}
 
+      {openEdit && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+            onClick={() => setOpenEdit(false)}
+          />
+          <div className="relative flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
+            <div className="flex items-start justify-between border-b border-slate-200 px-5 py-4">
+              <div>
+                <h2 className="text-base font-semibold text-slate-900">Edit Jadwal</h2>
+                <p className="mt-0.5 text-xs text-slate-500">Ubah data jadwal pengajian.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpenEdit(false)}
+                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="h-5 w-5">
+                  <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleUpdate} className="flex min-h-0 flex-1 flex-col">
+              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5">
+                {editError && (
+                  <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+                    {editError}
+                  </div>
+                )}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <label htmlFor="edit-jadwal-jenis" className="mb-1.5 block text-sm font-medium text-slate-700">
+                      Jenis Pengajian
+                    </label>
+                    <input
+                      id="edit-jadwal-jenis"
+                      type="text"
+                      value={editForm.jenisPengajian}
+                      onChange={(e) => setEditForm({ ...editForm, jenisPengajian: e.target.value })}
+                      placeholder="Contoh: Pengajian Rutin"
+                      required
+                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-jadwal-tanggal" className="mb-1.5 block text-sm font-medium text-slate-700">
+                      Tanggal <span className="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <input
+                      id="edit-jadwal-tanggal"
+                      type="date"
+                      value={editForm.tanggal}
+                      onChange={(e) => setEditForm({ ...editForm, tanggal: e.target.value })}
+                      required
+                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-jadwal-jam-mulai" className="mb-1.5 block text-sm font-medium text-slate-700">
+                      Jam Mulai <span className="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <input
+                      id="edit-jadwal-jam-mulai"
+                      type="time"
+                      value={editForm.jamMulai}
+                      onChange={(e) => setEditForm({ ...editForm, jamMulai: e.target.value })}
+                      required
+                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-jadwal-jam-selesai" className="mb-1.5 block text-sm font-medium text-slate-700">
+                      Jam Selesai <span className="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <input
+                      id="edit-jadwal-jam-selesai"
+                      type="time"
+                      value={editForm.jamSelesai}
+                      onChange={(e) => setEditForm({ ...editForm, jamSelesai: e.target.value })}
+                      required
+                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-jadwal-tingkat" className="mb-1.5 block text-sm font-medium text-slate-700">
+                      Tingkat <span className="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <select
+                      id="edit-jadwal-tingkat"
+                      value={editForm.tingkat}
+                      onChange={(e) => {
+                        const nilai = e.target.value;
+                        setEditForm((prev) => ({
+                          ...prev,
+                          tingkat: nilai,
+                          desaIds: nilai === "Desa" ? prev.desaIds : [],
+                          kelompokIds: nilai === "Kelompok" ? prev.kelompokIds : [],
+                        }));
+                      }}
+                      required
+                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                    >
+                      <option value="Daerah">Daerah (semua wilayah)</option>
+                      <option value="Desa">Desa (pilih desa, lalu kelompok)</option>
+                      <option value="Kelompok">Kelompok (pilih kelompok langsung)</option>
+                    </select>
+                  </div>
+
+                  {/* Kategori Jamaah - selalu ditampilkan */}
+                  <div className="sm:col-span-2">
+                    <CheckboxSearch
+                      items={daftarKategori.map((kat) => ({ id: kat.id, label: kat.nama }))}
+                      selected={editForm.kategoriIds}
+                      onChange={(ids) => setEditForm({ ...editForm, kategoriIds: ids })}
+                      label="Kategori Jamaah"
+                      placeholder="Cari kategori (Bapak, Ibu, dll)..."
+                      required
+                      maxHeight="180px"
+                    />
+                    <p className="mt-1 text-xs text-slate-500">
+                      Pilih satu atau lebih kategori jamaah (contoh: Bapak, Ibu).
+                    </p>
+                  </div>
+
+                  {/* Desa - hanya untuk tingkat Desa */}
+                  {editForm.tingkat === "Desa" && (
+                    <div className="sm:col-span-2">
+                      <CheckboxSearch
+                        items={daftarDesa.map((d) => ({ id: d.id, label: d.nama }))}
+                        selected={editForm.desaIds}
+                        onChange={(ids) =>
+                          setEditForm({ ...editForm, desaIds: ids, kelompokIds: [] })
+                        }
+                        label="Desa"
+                        placeholder="Cari desa..."
+                        required
+                        maxHeight="180px"
+                      />
+                      <p className="mt-1 text-xs text-slate-500">
+                        Pilih satu atau lebih desa. Kelompok akan muncul berdasarkan desa yang dipilih.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Kelompok - untuk tingkat Desa (berdasarkan desa terpilih) atau Kelompok (semua) */}
+                  {(editForm.tingkat === "Desa" || editForm.tingkat === "Kelompok") && (
+                    <div className="sm:col-span-2">
+                      <CheckboxSearch
+                        items={kelompokFilteredEdit.map((k) => ({
+                          id: k.id,
+                          label: `${k.desaNama} — ${k.nama}`,
+                        }))}
+                        selected={editForm.kelompokIds}
+                        onChange={(ids) => setEditForm({ ...editForm, kelompokIds: ids })}
+                        label="Kelompok"
+                        placeholder="Cari kelompok..."
+                        required
+                        disabled={
+                          editForm.tingkat === "Desa" && editForm.desaIds.length === 0
+                        }
+                        maxHeight="180px"
+                      />
+                      {editForm.tingkat === "Desa" && editForm.desaIds.length === 0 ? (
+                        <p className="mt-1 text-xs text-slate-500">
+                          Pilih desa terlebih dahulu untuk menampilkan kelompok.
+                        </p>
+                      ) : kelompokFilteredEdit.length === 0 ? (
+                        <p className="mt-1 text-xs text-slate-500">
+                          Tidak ada kelompok yang tersedia.
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-xs text-slate-500">
+                          Pilih satu atau lebih kelompok.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3.5">
+                <button
+                  type="button"
+                  onClick={() => setOpenEdit(false)}
+                  disabled={editSaving}
+                  className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={editSaving}
+                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
+                >
+                  {editSaving ? "Menyimpan..." : "Simpan Perubahan"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -553,6 +844,18 @@ export default function JadwalManager() {
                           </svg>
                         </button>
                       )}
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(j)}
+                        className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                        title="Edit Jadwal"
+                        aria-label="Edit jadwal"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      </button>
                     </div>
                   </td>
                 </tr>
