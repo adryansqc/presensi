@@ -7,7 +7,11 @@ import PresensiJadwalList from "@/components/admin/PresensiJadwalList";
 
 export const dynamic = "force-dynamic";
 
-export default async function PresensiPage() {
+export default async function PresensiPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tingkat?: string }>;
+}) {
   await connection();
   const session = await getServerSession(authOptions);
 
@@ -29,5 +33,10 @@ export default async function PresensiPage() {
     );
   }
 
-  return <PresensiJadwalList />;
+  const params = await searchParams;
+  const tingkat = ["Daerah", "Desa", "Kelompok"].includes(params?.tingkat ?? "")
+    ? params!.tingkat!
+    : "Semua";
+
+  return <PresensiJadwalList tingkat={tingkat} />;
 }

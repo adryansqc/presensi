@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import AdminShell from "@/components/admin/AdminShell";
 import { authOptions } from "@/lib/auth";
 import { getRolePermissions } from "@/lib/permission-store";
+import { getPresensiMenuGroups } from "@/lib/admin/presensi-menu";
+
 
 export const metadata = {
   title: "Admin • Presensi Jambi Kota 1",
@@ -19,6 +21,14 @@ async function AdminGate({ children }: { children: React.ReactNode }) {
 
   const role = (session.user as { role?: string } | undefined)?.role ?? "";
   const permissions = await getRolePermissions(role);
+
+  const presensiGroups = permissions.includes("presensi.view")
+    ? await getPresensiMenuGroups({
+        role,
+        desaId: (session.user as { desaId?: string } | undefined)?.desaId ?? null,
+        kelompokId: (session.user as { kelompokId?: string } | undefined)?.kelompokId ?? null,
+      })
+    : [];
 
   if (permissions.length === 0) {
     return (
@@ -50,6 +60,7 @@ async function AdminGate({ children }: { children: React.ReactNode }) {
     <AdminShell
       user={{ name: session.user?.name, email: session.user?.email, role }}
       permissions={permissions}
+      presensiGroups={presensiGroups}
     >
       {children}
     </AdminShell>

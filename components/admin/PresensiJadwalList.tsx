@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSwal } from "@/components/ui/SwalProvider";
 
@@ -17,7 +17,9 @@ type JadwalItem = {
   statusBuka: string;
 };
 
-export default function PresensiJadwalList() {
+const TINGKAT_TABS = ["Semua", "Daerah", "Desa", "Kelompok"] as const;
+
+export default function PresensiJadwalList({ tingkat }: { tingkat: string }) {
   const [jadwalList, setJadwalList] = useState<JadwalItem[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -49,14 +51,18 @@ export default function PresensiJadwalList() {
   }, [swal]);
 
   const filtered = useMemo(() => {
+    let list = jadwalList;
+    if (tingkat && tingkat !== "Semua") {
+      list = list.filter((j) => j.tingkat === tingkat);
+    }
     const needle = query.trim().toLowerCase();
-    if (!needle) return jadwalList;
-    return jadwalList.filter((j) =>
+    if (!needle) return list;
+    return list.filter((j) =>
       j.jenisPengajian.toLowerCase().includes(needle) ||
       j.lokasi.toLowerCase().includes(needle) ||
       j.tanggal.includes(needle)
     );
-  }, [jadwalList, query]);
+  }, [jadwalList, query, tingkat]);
 
   const statusBadge = (status: string) => {
     const isOpen = status === "Buka";
@@ -93,6 +99,25 @@ export default function PresensiJadwalList() {
             className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 w-full sm:w-64"
           />
         </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {TINGKAT_TABS.map((tab) => {
+          const active = tab === tingkat;
+          return (
+            <Link
+              key={tab}
+              href={tab === "Semua" ? "/admin/presensi" : `/admin/presensi?tingkat=${tab}`}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+                active
+                  ? "bg-emerald-600 text-white shadow-sm"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              {tab}
+            </Link>
+          );
+        })}
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">

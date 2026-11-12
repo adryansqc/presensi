@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 import { useSwal } from "@/components/ui/SwalProvider";
+import type { PresensiMenuGroup } from "@/lib/admin/presensi-menu";
 
 type NavItem = {
   href: string;
@@ -26,7 +27,8 @@ type IconName =
   | "shield"
   | "logout"
   | "menu"
-  | "close";
+  | "close"
+  | "chevron";
 
 const NAV_GROUPS: NavGroup[] = [
   {
@@ -207,21 +209,44 @@ function Icon({ name, className }: { name: IconName; className?: string }) {
           <path d="M6 6l12 12M18 6 6 18" />
         </svg>
       );
+    case "chevron":
+      return (
+        <svg {...common}>
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+      );
   }
 }
 
 export default function AdminShell({
   user,
   permissions,
+  presensiGroups = [],
   children,
 }: {
   user: { name?: string | null; email?: string | null; role?: string | null };
   permissions: string[];
+  presensiGroups?: PresensiMenuGroup[];
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [presensiOpenState, setPresensiOpenState] = useState<boolean | null>(null);
+  const [groupState, setGroupState] = useState<Record<string, boolean>>({});
   const { confirm } = useSwal();
+
+  const isPresensiRoute = pathname.startsWith("/admin/presensi");
+  const activeJadwalId = isPresensiRoute
+    ? pathname.split("/").filter(Boolean)[2] ?? null
+    : null;
+
+  const presensiOpen = presensiOpenState ?? isPresensiRoute;
+
+  const isGroupOpen = (group: PresensiMenuGroup) => {
+    if (groupState[group.key] !== undefined) return groupState[group.key];
+    if (!activeJadwalId) return false;
+    return group.items.some((i) => i.id === activeJadwalId);
+  };
   const permissionSet = new Set(permissions);
   const visibleGroups = NAV_GROUPS.map((group) => ({
     ...group,
@@ -267,6 +292,123 @@ export default function AdminShell({
                   item.href === "/admin"
                     ? pathname === "/admin"
                     : pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+                if (item.href === "/admin/presensi" && presensiGroups.length > 0) {
+                  return (
+                    <li key={item.href}>
+                      <div
+                        className={`flex items-center gap-1 rounded-xl transition ${
+                          active
+                            ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-inset ring-emerald-400/20"
+                            : "text-slate-400 hover:bg-white/5 hover:text-white"
+                        }`}
+                      >
+                        <Link
+                          href={item.href}
+                          onClick={() => setOpen(false)}
+                          className="flex flex-1 items-center gap-3 px-3 py-2 text-sm font-medium"
+                        >
+                          <Icon name={item.icon} className="h-4.5 w-4.5" />
+                          {item.label}
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => setPresensiOpenState(!presensiOpen)}
+                          aria-expanded={presensiOpen}
+                          aria-label={presensiOpen ? "Tutup submenu presensi" : "Buka submenu presensi"}
+                          className="mr-1.5 rounded-lg p-1.5 transition hover:bg-white/10"
+                        >
+                          <Icon
+                            name="chevron"
+                            className={`h-3.5 w-3.5 transition-transform ${presensiOpen ? "rotate-90" : ""}`}
+                          />
+                        </button>
+                      </div>
+
+                      {presensiOpen && (
+                        <ul className="mt-1 space-y-1 border-l border-white/10 pl-3 ml-4">
+                          {presensiGroups.map((sub) => {
+                            const subOpen = isGroupOpen(sub);
+                            const subActive = Boolean(
+                              activeJadwalId && sub.items.some((i) => i.id === activeJadwalId)
+                            );
+                            return (
+                              <li key={sub.key}>
+                                <div className="flex items-center gap-1">
+                                  <Link
+                                    href={`/admin/presensi?tingkat=${sub.key}`}
+                                    onClick={() => setOpen(false)}
+                                    className={`flex flex-1 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition ${
+                                      subActive
+                                        ? "text-emerald-300"
+                                        : "text-slate-400 hover:bg-white/5 hover:text-white"
+                                    }`}
+                                  >
+                                    {sub.label}
+                                    <span className="ml-auto rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium text-slate-300">
+                                      {sub.items.length}
+                                    </span>
+                                  </Link>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setGroupState((prev) => ({ ...prev, [sub.key]: !subOpen }))
+                                    }
+                                    aria-expanded={subOpen}
+                                    aria-label={`${subOpen ? "Tutup" : "Buka"} daftar jadwal ${sub.label}`}
+                                    className="rounded-lg p-1 text-slate-400 transition hover:bg-white/10 hover:text-white"
+                                  >
+                                    <Icon
+                                      name="chevron"
+                                      className={`h-3 w-3 transition-transform ${subOpen ? "rotate-90" : ""}`}
+                                    />
+                                  </button>
+                                </div>
+
+                                {subOpen && (
+                                  <ul className="mt-1 space-y-0.5 pl-4">
+                                    {sub.items.map((j) => {
+                                      const isCurrent = pathname === `/admin/presensi/${j.id}`;
+                                      return (
+                                        <li key={j.id}>
+                                          <Link
+                                            href={`/admin/presensi/${j.id}`}
+                                            onClick={() => setOpen(false)}
+                                            title={`${j.jenisPengajian} - ${j.lokasi} - ${j.tanggal}`}
+                                            className={`block rounded-lg px-2.5 py-1.5 text-xs transition ${
+                                              isCurrent
+                                                ? "bg-emerald-500/15 text-emerald-300"
+                                                : "text-slate-400 hover:bg-white/5 hover:text-white"
+                                            }`}
+                                          >
+                                            <span className="flex items-center gap-1.5">
+                                              <span
+                                                className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                                                  j.statusBuka === "Buka"
+                                                    ? "bg-emerald-400"
+                                                    : "bg-slate-500"
+                                                }`}
+                                              />
+                                              <span className="truncate">{j.jenisPengajian}</span>
+                                            </span>
+                                            <span className="mt-0.5 block truncate text-[11px] text-slate-500">
+                                              {j.tanggal} • {j.lokasi}
+                                            </span>
+                                          </Link>
+                                        </li>
+                                      );
+                                    })}
+                                  </ul>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                }
+
                 return (
                   <li key={item.href}>
                     <Link
