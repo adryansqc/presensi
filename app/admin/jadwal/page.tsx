@@ -33,6 +33,7 @@ export default async function JadwalPage() {
     <JadwalManager
       canCreate={permissions.includes("jadwal.create")}
       canEdit={permissions.includes("jadwal.edit")}
+      canDelete={permissions.includes("jadwal.delete")}
     />
   );
 }

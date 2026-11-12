@@ -22,11 +22,7 @@ export async function GET() {
     const jadwal = await prisma.jadwal.findMany({
       orderBy: { tanggal: "desc" },
       include: {
-        presensi: {
-          include: {
-            jamaah: { select: { nama: true, desa: { select: { nama: true } }, kelompok: { select: { nama: true } } } },
-          },
-        },
+        presensi: { select: { id: true } },
         dibuatOlehUser: { select: { name: true, email: true } },
       },
     });
