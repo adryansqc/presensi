@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { assertWithinScope, getScope, scopedWhere } from "@/lib/admin/scope";
 import { requirePermission } from "@/lib/auth-helpers";
 import { NextResponse } from "next/server";
 
@@ -11,30 +12,23 @@ type PresensiBody = {
   kelompokId?: string;
   status?: string;
   keterangan?: string;
-  lintasKelompok?: boolean;
 };
 
 export async function GET(request: Request) {
   const { error, session } = await requirePermission("presensi.view");
   if (error) return error;
 
-  const userRole = (session!.user as unknown as { role?: string }).role ?? "";
-  const desaId = (session!.user as unknown as { desaId?: string }).desaId ?? null;
-  const kelompokId = (session!.user as unknown as { kelompokId?: string }).kelompokId ?? null;
+  const scope = await getScope((session!.user as unknown as { id?: string }).id);
+  if (!scope) {
+    return NextResponse.json({ error: "Data akun tidak ditemukan." }, { status: 403 });
+  }
 
   const { searchParams } = new URL(request.url);
   const jadwalId = searchParams.get("jadwalId");
 
   try {
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { ...scopedWhere(scope) };
     if (jadwalId) where.jadwalId = jadwalId;
-
-    // Filter by cakupan wilayah
-    if (userRole === "Desa" && desaId) {
-      where.desaId = desaId;
-    } else if (userRole === "Kelompok" && kelompokId) {
-      where.kelompokId = kelompokId;
-    }
 
     const presensi = await prisma.presensi.findMany({
       where,
@@ -58,13 +52,14 @@ export async function POST(request: Request) {
   if (error) return error;
 
   const userId = (session!.user as unknown as { id?: string }).id ?? "";
-  const userRole = (session!.user as unknown as { role?: string }).role ?? "";
-  const userDesaId = (session!.user as unknown as { desaId?: string }).desaId ?? null;
-  const userKelompokId = (session!.user as unknown as { kelompokId?: string }).kelompokId ?? null;
+  const scope = await getScope(userId);
+  if (!scope) {
+    return NextResponse.json({ error: "Data akun tidak ditemukan." }, { status: 403 });
+  }
 
   try {
     const body = (await request.json()) as PresensiBody;
-    const { jadwalId, jamaahId, namaJamaah, kategoriId, desaId, kelompokId, status, keterangan, lintasKelompok } = body;
+    const { jadwalId, jamaahId, namaJamaah, kategoriId, desaId, kelompokId, status, keterangan } = body;
 
     if (!jadwalId || !status) {
       throw new Error("Field wajib tidak lengkap.");
@@ -94,13 +89,13 @@ export async function POST(request: Request) {
     if (!jadwal) throw new Error("Jadwal tidak ditemukan.");
     if (jadwal.statusBuka !== "Buka") throw new Error("Jadwal sudah ditutup.");
 
-    // Verifikasi cakupan wilayah untuk non-Super Admin/Daerah
-    if (userRole === "Desa" && userDesaId && resolvedDesaId !== userDesaId) {
-      throw new Error("Anda hanya dapat mengabsen jamaah di desa Anda.");
-    }
-    if (userRole === "Kelompok" && userKelompokId && resolvedKelompokId !== userKelompokId && !lintasKelompok) {
-      throw new Error("Anda hanya dapat mengabsen jamaah di kelompok Anda.");
-    }
+    // Verifikasi cakupan wilayah: admin Desa/Kelompok hanya boleh mengabsen
+    // jamaah yang berada di wilayahnya sendiri.
+    assertWithinScope(
+      scope,
+      { desaId: resolvedDesaId, kelompokId: resolvedKelompokId },
+      "jamaah"
+    );
 
     const payload = {
       namaJamaah: resolvedNamaJamaah,
@@ -112,7 +107,7 @@ export async function POST(request: Request) {
       keterangan: keterangan || null,
       sumber: "PENGURUS",
       dicatatOleh: userId,
-      lintasKelompok: lintasKelompok === true,
+      lintasKelompok: false,
     };
 
     // Cek apakah sudah ada presensi untuk jamaah ini di jadwal ini

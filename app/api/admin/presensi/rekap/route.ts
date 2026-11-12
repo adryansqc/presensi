@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getScope, scopedWhere } from "@/lib/admin/scope";
 import { requirePermission } from "@/lib/auth-helpers";
 import { NextResponse } from "next/server";
 
@@ -6,22 +7,17 @@ export async function GET(request: Request) {
   const { error, session } = await requirePermission("presensi.view");
   if (error) return error;
 
-  const userRole = (session!.user as unknown as { role?: string }).role ?? "";
-  const desaId = (session!.user as unknown as { desaId?: string }).desaId ?? null;
-  const kelompokId = (session!.user as unknown as { kelompokId?: string }).kelompokId ?? null;
+  const scope = await getScope((session!.user as unknown as { id?: string }).id);
+  if (!scope) {
+    return NextResponse.json({ error: "Data akun tidak ditemukan." }, { status: 403 });
+  }
 
   const { searchParams } = new URL(request.url);
   const jadwalId = searchParams.get("jadwalId");
 
   try {
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { ...scopedWhere(scope) };
     if (jadwalId) where.jadwalId = jadwalId;
-
-    if (userRole === "Desa" && desaId) {
-      where.desaId = desaId;
-    } else if (userRole === "Kelompok" && kelompokId) {
-      where.kelompokId = kelompokId;
-    }
 
     const presensi = await prisma.presensi.findMany({
       where,

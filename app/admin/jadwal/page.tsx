@@ -29,5 +29,10 @@ export default async function JadwalPage() {
     );
   }
 
-  return <JadwalManager />;
+  return (
+    <JadwalManager
+      canCreate={permissions.includes("jadwal.create")}
+      canEdit={permissions.includes("jadwal.edit")}
+    />
+  );
 }

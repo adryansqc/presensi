@@ -1,16 +1,41 @@
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/auth-helpers";
+import { assertJadwalDalamScope, getScope, getScopeMaps } from "@/lib/admin/scope";
+import { requirePermission } from "@/lib/auth-helpers";
 import { NextResponse } from "next/server";
 
 export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { error } = await requireRole(["Super_Admin", "Admin_CAI", "Desa", "Kelompok"]);
+  const { error, session } = await requirePermission("jadwal.edit");
   if (error) return error;
+
+  const userId = (session!.user as unknown as { id?: string }).id ?? "";
 
   try {
     const { id } = await params;
+
+    const scope = await getScope(userId);
+    if (!scope) {
+      return NextResponse.json({ error: "Data akun tidak ditemukan." }, { status: 403 });
+    }
+
+    const existing = await prisma.jadwal.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Jadwal tidak ditemukan." }, { status: 404 });
+    }
+
+    // Hanya jadwal di dalam cakupan wilayah akun yang boleh dibuka.
+    assertJadwalDalamScope(
+      scope,
+      {
+        tingkat: existing.tingkat,
+        desaIds: existing.desaIds ?? [],
+        kelompokIds: existing.kelompokIds ?? [],
+      },
+      await getScopeMaps(),
+      "jadwal"
+    );
 
     const jadwal = await prisma.jadwal.update({
       where: { id },

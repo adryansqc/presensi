@@ -452,6 +452,22 @@ export default function CrudManager({
                     const value = form[field.name];
                     const isWide = field.type === "textarea" || isCheckbox;
 
+                    if (field.visibleWhen) {
+                      const current = String(form[field.visibleWhen.field] ?? "");
+                      if (
+                        field.visibleWhen.equals !== undefined &&
+                        current !== field.visibleWhen.equals
+                      ) {
+                        return null;
+                      }
+                      if (
+                        field.visibleWhen.notEquals &&
+                        field.visibleWhen.notEquals.includes(current)
+                      ) {
+                        return null;
+                      }
+                    }
+
                     if (isCheckbox) {
                       return (
                         <div key={field.name} className="sm:col-span-2">

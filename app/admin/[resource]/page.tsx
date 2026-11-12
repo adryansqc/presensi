@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import CrudManager from "@/components/admin/CrudManager";
 import PermissionDenied from "@/components/admin/PermissionDenied";
 import { getResource } from "@/lib/admin/resources";
+import { getScope } from "@/lib/admin/scope";
 import { authOptions } from "@/lib/auth";
 import { roleHasPermission } from "@/lib/permission-store";
 
@@ -16,14 +17,21 @@ export default async function AdminResourcePage({
 }) {
   await connection();
   const { resource } = await params;
-  const config = await getResource(resource);
+  const session = await getServerSession(authOptions);
+  const role = (session?.user as { role?: string } | undefined)?.role ?? "";
+  const scope = await getScope(
+    (session?.user as { id?: string } | undefined)?.id
+  );
+
+  if (!scope) {
+    notFound();
+  }
+
+  const config = await getResource(resource, scope);
 
   if (!config) {
     notFound();
   }
-
-  const session = await getServerSession(authOptions);
-  const role = (session?.user as { role?: string } | undefined)?.role ?? "";
 
   const canView = await roleHasPermission(role, `${resource}.view`);
   const canCreate = await roleHasPermission(role, `${resource}.create`);
@@ -36,7 +44,7 @@ export default async function AdminResourcePage({
     );
   }
 
-  const rows = await config.list();
+  const rows = await config.list(scope);
 
   return (
     <CrudManager

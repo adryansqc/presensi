@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { getRolePermissions } from "@/lib/permission-store";
 import { prisma } from "@/lib/prisma";
+import { getScope, jadwalVisible, type ScopeMaps } from "@/lib/admin/scope";
 import { notFound } from "next/navigation";
 import PresensiDetailManager, { type JamaahRow } from "@/components/admin/PresensiDetailManager";
 
@@ -82,8 +83,31 @@ export default async function PresensiDetailPage({
         ? desaNames.map((d) => d.nama).join(", ")
         : "Daerah";
 
-  const userDesaId = (session.user as { desaId?: string } | undefined)?.desaId ?? null;
-  const userKelompokId = (session.user as { kelompokId?: string } | undefined)?.kelompokId ?? null;
+  const scope = await getScope((session.user as { id?: string } | undefined)?.id);
+  if (!scope) {
+    notFound();
+  }
+
+  // Pastikan jadwal ini berada di dalam cakupan wilayah akun.
+  const kelompokList = await prisma.kelompok.findMany({
+    select: { id: true, desaId: true },
+  });
+  const maps: ScopeMaps = {
+    kelompokToDesa: new Map(kelompokList.map((k) => [k.id, k.desaId] as const)),
+  };
+  const boleh =
+    jadwalVisible(
+      scope,
+      {
+        tingkat: jadwal.tingkat,
+        desaIds: jadwal.desaIds ?? [],
+        kelompokIds: jadwal.kelompokIds ?? [],
+      },
+      maps
+    );
+  if (!boleh) {
+    notFound();
+  }
 
   // Filter jamaah berdasarkan kriteria jadwal dan role user
   const jamaahWhere: Record<string, unknown> = { statusAktif: "Aktif" };
@@ -103,11 +127,13 @@ export default async function PresensiDetailPage({
     jamaahWhere.kelompokId = { in: jadwal.kelompokIds };
   }
 
-  // Bataskan cakupan wilayah sesuai role user
-  if (role === "Desa" && userDesaId) {
-    jamaahWhere.desaId = userDesaId;
-  } else if (role === "Kelompok" && userKelompokId) {
-    jamaahWhere.kelompokId = userKelompokId;
+  // Bataskan cakupan wilayah sesuai scope akun
+  if (scope.kind === "kelompok") {
+    jamaahWhere.kelompokId = scope.kelompokId;
+  } else if (scope.kind === "desa") {
+    jamaahWhere.desaId = scope.desaId;
+  } else if (scope.kind === "none") {
+    jamaahWhere.id = "__tidak_ada_akses__";
   }
 
   const jamaahList = await prisma.jamaah.findMany({

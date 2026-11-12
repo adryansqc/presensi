@@ -1,4 +1,5 @@
 import { getResource } from "@/lib/admin/resources";
+import { getScope } from "@/lib/admin/scope";
 import { requirePermission } from "@/lib/auth-helpers";
 import { NextResponse } from "next/server";
 
@@ -23,17 +24,24 @@ export async function PUT(
   { params }: { params: Promise<{ resource: string; id: string }> }
 ) {
   const { resource, id } = await params;
-  const { error } = await requirePermission(`${resource}.edit`);
+  const { error, session } = await requirePermission(`${resource}.edit`);
   if (error) return error;
 
-  const config = await getResource(resource);
+  const scope = await getScope(
+    (session?.user as { id?: string } | undefined)?.id
+  );
+  if (!scope) {
+    return NextResponse.json({ error: "Data akun tidak ditemukan." }, { status: 403 });
+  }
+
+  const config = await getResource(resource, scope);
   if (!config) {
     return NextResponse.json({ error: "Resource tidak dikenal." }, { status: 404 });
   }
 
   try {
     const body = await request.json();
-    await config.update(id, body ?? {});
+    await config.update(id, body ?? {}, scope);
     return NextResponse.json({ ok: true });
   } catch (err) {
     return NextResponse.json({ error: toErrorMessage(err) }, { status: 400 });
@@ -48,7 +56,14 @@ export async function DELETE(
   const { error, session } = await requirePermission(`${resource}.delete`);
   if (error) return error;
 
-  const config = await getResource(resource);
+  const scope = await getScope(
+    (session?.user as { id?: string } | undefined)?.id
+  );
+  if (!scope) {
+    return NextResponse.json({ error: "Data akun tidak ditemukan." }, { status: 403 });
+  }
+
+  const config = await getResource(resource, scope);
   if (!config) {
     return NextResponse.json({ error: "Resource tidak dikenal." }, { status: 404 });
   }
@@ -62,7 +77,7 @@ export async function DELETE(
   }
 
   try {
-    await config.remove(id);
+    await config.remove(id, scope);
     return NextResponse.json({ ok: true });
   } catch (err) {
     return NextResponse.json({ error: toErrorMessage(err) }, { status: 400 });

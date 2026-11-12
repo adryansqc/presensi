@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getScope, jadwalVisible, type ScopeMaps } from "@/lib/admin/scope";
 
 export type PresensiMenuJadwal = {
   id: string;
@@ -28,9 +29,11 @@ function formatTanggal(value: Date): string {
 }
 
 export async function getPresensiMenuGroups(
-  user: { role?: string | null; desaId?: string | null; kelompokId?: string | null },
+  userId: string | undefined,
   limit = 30
 ): Promise<PresensiMenuGroup[]> {
+  const scope = await getScope(userId);
+  if (!scope) return [];
   const jadwal = await prisma.jadwal.findMany({
     orderBy: [{ tanggal: "desc" }, { createdAt: "desc" }],
     take: limit * 4,
@@ -50,31 +53,23 @@ export async function getPresensiMenuGroups(
     prisma.kelompok.findMany({ select: { id: true, nama: true, desaId: true } }),
   ]);
 
+  const maps: ScopeMaps = {
+    kelompokToDesa: new Map(kelompokList.map((k) => [k.id, k.desaId] as const)),
+  };
+
   const desaNama = new Map(desaList.map((d) => [d.id, d.nama]));
   const kelompokNama = new Map(kelompokList.map((k) => [k.id, k.nama]));
-  const kelompokIdsByDesa = new Map<string, string[]>();
-  for (const k of kelompokList) {
-    const list = kelompokIdsByDesa.get(k.desaId) ?? [];
-    list.push(k.id);
-    kelompokIdsByDesa.set(k.desaId, list);
-  }
-
-  const role = user.role ?? "";
-  const desaId = user.desaId ?? null;
-  const kelompokId = user.kelompokId ?? null;
-
-  const visible = jadwal.filter((j) => {
-    if (role === "Desa" && desaId) {
-      if (j.tingkat === "Daerah") return true;
-      if (j.desaIds.includes(desaId)) return true;
-      const childKelompok = kelompokIdsByDesa.get(desaId) ?? [];
-      return j.kelompokIds.some((id) => childKelompok.includes(id));
-    }
-    if (role === "Kelompok" && kelompokId) {
-      return j.kelompokIds.includes(kelompokId);
-    }
-    return true;
-  });
+  const visible = jadwal.filter((j) =>
+    jadwalVisible(
+      scope,
+      {
+        tingkat: j.tingkat,
+        desaIds: j.desaIds ?? [],
+        kelompokIds: j.kelompokIds ?? [],
+      },
+      maps
+    )
+  );
 
   const groups: PresensiMenuGroup[] = TINGKAT_ORDER.map((key) => ({
     key,

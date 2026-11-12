@@ -13,9 +13,20 @@ type JadwalItem = {
   tingkat: string;
   desaId: string | null;
   kelompokId: string | null;
+  desaIds?: string[];
+  kelompokIds?: string[];
   lokasi: string;
+  lokasiNama?: string;
   statusBuka: string;
 };
+
+const formatTanggal = (iso: string) => {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+};
+
+const lokasiText = (j: JadwalItem) => j.lokasiNama || j.lokasi || "Daerah";
 
 const TINGKAT_TABS = ["Semua", "Daerah", "Desa", "Kelompok"] as const;
 
@@ -59,7 +70,7 @@ export default function PresensiJadwalList({ tingkat }: { tingkat: string }) {
     if (!needle) return list;
     return list.filter((j) =>
       j.jenisPengajian.toLowerCase().includes(needle) ||
-      j.lokasi.toLowerCase().includes(needle) ||
+      lokasiText(j).toLowerCase().includes(needle) ||
       j.tanggal.includes(needle)
     );
   }, [jadwalList, query, tingkat]);
@@ -143,7 +154,7 @@ export default function PresensiJadwalList({ tingkat }: { tingkat: string }) {
             ) : (
               filtered.map((j) => (
                 <tr key={j.id} className="transition hover:bg-slate-50/70">
-                  <td className="px-4 py-3 text-sm text-slate-700">{j.tanggal}</td>
+                  <td className="px-4 py-3 text-sm text-slate-700">{formatTanggal(j.tanggal)}</td>
                   <td className="px-4 py-3 text-sm font-medium text-slate-900">{j.jenisPengajian}</td>
                   <td className="px-4 py-3 text-sm text-slate-700">{j.jamMulai} - {j.jamSelesai}</td>
                   <td className="px-4 py-3 text-sm text-slate-700">
@@ -157,7 +168,7 @@ export default function PresensiJadwalList({ tingkat }: { tingkat: string }) {
                       {j.tingkat}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-slate-700">{j.lokasi}</td>
+                  <td className="px-4 py-3 text-sm text-slate-700">{lokasiText(j)}</td>
                   <td className="px-4 py-3 text-sm text-slate-700">{statusBadge(j.statusBuka)}</td>
                   <td className="px-4 py-3 text-sm text-right">
                     <Link

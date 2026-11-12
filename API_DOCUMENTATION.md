@@ -54,7 +54,8 @@ Mendaftar jadwal pengajian.
 ### `POST /api/admin/jadwal`
 Membuat jadwal baru. Selalu dibuat dengan status `"Tutup"`.
 
-- **Auth:** Diperlukan (`Super_Admin` atau `Admin_CAI`)
+- **Auth:** Diperlukan (`jadwal.create`)
+- **Batas cakupan:** jadwal wajib berada di dalam wilayah akun. Scope "kelompok" hanya boleh membuat jadwal untuk kelompoknya, scope "desa" hanya untuk desanya, jadwal tingkat `Daerah` (tanpa desa/kelompok) hanya untuk Super Admin/Admin CAI.
 - **Body:**
 ```json
 {
@@ -77,7 +78,8 @@ Membuat jadwal baru. Selalu dibuat dengan status `"Tutup"`.
 ### `PUT /api/admin/jadwal/[id]`
 Mengupdate jadwal.
 
-- **Auth:** Diperlukan (`Super_Admin` atau `Admin_CAI`)
+- **Auth:** Diperlukan (`jadwal.edit`)
+- **Batas cakupan:** jadwal yang ada (dan nilai baru) harus berada di dalam wilayah akun.
 - **Body:** Field yang sama dengan POST (parsial diizinkan)
 
 ---
@@ -85,14 +87,16 @@ Mengupdate jadwal.
 ### `DELETE /api/admin/jadwal/[id]`
 Menghapus jadwal.
 
-- **Auth:** Diperlukan (`Super_Admin` atau `Admin_CAI`)
+- **Auth:** Diperlukan (`jadwal.delete`)
+- **Batas cakupan:** jadwal harus berada di dalam wilayah akun.
 
 ---
 
 ### `POST /api/admin/jadwal/[id]/buka`
 Membuka sesi absensi. Sistem otomatis menutup semua jadwal lain yang masih `"Buka"` — hanya satu jadwal yang boleh buka pada satu waktu.
 
-- **Auth:** Diperlukan (`Super_Admin`, `Admin_CAI`, `Desa`, `Kelompok`)
+- **Auth:** Diperlukan (`jadwal.edit`)
+- **Batas cakupan:** hanya jadwal di dalam wilayah akun yang boleh dibuka. Jadwal tingkat `Daerah` hanya untuk Super Admin/Admin CAI.
 - **Response (200):**
 ```json
 { "ok": true, "jadwal": { ... } }
@@ -103,14 +107,16 @@ Membuka sesi absensi. Sistem otomatis menutup semua jadwal lain yang masih `"Buk
 ### `POST /api/admin/jadwal/[id]/tutup`
 Menutup sesi absensi. Setelah ditutup, data absensi terkunci dan tidak dapat diubah.
 
-- **Auth:** Diperlukan (`Super_Admin`, `Admin_CAI`, `Desa`, `Kelompok`)
+- **Auth:** Diperlukan (`jadwal.edit`)
+- **Batas cakupan:** hanya jadwal di dalam wilayah akun yang boleh ditutup.
 
 ---
 
 ### `POST /api/admin/jadwal/[id]/bagikan`
 Generate link publik untuk absensi mandiri jamaah.
 
-- **Auth:** Diperlukan (`Super_Admin`, `Admin_CAI`, `Desa`, `Kelompok`)
+- **Auth:** Diperlukan (`jadwal.edit`)
+- **Batas cakupan:** hanya jadwal di dalam wilayah akun yang boleh dibuatkan link publik.
 - **Prasyarat:** Jadwal harus berstatus `"Buka"`
 - **Response (200):**
 ```json

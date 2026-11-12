@@ -1,11 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { parseCSV } from "@/lib/csv";
+import { assertWithinScope, getScope } from "@/lib/admin/scope";
 import { requirePermission } from "@/lib/auth-helpers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const { error } = await requirePermission("jamaah.create");
+  const { error, session } = await requirePermission("jamaah.create");
   if (error) return error;
+
+  const scope = await getScope((session!.user as unknown as { id?: string }).id);
+  if (!scope) {
+    return NextResponse.json({ error: "Data akun tidak ditemukan." }, { status: 403 });
+  }
 
   try {
     const formData = await request.formData();
@@ -87,6 +93,21 @@ export async function POST(request: Request) {
         errors.push({
           row: i + 1,
           message: `Desa "${desaNama}" tidak cocok dengan kelompok "${kelompokNama}" (desa kelompok: ${kelompok.desa.nama}).`,
+        });
+        continue;
+      }
+
+      // Batasi import hanya ke wilayah akun.
+      try {
+        assertWithinScope(
+          scope,
+          { desaId: kelompok.desa.id, kelompokId: kelompok.id },
+          "jamaah"
+        );
+      } catch (err) {
+        errors.push({
+          row: i + 1,
+          message: err instanceof Error ? err.message : "Di luar cakupan wilayah Anda.",
         });
         continue;
       }

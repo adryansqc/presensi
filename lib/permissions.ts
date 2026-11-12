@@ -54,11 +54,24 @@ export const PERMISSIONS: PermissionDef[] = [
 
 export const ALL_PERMISSION_KEYS = PERMISSIONS.map((permission) => permission.key);
 
-const VIEW_ONLY_KEYS = [
+/**
+ * Role Desa & Kelompok mendapat hak operasional (lihat, tambah, ubah) tanpa
+ * hak hapus. Data yang boleh dikelola tetap dibatasi oleh scope wilayah
+ * akunnya, bukan oleh daftar permission ini.
+ */
+const SCOPED_OPERATIONAL_KEYS = [
   "dashboard.view",
-  ...PERMISSION_RESOURCES.filter((resource) => resource.key !== "pengguna").map(
-    (resource) => `${resource.key}.view`
-  ),
+  "desa.view",
+  "kelompok.view",
+  "kategori.view",
+  "jamaah.view",
+  "jamaah.create",
+  "jamaah.edit",
+  "jadwal.view",
+  "jadwal.edit",
+  "presensi.view",
+  "presensi.create",
+  "presensi.edit",
 ];
 
 export const ROLES: RoleDef[] = [
@@ -92,8 +105,8 @@ export const ROLE_LABELS: Record<string, string> = Object.fromEntries(
 export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
   Super_Admin: [...ALL_PERMISSION_KEYS],
   Admin_CAI: ALL_PERMISSION_KEYS.filter((key) => key !== "role.manage"),
-  Desa: [...VIEW_ONLY_KEYS],
-  Kelompok: [...VIEW_ONLY_KEYS],
+  Desa: [...SCOPED_OPERATIONAL_KEYS],
+  Kelompok: [...SCOPED_OPERATIONAL_KEYS],
 };
 
 export function isKnownPermission(value: string) {

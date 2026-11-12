@@ -1,14 +1,22 @@
 import { prisma } from "@/lib/prisma";
-import { requirePermission, requireRole } from "@/lib/auth-helpers";
+import {
+  assertJadwalDalamScope,
+  getScope,
+  getScopeMaps,
+  jadwalVisible,
+  type ScopeMaps,
+} from "@/lib/admin/scope";
+import { requirePermission } from "@/lib/auth-helpers";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   const { error, session } = await requirePermission("jadwal.view");
   if (error) return error;
 
-  const userRole = (session!.user as unknown as { role?: string }).role ?? "";
-  const userDesaId = (session!.user as unknown as { desaId?: string }).desaId ?? null;
-  const userKelompokId = (session!.user as unknown as { kelompokId?: string }).kelompokId ?? null;
+  const scope = await getScope((session!.user as unknown as { id?: string }).id);
+  if (!scope) {
+    return NextResponse.json({ error: "Data akun tidak ditemukan." }, { status: 403 });
+  }
 
   try {
     const jadwal = await prisma.jadwal.findMany({
@@ -23,15 +31,69 @@ export async function GET() {
       },
     });
 
-    // Filter by cakupan wilayah
-    let filtered = jadwal;
-    if (userRole === "Desa" && userDesaId) {
-      filtered = jadwal.filter((j) => Array.isArray(j.desaIds) && j.desaIds.includes(userDesaId));
-    } else if (userRole === "Kelompok" && userKelompokId) {
-      filtered = jadwal.filter((j) => Array.isArray(j.kelompokIds) && j.kelompokIds.includes(userKelompokId));
-    }
+    // Filter by cakupan wilayah akun
+    const kelompokList = await prisma.kelompok.findMany({
+      select: { id: true, desaId: true },
+    });
+    const maps: ScopeMaps = {
+      kelompokToDesa: new Map(kelompokList.map((k) => [k.id, k.desaId] as const)),
+    };
 
-    return NextResponse.json(filtered);
+    // Resolusi nama kategori & lokasi di server supaya tabel tetap menampilkan
+    // nama (bukan ID) walaupun akun tidak punya izin akses data master.
+    const [kategoriList, namaKelompokList, namaDesaList] = await Promise.all([
+      prisma.kategori.findMany({ select: { id: true, nama: true } }),
+      prisma.kelompok.findMany({
+        select: { id: true, nama: true, desaId: true, desa: { select: { nama: true } } },
+      }),
+      prisma.desa.findMany({ select: { id: true, nama: true } }),
+    ]);
+    const kategoriMap = new Map(kategoriList.map((k) => [k.id, k.nama] as const));
+    const kelompokNamaMap = new Map(namaKelompokList.map((k) => [k.id, k.nama] as const));
+    const desaNamaMap = new Map(namaDesaList.map((d) => [d.id, d.nama] as const));
+
+    const filtered = jadwal.filter((j) =>
+      jadwalVisible(
+        scope,
+        {
+          tingkat: j.tingkat,
+          desaIds: Array.isArray(j.desaIds) ? j.desaIds : [],
+          kelompokIds: Array.isArray(j.kelompokIds) ? j.kelompokIds : [],
+        },
+        maps
+      )
+    );
+
+    return NextResponse.json(
+      filtered.map((j) => {
+        const kategoriIds = Array.isArray(j.kategoriIds) ? j.kategoriIds : [];
+        const desaIds = Array.isArray(j.desaIds) ? j.desaIds : [];
+        const kelompokIds = Array.isArray(j.kelompokIds) ? j.kelompokIds : [];
+
+        const kategoriNama = kategoriIds
+          .map((id) => kategoriMap.get(id))
+          .filter(Boolean) as string[];
+        const kelompokNama = kelompokIds
+          .map((id) => kelompokNamaMap.get(id))
+          .filter(Boolean) as string[];
+        const desaNama = desaIds.map((id) => desaNamaMap.get(id)).filter(Boolean) as string[];
+
+        const lokasiNama =
+          kelompokNama.length > 0
+            ? kelompokNama.join(", ")
+            : desaNama.length > 0
+              ? desaNama.join(", ")
+              : "Daerah";
+
+        return {
+          ...j,
+          kategoriNama,
+          kelompokNama,
+          desaNama,
+          lokasiNama,
+        };
+      })
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Gagal memuat jadwal.";
     return NextResponse.json({ error: message }, { status: 400 });
@@ -39,10 +101,15 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { error, session } = await requireRole(["Super_Admin", "Admin_CAI"]);
+  const { error, session } = await requirePermission("jadwal.create");
   if (error) return error;
 
   const userId = (session!.user as unknown as { id?: string }).id ?? "";
+
+  const scope = await getScope(userId);
+  if (!scope) {
+    return NextResponse.json({ error: "Data akun tidak ditemukan." }, { status: 403 });
+  }
 
   try {
     const body = await request.json();
@@ -52,6 +119,16 @@ export async function POST(request: Request) {
       throw new Error("Semua field wajib diisi.");
     }
 
+    const targetDesaIds = Array.isArray(desaIds) ? desaIds : [];
+    const targetKelompokIds = Array.isArray(kelompokIds) ? kelompokIds : [];
+
+    // Cakupan wilayah dibatasi sesuai akun (Super Admin/Admin CAI bebas).
+    assertJadwalDalamScope(
+      scope,
+      { tingkat, desaIds: targetDesaIds, kelompokIds: targetKelompokIds },
+      await getScopeMaps()
+    );
+
     const jadwal = await prisma.jadwal.create({
       data: {
         tanggal: new Date(tanggal),
@@ -59,8 +136,8 @@ export async function POST(request: Request) {
         jamMulai,
         jamSelesai,
         tingkat,
-        desaIds: Array.isArray(desaIds) ? desaIds : [],
-        kelompokIds: Array.isArray(kelompokIds) ? kelompokIds : [],
+        desaIds: targetDesaIds,
+        kelompokIds: targetKelompokIds,
         kategoriIds: Array.isArray(kategoriIds) ? kategoriIds : [],
         statusBuka: "Tutup",
         dibuatOleh: userId,

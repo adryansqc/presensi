@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/auth-helpers";
+import { assertJadwalDalamScope, getScope, getScopeMaps } from "@/lib/admin/scope";
+import { requirePermission } from "@/lib/auth-helpers";
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 
@@ -11,11 +12,18 @@ export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { error } = await requireRole(["Super_Admin", "Admin_CAI", "Desa", "Kelompok"]);
+  const { error, session } = await requirePermission("jadwal.edit");
   if (error) return error;
+
+  const userId = (session!.user as unknown as { id?: string }).id ?? "";
 
   try {
     const { id } = await params;
+
+    const scope = await getScope(userId);
+    if (!scope) {
+      return NextResponse.json({ error: "Data akun tidak ditemukan." }, { status: 403 });
+    }
 
     // Cek jadwal masih buka
     const jadwal = await prisma.jadwal.findUnique({ where: { id } });
@@ -25,6 +33,18 @@ export async function POST(
     if (jadwal.statusBuka !== "Buka") {
       return NextResponse.json({ error: "Jadwal belum dibuka." }, { status: 400 });
     }
+
+    // Link publik hanya boleh dibuat untuk jadwal di dalam cakupan akun.
+    assertJadwalDalamScope(
+      scope,
+      {
+        tingkat: jadwal.tingkat,
+        desaIds: jadwal.desaIds ?? [],
+        kelompokIds: jadwal.kelompokIds ?? [],
+      },
+      await getScopeMaps(),
+      "jadwal"
+    );
 
     // Generate slug unik
     let slug = generateSlug();

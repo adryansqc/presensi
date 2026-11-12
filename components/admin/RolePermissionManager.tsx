@@ -230,6 +230,26 @@ export default function RolePermissionManager({
         )}
       </div>
 
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 text-sm text-slate-700">
+        <p className="font-semibold text-slate-800">Izin menentukan tindakan, cakupan wilayah menentukan data.</p>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-relaxed text-slate-600">
+          <li>
+            <span className="font-medium text-slate-700">Izin di bawah</span> mengatur apakah role boleh melihat,
+            menambah, mengubah, atau menghapus data.
+          </li>
+          <li>
+            <span className="font-medium text-slate-700">Cakupan wilayah</span> diatur per akun di menu{" "}
+            <span className="font-medium text-slate-700">Pengguna</span>: role <span className="font-medium">Desa</span>{" "}
+            ditugaskan ke satu desa, role <span className="font-medium">Kelompok</span> ditugaskan ke satu kelompok.
+            Akun yang belum ditugaskan tidak dapat melihat data operasional apa pun.
+          </li>
+          <li>
+            Contoh: role <span className="font-medium">Kelompok</span> dengan izin <span className="font-medium">Tambah Jamaah</span>{" "}
+            hanya dapat menambah jamaah di kelompoknya sendiri.
+          </li>
+        </ul>
+      </div>
+
       <div className="grid gap-5 lg:grid-cols-[18rem_1fr]">
         <aside className="space-y-2">
           {roleList.map((role) => {

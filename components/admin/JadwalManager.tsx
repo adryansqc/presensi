@@ -22,6 +22,10 @@ type Jadwal = {
   presensi: Array<{ id: string; jamaah: { nama: string } | null }>;
   createdAt: string;
   lokasi: string;
+  kategoriNama?: string[];
+  kelompokNama?: string[];
+  desaNama?: string[];
+  lokasiNama?: string;
 };
 
 type Desa = { id: string; nama: string };
@@ -39,7 +43,13 @@ type CreateForm = {
   kelompokIds: string[];
 };
 
-export default function JadwalManager() {
+export default function JadwalManager({
+  canCreate = false,
+  canEdit = false,
+}: {
+  canCreate?: boolean;
+  canEdit?: boolean;
+}) {
   const [jadwalList, setJadwalList] = useState<Jadwal[]>([]);
   const [daftarDesa, setDaftarDesa] = useState<Desa[]>([]);
   const [daftarKelompok, setDaftarKelompok] = useState<Kelompok[]>([]);
@@ -95,7 +105,7 @@ export default function JadwalManager() {
     return [];
   }, [editForm.tingkat, editForm.desaIds, daftarKelompok]);
 
-  async function refreshData() {
+  const refreshData = useCallback(async () => {
     try {
       const [jRes, dRes, kRes, cRes] = await Promise.all([
         fetch("/api/admin/jadwal", { cache: "no-store" }),
@@ -112,18 +122,28 @@ export default function JadwalManager() {
       if (dRes.ok) setDaftarDesa(Array.isArray(dData) ? dData : []);
       if (kRes.ok) setDaftarKelompok(Array.isArray(kData) ? kData : []);
       if (cRes.ok) setDaftarKategori(Array.isArray(cData) ? cData : []);
+
+      // Fallback: bila salah satu endpoint data master ditolak (akun tidak punya
+      // izin akses data master), ambil daftarnya dari endpoint master jadwal.
+      if (!dRes.ok || !kRes.ok || !cRes.ok) {
+        const mRes = await fetch("/api/admin/jadwal/master", { cache: "no-store" });
+        if (mRes.ok) {
+          const mData = await mRes.json();
+          if (!dRes.ok && Array.isArray(mData?.desa)) setDaftarDesa(mData.desa);
+          if (!kRes.ok && Array.isArray(mData?.kelompok)) setDaftarKelompok(mData.kelompok);
+          if (!cRes.ok && Array.isArray(mData?.kategori)) setDaftarKategori(mData.kategori);
+        }
+      }
     } catch {
       await swal.error("Gagal memuat data", "Tidak dapat menghubungi server.");
     }
-  }
+  }, [swal]);
 
   useEffect(() => {
-    let mounted = true;
-    refreshData();
-    return () => {
-      mounted = false;
-    };
-  }, [swal]);
+    (async () => {
+      await refreshData();
+    })();
+  }, [refreshData]);
 
   function resetCreateForm() {
     setCreateForm({
@@ -290,6 +310,9 @@ export default function JadwalManager() {
   };
 
   const tampilkanKelompok = (jadwal: Jadwal) => {
+    // Nama sudah diresolusi di server; pakai itu dulu karena daftar master
+    // lokal bisa kosong bila akun tidak punya izin akses data master.
+    if (jadwal.lokasiNama) return jadwal.lokasiNama;
     if (jadwal.kelompokIds.length > 0) {
       return jadwal.kelompokIds
         .map((id) => {
@@ -310,6 +333,9 @@ export default function JadwalManager() {
   };
 
   const tampilkanKategori = (jadwal: Jadwal) => {
+    if (jadwal.kategoriNama && jadwal.kategoriNama.length > 0) {
+      return jadwal.kategoriNama.join(", ");
+    }
     if (jadwal.kategoriIds.length > 0) {
       return jadwal.kategoriIds
         .map((id) => {
@@ -330,16 +356,18 @@ export default function JadwalManager() {
             Buat jadwal pengajian, pilih kategori jamaah (Bapak/Ibu), atur cakupan desa/kelompok, buka/tutup sesi absensi, dan bagikan link publik.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setOpenCreate(true)}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="h-4 w-4">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          Tambah
-        </button>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => setOpenCreate(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Tambah
+          </button>
+        )}
       </div>
 
       {openCreate && (
@@ -787,7 +815,7 @@ export default function JadwalManager() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1.5">
-                      {j.statusBuka === "Tutup" && (
+                      {canEdit && j.statusBuka === "Tutup" && (
                         <button
                           type="button"
                           onClick={() => handleBuka(j.id)}
@@ -801,7 +829,7 @@ export default function JadwalManager() {
                           </svg>
                         </button>
                       )}
-                      {j.statusBuka === "Buka" && (
+                      {canEdit && j.statusBuka === "Buka" && (
                         <button
                           type="button"
                           onClick={() => handleTutup(j.id)}
@@ -815,7 +843,7 @@ export default function JadwalManager() {
                           </svg>
                         </button>
                       )}
-                      {j.statusBuka === "Buka" && j.linkPublikAktif && j.slugPublik && (
+                      {canEdit && j.statusBuka === "Buka" && j.linkPublikAktif && j.slugPublik && (
                         <button
                           type="button"
                           onClick={() => handleBagikan(j.id)}
@@ -832,7 +860,7 @@ export default function JadwalManager() {
                           </svg>
                         </button>
                       )}
-                      {(!j.linkPublikAktif || !j.slugPublik) && j.statusBuka === "Buka" && (
+                      {canEdit && (!j.linkPublikAktif || !j.slugPublik) && j.statusBuka === "Buka" && (
                         <button
                           type="button"
                           onClick={() => handleBagikan(j.id)}
@@ -847,18 +875,20 @@ export default function JadwalManager() {
                           </svg>
                         </button>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => handleEdit(j)}
-                        className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                        title="Edit Jadwal"
-                        aria-label="Edit jadwal"
-                      >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                      </button>
+                      {canEdit && (
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(j)}
+                          className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                          title="Edit Jadwal"
+                          aria-label="Edit jadwal"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

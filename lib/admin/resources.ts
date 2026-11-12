@@ -1,6 +1,14 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getAllRoleDefinitions } from "@/lib/permission-store";
+import {
+  assertMasterDataWritable,
+  assertWithinScope,
+  jadwalVisible,
+  scopedWhere,
+  type Scope,
+  type ScopeMaps,
+} from "@/lib/admin/scope";
 
 export type FieldType =
   | "text"
@@ -25,6 +33,8 @@ export type FieldDef = {
   options?: FieldOption[];
   defaultValue?: string | boolean | number | string[];
   multiSelect?: boolean;
+  /** Tampilkan field hanya bila field lain bernilai tertentu. */
+  visibleWhen?: { field: string; equals?: string; notEquals?: string[] };
 };
 
 export type ColumnType = "text" | "badge" | "date" | "datetime" | "number";
@@ -46,10 +56,10 @@ export type ResourceConfig = {
   columns: ColumnDef[];
   fields: FieldDef[];
   searchKeys: string[];
-  list: () => Promise<CrudRow[]>;
-  create: (input: CrudInput) => Promise<unknown>;
-  update: (id: string, input: CrudInput) => Promise<unknown>;
-  remove: (id: string) => Promise<unknown>;
+  list: (scope: Scope) => Promise<CrudRow[]>;
+  create: (input: CrudInput, scope: Scope) => Promise<unknown>;
+  update: (id: string, input: CrudInput, scope: Scope) => Promise<unknown>;
+  remove: (id: string, scope: Scope) => Promise<unknown>;
 };
 
 const isoDate = (value: Date) => value.toISOString().slice(0, 10);
@@ -122,8 +132,19 @@ async function desaResource(): Promise<ResourceConfig> {
     ],
     fields,
     searchKeys: ["nama"],
-    list: async () => {
+    list: async (scope) => {
+      const where: Record<string, unknown> = {};
+      if (scope.kind === "desa") where.id = scope.desaId;
+      if (scope.kind === "kelompok") {
+        const kelompok = await prisma.kelompok.findMany({
+          where: { id: scope.kelompokId ?? "" },
+          select: { desaId: true },
+        });
+        if (kelompok[0]) where.id = kelompok[0].desaId;
+      }
+
       const rows = await prisma.desa.findMany({
+        where,
         orderBy: { nama: "asc" },
         include: {
           _count: { select: { kelompok: true, jamaah: true } },
@@ -137,22 +158,29 @@ async function desaResource(): Promise<ResourceConfig> {
         jumlahJamaah: row._count.jamaah,
       }));
     },
-    create: async (input) =>
-      prisma.desa.create({
+    create: async (input, scope) => {
+      assertMasterDataWritable(scope, "desa");
+      return prisma.desa.create({
         data: {
           nama: requireString(input, "nama", "Nama desa"),
           aktif: boolValue(input, "aktif"),
         },
-      }),
-    update: async (id, input) =>
-      prisma.desa.update({
+      });
+    },
+    update: async (id, input, scope) => {
+      assertMasterDataWritable(scope, "desa");
+      return prisma.desa.update({
         where: { id },
         data: {
           nama: requireString(input, "nama", "Nama desa"),
           aktif: boolValue(input, "aktif"),
         },
-      }),
-    remove: async (id) => prisma.desa.delete({ where: { id } }),
+      });
+    },
+    remove: async (id, scope) => {
+      assertMasterDataWritable(scope, "desa");
+      return prisma.desa.delete({ where: { id } });
+    },
   };
 }
 
@@ -200,8 +228,13 @@ async function kelompokResource(): Promise<ResourceConfig> {
     ],
     fields,
     searchKeys: ["nama", "desaNama"],
-    list: async () => {
+    list: async (scope) => {
+      const where: Record<string, unknown> = {};
+      if (scope.kind === "desa") where.desaId = scope.desaId;
+      if (scope.kind === "kelompok") where.id = scope.kelompokId;
+
       const rows = await prisma.kelompok.findMany({
+        where,
         orderBy: [{ desa: { nama: "asc" } }, { nama: "asc" }],
         include: {
           desa: { select: { nama: true } },
@@ -217,24 +250,31 @@ async function kelompokResource(): Promise<ResourceConfig> {
         aktif: row.aktif,
       }));
     },
-    create: async (input) =>
-      prisma.kelompok.create({
+    create: async (input, scope) => {
+      assertMasterDataWritable(scope, "kelompok");
+      return prisma.kelompok.create({
         data: {
           nama: requireString(input, "nama", "Nama kelompok"),
           desaId: requireString(input, "desaId", "Desa"),
           aktif: boolValue(input, "aktif"),
         },
-      }),
-    update: async (id, input) =>
-      prisma.kelompok.update({
+      });
+    },
+    update: async (id, input, scope) => {
+      assertMasterDataWritable(scope, "kelompok");
+      return prisma.kelompok.update({
         where: { id },
         data: {
           nama: requireString(input, "nama", "Nama kelompok"),
           desaId: requireString(input, "desaId", "Desa"),
           aktif: boolValue(input, "aktif"),
         },
-      }),
-    remove: async (id) => prisma.kelompok.delete({ where: { id } }),
+      });
+    },
+    remove: async (id, scope) => {
+      assertMasterDataWritable(scope, "kelompok");
+      return prisma.kelompok.delete({ where: { id } });
+    },
   };
 }
 
@@ -294,17 +334,20 @@ async function kategoriResource(): Promise<ResourceConfig> {
         aktif: row.aktif,
       }));
     },
-    create: async (input) =>
-      prisma.kategori.create({
+    create: async (input, scope) => {
+      assertMasterDataWritable(scope, "kategori");
+      return prisma.kategori.create({
         data: {
           nama: requireString(input, "nama", "Nama kategori"),
           deskripsi: optionalString(input, "deskripsi"),
           urutan: numberValue(input, "urutan"),
           aktif: boolValue(input, "aktif"),
         },
-      }),
-    update: async (id, input) =>
-      prisma.kategori.update({
+      });
+    },
+    update: async (id, input, scope) => {
+      assertMasterDataWritable(scope, "kategori");
+      return prisma.kategori.update({
         where: { id },
         data: {
           nama: requireString(input, "nama", "Nama kategori"),
@@ -312,13 +355,17 @@ async function kategoriResource(): Promise<ResourceConfig> {
           urutan: numberValue(input, "urutan"),
           aktif: boolValue(input, "aktif"),
         },
-      }),
-    remove: async (id) => prisma.kategori.delete({ where: { id } }),
+      });
+    },
+    remove: async (id, scope) => {
+      assertMasterDataWritable(scope, "kategori");
+      return prisma.kategori.delete({ where: { id } });
+    },
   };
 }
 
-async function jamaahResource(): Promise<ResourceConfig> {
-  const [daftarKategori, daftarKelompok] = await Promise.all([
+async function jamaahResource(scope: Scope): Promise<ResourceConfig> {
+  const [daftarKategori, semuaKelompok] = await Promise.all([
     prisma.kategori.findMany({
       where: { aktif: true },
       orderBy: [{ urutan: "asc" }, { nama: "asc" }],
@@ -327,9 +374,17 @@ async function jamaahResource(): Promise<ResourceConfig> {
     prisma.kelompok.findMany({
       where: { aktif: true },
       orderBy: [{ desa: { nama: "asc" } }, { nama: "asc" }],
-      select: { id: true, nama: true, desa: { select: { nama: true } } },
+      select: { id: true, nama: true, desaId: true, desa: { select: { nama: true } } },
     }),
   ]);
+
+  // Admin Desa / Admin Kelompok hanya boleh memilih kelompok di wilayahnya.
+  const daftarKelompok = semuaKelompok.filter((item) => {
+    if (scope.kind === "all") return true;
+    if (scope.kind === "none") return false;
+    if (scope.kind === "kelompok") return item.id === scope.kelompokId;
+    return item.desaId === scope.desaId;
+  });
 
   const fields: FieldDef[] = [
     {
@@ -396,8 +451,9 @@ async function jamaahResource(): Promise<ResourceConfig> {
     ],
     fields,
     searchKeys: ["nama", "kategoriNama", "desaNama", "kelompokNama", "noWa"],
-    list: async () => {
+    list: async (scope) => {
       const rows = await prisma.jamaah.findMany({
+        where: scopedWhere(scope),
         orderBy: { nama: "asc" },
         include: {
           kategori: { select: { nama: true } },
@@ -418,10 +474,16 @@ async function jamaahResource(): Promise<ResourceConfig> {
         statusAktif: row.statusAktif,
       }));
     },
-    create: async (input) => {
+    create: async (input, scope) => {
       const kelompokId = requireString(input, "kelompokId", "Kelompok");
       const kelompok = await prisma.kelompok.findUnique({ where: { id: kelompokId } });
       if (!kelompok) throw new Error("Kelompok tidak ditemukan.");
+
+      assertWithinScope(
+        scope,
+        { desaId: kelompok.desaId, kelompokId: kelompok.id },
+        "jamaah"
+      );
 
       return prisma.jamaah.create({
         data: {
@@ -434,10 +496,23 @@ async function jamaahResource(): Promise<ResourceConfig> {
         },
       });
     },
-    update: async (id, input) => {
+    update: async (id, input, scope) => {
+      const existing = await prisma.jamaah.findUnique({
+        where: { id },
+        select: { id: true, desaId: true, kelompokId: true },
+      });
+      if (!existing) throw new Error("Jamaah tidak ditemukan.");
+      assertWithinScope(scope, existing, "jamaah");
+
       const kelompokId = requireString(input, "kelompokId", "Kelompok");
       const kelompok = await prisma.kelompok.findUnique({ where: { id: kelompokId } });
       if (!kelompok) throw new Error("Kelompok tidak ditemukan.");
+
+      assertWithinScope(
+        scope,
+        { desaId: kelompok.desaId, kelompokId: kelompok.id },
+        "jamaah"
+      );
 
       return prisma.jamaah.update({
         where: { id },
@@ -451,11 +526,19 @@ async function jamaahResource(): Promise<ResourceConfig> {
         },
       });
     },
-    remove: async (id) => prisma.jamaah.delete({ where: { id } }),
+    remove: async (id, scope) => {
+      const existing = await prisma.jamaah.findUnique({
+        where: { id },
+        select: { id: true, desaId: true, kelompokId: true },
+      });
+      if (!existing) throw new Error("Jamaah tidak ditemukan.");
+      assertWithinScope(scope, existing, "jamaah");
+      return prisma.jamaah.delete({ where: { id } });
+    },
   };
 }
 
-async function jadwalResource(): Promise<ResourceConfig> {
+async function jadwalResource(scope: Scope): Promise<ResourceConfig> {
   const [daftarDesa, daftarKelompok, daftarKategori] = await Promise.all([
     prisma.desa.findMany({
       where: { aktif: true },
@@ -465,7 +548,7 @@ async function jadwalResource(): Promise<ResourceConfig> {
     prisma.kelompok.findMany({
       where: { aktif: true },
       orderBy: [{ desa: { nama: "asc" } }, { nama: "asc" }],
-      select: { id: true, nama: true, desa: { select: { nama: true } } },
+      select: { id: true, nama: true, desaId: true, desa: { select: { nama: true } } },
     }),
     prisma.kategori.findMany({
       where: { aktif: true },
@@ -578,34 +661,55 @@ async function jadwalResource(): Promise<ResourceConfig> {
       const rows = await prisma.jadwal.findMany({
         orderBy: { tanggal: "desc" },
       });
-      return rows.map((row) => {
-        const lokasiNama =
-          row.kelompokIds?.length
-            ? row.kelompokIds
-                .map((id) => kelompokMap.get(id)?.nama)
-                .filter(Boolean)
-                .join(", ")
-            : row.desaIds?.length
-              ? row.desaIds.map((id) => desaMap.get(id)?.nama).filter(Boolean).join(", ")
-              : "Daerah";
-        return {
-          id: row.id,
-          tanggal: isoDate(row.tanggal),
-          jenisPengajian: row.jenisPengajian,
-          jamMulai: row.jamMulai,
-          jamSelesai: row.jamSelesai,
-          waktu: `${row.jamMulai} - ${row.jamSelesai}`,
-          tingkat: row.tingkat,
-          desaIds: row.desaIds ?? [],
-          kelompokIds: row.kelompokIds ?? [],
-          kategoriIds: row.kategoriIds ?? [],
-          lokasi: lokasiNama,
-          statusBuka: row.statusBuka,
-        };
-      });
+      const maps: ScopeMaps = {
+        kelompokToDesa: new Map(
+          daftarKelompok
+            .filter((item) => item.desaId)
+            .map((item) => [item.id, item.desaId] as const)
+        ),
+      };
+
+      return rows
+        .filter((row) =>
+          jadwalVisible(
+            scope,
+            {
+              tingkat: row.tingkat,
+              desaIds: row.desaIds ?? [],
+              kelompokIds: row.kelompokIds ?? [],
+            },
+            maps
+          )
+        )
+        .map((row) => {
+          const lokasiNama =
+            row.kelompokIds?.length
+              ? row.kelompokIds
+                  .map((id) => kelompokMap.get(id)?.nama)
+                  .filter(Boolean)
+                  .join(", ")
+              : row.desaIds?.length
+                ? row.desaIds.map((id) => desaMap.get(id)?.nama).filter(Boolean).join(", ")
+                : "Daerah";
+          return {
+            id: row.id,
+            tanggal: isoDate(row.tanggal),
+            jenisPengajian: row.jenisPengajian,
+            jamMulai: row.jamMulai,
+            jamSelesai: row.jamSelesai,
+            waktu: `${row.jamMulai} - ${row.jamSelesai}`,
+            tingkat: row.tingkat,
+            desaIds: row.desaIds ?? [],
+            kelompokIds: row.kelompokIds ?? [],
+            kategoriIds: row.kategoriIds ?? [],
+            lokasi: lokasiNama,
+            statusBuka: row.statusBuka,
+          };
+        });
     },
-    create: async (input) =>
-      prisma.jadwal.create({
+    create: async (input, scope) => {
+      assertMasterDataWritable(scope, "jadwal");
+      return prisma.jadwal.create({
         data: {
           tanggal: dateValue(input, "tanggal", "Tanggal"),
           jenisPengajian: requireString(input, "jenisPengajian", "Jenis pengajian"),
@@ -617,9 +721,11 @@ async function jadwalResource(): Promise<ResourceConfig> {
           kategoriIds: Array.isArray(input.kategoriIds) ? input.kategoriIds : [],
           statusBuka: optionalString(input, "statusBuka") ?? "Tutup",
         },
-      }),
-    update: async (id, input) =>
-      prisma.jadwal.update({
+      });
+    },
+    update: async (id, input, scope) => {
+      assertMasterDataWritable(scope, "jadwal");
+      return prisma.jadwal.update({
         where: { id },
         data: {
           tanggal: dateValue(input, "tanggal", "Tanggal"),
@@ -632,13 +738,17 @@ async function jadwalResource(): Promise<ResourceConfig> {
           kategoriIds: Array.isArray(input.kategoriIds) ? input.kategoriIds : [],
           statusBuka: optionalString(input, "statusBuka") ?? "Tutup",
         },
-      }),
-    remove: async (id) => prisma.jadwal.delete({ where: { id } }),
+      });
+    },
+    remove: async (id, scope) => {
+      assertMasterDataWritable(scope, "jadwal");
+      return prisma.jadwal.delete({ where: { id } });
+    },
   };
 }
 
-async function presensiResource(): Promise<ResourceConfig> {
-  const [daftarJadwal, daftarJamaah] = await Promise.all([
+async function presensiResource(scope: Scope): Promise<ResourceConfig> {
+  const [daftarJadwal, semuaJamaah] = await Promise.all([
     prisma.jadwal.findMany({
       orderBy: { tanggal: "desc" },
       select: {
@@ -647,6 +757,8 @@ async function presensiResource(): Promise<ResourceConfig> {
         jenisPengajian: true,
         jamMulai: true,
         tingkat: true,
+        desaIds: true,
+        kelompokIds: true,
       },
     }),
     prisma.jamaah.findMany({
@@ -654,11 +766,20 @@ async function presensiResource(): Promise<ResourceConfig> {
       select: {
         id: true,
         nama: true,
+        desaId: true,
+        kelompokId: true,
         desa: { select: { nama: true } },
         kelompok: { select: { nama: true } },
       },
     }),
   ]);
+
+  const daftarJamaah = semuaJamaah.filter((j) => {
+    if (scope.kind === "all") return true;
+    if (scope.kind === "none") return false;
+    if (scope.kind === "kelompok") return j.kelompokId === scope.kelompokId;
+    return j.desaId === scope.desaId;
+  });
 
   const fields: FieldDef[] = [
     {
@@ -717,8 +838,9 @@ async function presensiResource(): Promise<ResourceConfig> {
     ],
     fields,
     searchKeys: ["namaJamaah", "jadwalLabel", "kategoriNama", "status"],
-    list: async () => {
+    list: async (scope) => {
       const rows = await prisma.presensi.findMany({
+        where: scopedWhere(scope),
         orderBy: { createdAt: "desc" },
         include: {
           jadwal: { select: { tanggal: true, jenisPengajian: true } },
@@ -737,11 +859,12 @@ async function presensiResource(): Promise<ResourceConfig> {
         createdAt: row.createdAt.toISOString(),
       }));
     },
-    create: async (input) => {
+    create: async (input, scope) => {
       const jadwalId = requireString(input, "jadwalId", "Jadwal");
       const jamaahId = requireString(input, "jamaahId", "Jamaah");
       const jamaah = await prisma.jamaah.findUnique({ where: { id: jamaahId } });
       if (!jamaah) throw new Error("Jamaah tidak ditemukan.");
+      assertWithinScope(scope, jamaah, "presensi");
 
       return prisma.presensi.create({
         data: {
@@ -756,11 +879,19 @@ async function presensiResource(): Promise<ResourceConfig> {
         },
       });
     },
-    update: async (id, input) => {
+    update: async (id, input, scope) => {
+      const existing = await prisma.presensi.findUnique({
+        where: { id },
+        select: { id: true, desaId: true, kelompokId: true },
+      });
+      if (!existing) throw new Error("Data presensi tidak ditemukan.");
+      assertWithinScope(scope, existing, "presensi");
+
       const jadwalId = requireString(input, "jadwalId", "Jadwal");
       const jamaahId = requireString(input, "jamaahId", "Jamaah");
       const jamaah = await prisma.jamaah.findUnique({ where: { id: jamaahId } });
       if (!jamaah) throw new Error("Jamaah tidak ditemukan.");
+      assertWithinScope(scope, jamaah, "presensi");
 
       return prisma.presensi.update({
         where: { id },
@@ -776,12 +907,27 @@ async function presensiResource(): Promise<ResourceConfig> {
         },
       });
     },
-    remove: async (id) => prisma.presensi.delete({ where: { id } }),
+    remove: async (id, scope) => {
+      const existing = await prisma.presensi.findUnique({
+        where: { id },
+        select: { id: true, desaId: true, kelompokId: true },
+      });
+      if (!existing) throw new Error("Data presensi tidak ditemukan.");
+      assertWithinScope(scope, existing, "presensi");
+      return prisma.presensi.delete({ where: { id } });
+    },
   };
 }
 
-async function penggunaResource(): Promise<ResourceConfig> {
-  const roleDefinitions = await getAllRoleDefinitions();
+async function penggunaResource(scope: Scope): Promise<ResourceConfig> {
+  const [roleDefinitions, daftarDesa, daftarKelompok] = await Promise.all([
+    getAllRoleDefinitions(),
+    prisma.desa.findMany({ orderBy: { nama: "asc" }, select: { id: true, nama: true } }),
+    prisma.kelompok.findMany({
+      orderBy: [{ desa: { nama: "asc" } }, { nama: "asc" }],
+      select: { id: true, nama: true, desaId: true, desa: { select: { nama: true } } },
+    }),
+  ]);
 
   const fields: FieldDef[] = [
     {
@@ -818,7 +964,62 @@ async function penggunaResource(): Promise<ResourceConfig> {
         label: role.label,
       })),
     },
+    {
+      name: "desaId",
+      label: "Desa",
+      type: "select",
+      placeholder: "Pilih desa",
+      options: daftarDesa.map((desa) => ({ value: desa.id, label: desa.nama })),
+      visibleWhen: { field: "role", notEquals: ["Super_Admin", "Admin_CAI"] },
+      help: "Wajib untuk role Desa. Menentukan cakupan data yang bisa diakses akun.",
+    },
+    {
+      name: "kelompokId",
+      label: "Kelompok",
+      type: "select",
+      placeholder: "Pilih kelompok",
+      options: daftarKelompok.map((item) => ({
+        value: item.id,
+        label: `${item.desa.nama} — ${item.nama}`,
+      })),
+      visibleWhen: { field: "role", notEquals: ["Super_Admin", "Admin_CAI"] },
+      help: "Wajib untuk role Kelompok. Menentukan cakupan data yang bisa diakses akun.",
+    },
   ];
+
+  const targetOf = async (input: CrudInput) => {
+    const role = requireString(input, "role", "Role");
+    if (role === "Super_Admin" || role === "Admin_CAI") {
+      return { role, desaId: null, kelompokId: null };
+    }
+
+    const kelompokId = optionalString(input, "kelompokId");
+    const desaId = optionalString(input, "desaId");
+
+    if (role === "Desa" && !desaId) {
+      throw new Error("Desa wajib dipilih untuk role Desa.");
+    }
+    if (role === "Kelompok" && !kelompokId) {
+      throw new Error("Kelompok wajib dipilih untuk role Kelompok.");
+    }
+    if (!desaId && !kelompokId) {
+      throw new Error(
+        "Pilih Desa atau Kelompok agar cakupan data akun ini terbatas pada wilayah tersebut."
+      );
+    }
+
+    // Bila kelompok dipilih, desa diambil dari kelompok tersebut agar konsisten.
+    if (kelompokId) {
+      const kelompok = await prisma.kelompok.findUnique({
+        where: { id: kelompokId },
+        select: { desaId: true },
+      });
+      if (!kelompok) throw new Error("Kelompok tidak ditemukan.");
+      return { role, desaId: kelompok.desaId, kelompokId };
+    }
+
+    return { role, desaId, kelompokId: null };
+  };
 
   return {
     key: "pengguna",
@@ -830,10 +1031,11 @@ async function penggunaResource(): Promise<ResourceConfig> {
       { key: "name", label: "Nama" },
       { key: "email", label: "Email" },
       { key: "role", label: "Role", type: "badge" },
+      { key: "wilayah", label: "Wilayah" },
       { key: "createdAt", label: "Dibuat", type: "date" },
     ],
     fields,
-    searchKeys: ["name", "email", "role"],
+    searchKeys: ["name", "email", "role", "wilayah"],
     list: async () => {
       const rows = await prisma.user.findMany({
         orderBy: { createdAt: "desc" },
@@ -842,18 +1044,31 @@ async function penggunaResource(): Promise<ResourceConfig> {
           name: true,
           email: true,
           role: true,
+          desaId: true,
+          kelompokId: true,
           createdAt: true,
         },
       });
+      const desaNama = new Map(daftarDesa.map((d) => [d.id, d.nama]));
+      const kelompokNama = new Map(daftarKelompok.map((k) => [k.id, k.nama]));
+
       return rows.map((row) => ({
         id: row.id,
         name: row.name,
         email: row.email,
         role: row.role,
+        desaId: row.desaId,
+        kelompokId: row.kelompokId,
+        wilayah:
+          (row.kelompokId ? kelompokNama.get(row.kelompokId) : undefined) ??
+          (row.desaId ? desaNama.get(row.desaId) : undefined) ??
+          "Seluruh wilayah",
         createdAt: row.createdAt.toISOString(),
       }));
     },
     create: async (input) => {
+      assertMasterDataWritable(scope, "pengguna");
+
       const email = requireString(input, "email", "Email").toLowerCase();
       const password = requireString(input, "password", "Password");
       if (password.length < 6) {
@@ -863,16 +1078,22 @@ async function penggunaResource(): Promise<ResourceConfig> {
       const existing = await prisma.user.findUnique({ where: { email } });
       if (existing) throw new Error("Email sudah digunakan oleh akun lain.");
 
+      const target = await targetOf(input);
+
       return prisma.user.create({
         data: {
           name: requireString(input, "name", "Nama"),
           email,
           password: await bcrypt.hash(password, 12),
-          role: requireString(input, "role", "Role"),
+          role: target.role,
+          desaId: target.desaId,
+          kelompokId: target.kelompokId,
         },
       });
     },
     update: async (id, input) => {
+      assertMasterDataWritable(scope, "pengguna");
+
       const email = requireString(input, "email", "Email").toLowerCase();
       const existing = await prisma.user.findUnique({ where: { email } });
       if (existing && existing.id !== id) {
@@ -884,21 +1105,31 @@ async function penggunaResource(): Promise<ResourceConfig> {
         throw new Error("Password minimal 6 karakter.");
       }
 
+      const target = await targetOf(input);
+
       return prisma.user.update({
         where: { id },
         data: {
           name: requireString(input, "name", "Nama"),
           email,
-          role: requireString(input, "role", "Role"),
+          role: target.role,
+          desaId: target.desaId,
+          kelompokId: target.kelompokId,
           ...(password ? { password: await bcrypt.hash(password, 12) } : {}),
         },
       });
     },
-    remove: async (id) => prisma.user.delete({ where: { id } }),
+    remove: async (id) => {
+      assertMasterDataWritable(scope, "pengguna");
+      return prisma.user.delete({ where: { id } });
+    },
   };
 }
 
-export async function getResource(key: string): Promise<ResourceConfig | null> {
+export async function getResource(
+  key: string,
+  scope: Scope
+): Promise<ResourceConfig | null> {
   switch (key) {
     case "desa":
       return desaResource();
@@ -907,13 +1138,13 @@ export async function getResource(key: string): Promise<ResourceConfig | null> {
     case "kategori":
       return kategoriResource();
     case "jamaah":
-      return jamaahResource();
+      return jamaahResource(scope);
     case "jadwal":
-      return jadwalResource();
+      return jadwalResource(scope);
     case "presensi":
-      return presensiResource();
+      return presensiResource(scope);
     case "pengguna":
-      return penggunaResource();
+      return penggunaResource(scope);
     default:
       return null;
   }

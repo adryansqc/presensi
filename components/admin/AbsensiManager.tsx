@@ -20,6 +20,12 @@ type JadwalItem = {
   statusBuka: string;
 };
 
+const formatTanggal = (iso: string) => {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+};
+
 type PresensiItem = {
   id: string;
   jamaahId: string | null;
@@ -184,7 +190,7 @@ export default function AbsensiManager() {
           >
             {jadwalList.map((j) => (
               <option key={j.id} value={j.id}>
-                {j.jenisPengajian} - {j.tanggal}
+                {j.jenisPengajian} - {formatTanggal(j.tanggal)}
               </option>
             ))}
           </select>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 type CheckboxItem = {
   id: string;
@@ -29,7 +29,6 @@ export default function CheckboxSearch({
   maxHeight = "200px",
 }: CheckboxSearchProps) {
   const [query, setQuery] = useState("");
-  const [selectAll, setSelectAll] = useState<'none' | 'partial' | 'all'>('none');
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -47,16 +46,12 @@ export default function CheckboxSearch({
     return filtered.every((i) => !selected.includes(i.id));
   }, [filtered, selected]);
 
-  // Sinkronkan selectAll saat daftar terfilter berubah (misal saat pencarian)
-  useEffect(() => {
-    if (isAllSelected) {
-      setSelectAll('all');
-    } else if (isNoneSelected) {
-      setSelectAll('none');
-    } else {
-      setSelectAll('partial');
-    }
-  }, [isAllSelected, isNoneSelected]);
+  // Status "pilih semua" diturunkan langsung dari data (tidak disimpan di state)
+  const selectAll: 'none' | 'partial' | 'all' = isAllSelected
+    ? 'all'
+    : isNoneSelected
+      ? 'none'
+      : 'partial';
 
   const isSelected = (id: string) => selected.includes(id);
 
@@ -73,10 +68,8 @@ export default function CheckboxSearch({
   const handleSelectAll = useCallback(() => {
     if (selectAll === 'all') {
       onChange([]);
-      setSelectAll('none');
     } else {
       onChange(filtered.map((i) => i.id));
-      setSelectAll('all');
     }
   }, [selectAll, filtered, onChange]);
 
@@ -96,7 +89,6 @@ export default function CheckboxSearch({
         <input
           type="checkbox"
           checked={selectAll === 'all'}
-          defaultChecked={selectAll === 'all'}
           onChange={handleSelectAll}
           disabled={disabled || filtered.length === 0}
           className={`h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 shrink-0 ${

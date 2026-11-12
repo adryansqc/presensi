@@ -10,6 +10,12 @@ type JadwalItem = {
   statusBuka: string;
 };
 
+const formatTanggal = (iso: string) => {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+};
+
 type KelompokStats = {
   kelompok: string;
   hadir: number;
@@ -118,7 +124,7 @@ export default function RekapManager() {
         >
           {jadwalList.map((j) => (
             <option key={j.id} value={j.id}>
-              {j.jenisPengajian} - {j.tanggal} ({j.statusBuka})
+              {j.jenisPengajian} - {formatTanggal(j.tanggal)} ({j.statusBuka})
             </option>
           ))}
         </select>

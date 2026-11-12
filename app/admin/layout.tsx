@@ -23,11 +23,7 @@ async function AdminGate({ children }: { children: React.ReactNode }) {
   const permissions = await getRolePermissions(role);
 
   const presensiGroups = permissions.includes("presensi.view")
-    ? await getPresensiMenuGroups({
-        role,
-        desaId: (session.user as { desaId?: string } | undefined)?.desaId ?? null,
-        kelompokId: (session.user as { kelompokId?: string } | undefined)?.kelompokId ?? null,
-      })
+    ? await getPresensiMenuGroups((session.user as { id?: string } | undefined)?.id)
     : [];
 
   if (permissions.length === 0) {
