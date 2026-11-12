@@ -58,6 +58,34 @@ export async function POST(
       return NextResponse.json({ error: "Jamaah tidak ditemukan." }, { status: 404 });
     }
 
+    // Jamaah harus sesuai cakupan jadwal (kelompok/desa dan kategori)
+    const jadwalKelompokIds = jadwal.kelompokIds ?? [];
+    const jadwalDesaIds = jadwal.desaIds ?? [];
+    const jadwalKategoriIds = jadwal.kategoriIds ?? [];
+
+    if (jadwalKelompokIds.length > 0 && !jadwalKelompokIds.includes(jamaah.kelompokId ?? "")) {
+      return NextResponse.json(
+        { error: "Nama yang dipilih bukan anggota kelompok yang mengikuti acara ini." },
+        { status: 400 }
+      );
+    }
+    if (
+      jadwalKelompokIds.length === 0 &&
+      jadwalDesaIds.length > 0 &&
+      !jadwalDesaIds.includes(jamaah.desaId ?? "")
+    ) {
+      return NextResponse.json(
+        { error: "Nama yang dipilih bukan anggota desa yang mengikuti acara ini." },
+        { status: 400 }
+      );
+    }
+    if (jadwalKategoriIds.length > 0 && !jadwalKategoriIds.includes(jamaah.kategoriId)) {
+      return NextResponse.json(
+        { error: "Kategori yang dipilih tidak termasuk dalam acara ini." },
+        { status: 400 }
+      );
+    }
+
     // Satu jamaah satu absensi per jadwal
     const existing = await prisma.presensi.findFirst({ where: { jadwalId: jadwal.id, jamaahId } });
     if (existing) {

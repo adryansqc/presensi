@@ -1,14 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSwal } from "@/components/ui/SwalProvider";
 
 type JamaahOption = {
   id: string;
   nama: string;
+  kategoriId: string;
+  desaId: string;
+  kelompokId: string;
   desa: { nama: string };
   kelompok: { nama: string };
 };
+
+type DesaOption = { id: string; nama: string };
+type KelompokOption = { id: string; nama: string; desaId: string; desaNama: string };
 
 type JadwalPublic = {
   id: string;
@@ -19,6 +25,9 @@ type JadwalPublic = {
   tingkat: string;
   statusBuka: string;
   slugPublik: string | null;
+  kategoriIds: string[];
+  desa: DesaOption[];
+  kelompok: KelompokOption[];
 };
 
 type RekapData = {
@@ -46,8 +55,12 @@ export default function PublicAbsenPage({
 }) {
   const [jadwal, setJadwal] = useState<JadwalPublic | null>(null);
   const [jadwalError, setJadwalError] = useState<string | null>(null);
-  const [jamaahOptions, setJamaahOptions] = useState<JamaahOption[]>([]);
-  const [selectedJamaah, setSelectedJamaah] = useState<string>("");
+  const [desaId, setDesaId] = useState("");
+  const [kelompokId, setKelompokId] = useState("");
+  const [cariNama, setCariNama] = useState("");
+  const [daftarJamaah, setDaftarJamaah] = useState<JamaahOption[]>([]);
+  const [memuatJamaah, setMemuatJamaah] = useState(false);
+  const [selectedJamaah, setSelectedJamaah] = useState("");
   const [selectedJamaahLabel, setSelectedJamaahLabel] = useState("");
   const [status, setStatus] = useState("Izin");
   const [keterangan, setKeterangan] = useState("");
@@ -95,21 +108,59 @@ export default function PublicAbsenPage({
     };
   }, [params, swal, loadRekap]);
 
-  async function searchJamaah(q: string) {
-    if (!q.trim()) {
-      setJamaahOptions([]);
+  async function loadJamaah(kelompok: string) {
+    if (!kelompok) {
+      setDaftarJamaah([]);
       return;
     }
+    setMemuatJamaah(true);
     try {
-      const res = await fetch(`/api/public/jamaah?q=${encodeURIComponent(q)}`);
+      const res = await fetch(`/api/public/jamaah?kelompokId=${encodeURIComponent(kelompok)}`);
       const data = await res.json();
       if (Array.isArray(data)) {
-        setJamaahOptions(data);
+        setDaftarJamaah(data);
       }
     } catch {
       // ignore
+    } finally {
+      setMemuatJamaah(false);
     }
   }
+
+  function handleGantiDesa(value: string) {
+    setDesaId(value);
+    setKelompokId("");
+    setDaftarJamaah([]);
+    setSelectedJamaah("");
+    setSelectedJamaahLabel("");
+    setCariNama("");
+  }
+
+  function handleGantiKelompok(value: string) {
+    setKelompokId(value);
+    setSelectedJamaah("");
+    setSelectedJamaahLabel("");
+    setCariNama("");
+    loadJamaah(value);
+  }
+
+  function pilihNama(jamaah: JamaahOption) {
+    setSelectedJamaah(jamaah.id);
+    setSelectedJamaahLabel(jamaah.nama);
+  }
+
+  const daftarTersaring = useMemo(() => {
+    // Hanya nama yang sesuai kategori acara ini (Bapak, Ibu, dll)
+    const kategoriIds = jadwal?.kategoriIds ?? [];
+    const sesuaiKategori =
+      kategoriIds.length === 0
+        ? daftarJamaah
+        : daftarJamaah.filter((j) => kategoriIds.includes(j.kategoriId));
+
+    const needle = cariNama.trim().toLowerCase();
+    if (!needle) return sesuaiKategori;
+    return sesuaiKategori.filter((j) => j.nama.toLowerCase().includes(needle));
+  }, [daftarJamaah, cariNama, jadwal]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -197,41 +248,112 @@ export default function PublicAbsenPage({
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="public-jamaah" className="block text-sm font-medium text-slate-700 mb-1">
-                    Nama Jamaah
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="public-jamaah"
-                      type="text"
-                      value={selectedJamaahLabel}
-                      onChange={(e) => {
-                        setSelectedJamaahLabel(e.target.value);
-                        searchJamaah(e.target.value);
-                      }}
-                      onBlur={() => {
-                        const match = jamaahOptions.find((j) => j.nama === selectedJamaahLabel);
-                        if (match) {
-                          setSelectedJamaah(match.id);
-                          setSelectedJamaahLabel(match.nama);
-                        }
-                      }}
-                      placeholder="Cari nama jamaah..."
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500"
-                      list="jamaah-list"
-                    />
-                    <datalist id="jamaah-list">
-                      {jamaahOptions.map((j) => (
-                        <option key={j.id} value={j.nama}>
-                          {j.kelompok.nama} - {j.desa.nama}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="public-desa" className="block text-sm font-medium text-slate-700 mb-1">
+                      Desa
+                    </label>
+                    <select
+                      id="public-desa"
+                      value={desaId}
+                      onChange={(e) => handleGantiDesa(e.target.value)}
+                      required
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500"
+                    >
+                      <option value="">-- Pilih Desa --</option>
+                      {(jadwal?.desa ?? []).map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.nama}
                         </option>
                       ))}
-                    </datalist>
+                    </select>
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-1">
-                    Pilih nama dari daftar saran yang muncul saat mengetik.
-                  </p>
+                  <div>
+                    <label htmlFor="public-kelompok" className="block text-sm font-medium text-slate-700 mb-1">
+                      Kelompok
+                    </label>
+                    <select
+                      id="public-kelompok"
+                      value={kelompokId}
+                      onChange={(e) => handleGantiKelompok(e.target.value)}
+                      required
+                      disabled={!desaId}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 disabled:bg-slate-100 disabled:text-slate-400"
+                    >
+                      <option value="">-- Pilih Kelompok --</option>
+                      {(jadwal?.kelompok ?? [])
+                        .filter((k) => k.desaId === desaId)
+                        .map((k) => (
+                          <option key={k.id} value={k.id}>
+                            {k.nama}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="public-cari" className="block text-sm font-medium text-slate-700 mb-1">
+                    Nama Jamaah
+                  </label>
+                  <input
+                    id="public-cari"
+                    type="search"
+                    value={cariNama}
+                    onChange={(e) => setCariNama(e.target.value)}
+                    placeholder={kelompokId ? "Cari nama sesuai kelompok..." : "Pilih kelompok terlebih dahulu"}
+                    disabled={!kelompokId}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 disabled:bg-slate-100 disabled:text-slate-400"
+                  />
+
+                  {selectedJamaah && (
+                    <div className="mt-2 flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+                      <span className="text-sm font-medium text-emerald-800">
+                        {selectedJamaahLabel}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedJamaah("");
+                          setSelectedJamaahLabel("");
+                        }}
+                        className="text-xs font-semibold text-emerald-700 underline"
+                      >
+                        Ganti
+                      </button>
+                    </div>
+                  )}
+
+                  {kelompokId && !selectedJamaah && (
+                    <div className="mt-2 max-h-56 overflow-y-auto rounded-lg border border-slate-200 bg-white">
+                      {memuatJamaah ? (
+                        <p className="px-3 py-3 text-sm text-slate-500">Memuat daftar nama...</p>
+                      ) : daftarTersaring.length === 0 ? (
+                        <p className="px-3 py-3 text-sm text-slate-500">
+                          {cariNama.trim()
+                            ? "Tidak ada nama yang cocok di kelompok ini."
+                            : "Belum ada jamaah terdaftar di kelompok ini."}
+                        </p>
+                      ) : (
+                        <ul className="divide-y divide-slate-100">
+                          {daftarTersaring.map((j) => (
+                            <li key={j.id}>
+                              <button
+                                type="button"
+                                onClick={() => pilihNama(j)}
+                                className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-emerald-50"
+                              >
+                                <span className="font-medium">{j.nama}</span>
+                                <span className="text-xs text-slate-400">
+                                  {j.kelompok.nama} - {j.desa.nama}
+                                </span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">

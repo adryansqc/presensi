@@ -200,24 +200,30 @@ Mendapatkan rekap agregat kehadiran per jadwal.
 ## 🌐 Publik (Tanpa Login)
 
 ### `GET /api/public/jadwal/[slug]`
-Mengambil informasi jadwal melalui slug publik.
+Mengambil informasi jadwal melalui slug publik, sekaligus daftar desa & kelompok yang boleh dipilih pada form absensi.
 
 - **Auth:** Tidak diperlukan
 - **Syarat:** `slugPublik` valid dan `linkPublikAktif = true`
+- **Response:** `jadwal` berisi `desa[]` dan `kelompok[]` sesuai cakupan jadwal (tingkat Kelompok → kelompok yang ditunjuk; tingkat Desa → desa + seluruh kelompoknya; tingkat Daerah → semua).
 
 ---
 
-### `GET /api/public/jamaah?q=...`
-Pencarian jamaah untuk autocomplete form publik.
+### `GET /api/public/jamaah?kelompokId=...&q=...`
+Daftar jamaah untuk form absensi publik.
 
 - **Auth:** Tidak diperlukan
-- **Query:** `q` (nama jamaah, case-insensitive)
+- **Query:**
+  - `kelompokId` (opsional) — batasi daftar ke satu kelompok
+  - `q` (opsional) — filter pencarian nama (case-insensitive)
 - **Response:**
 ```json
 [
   {
     "id": "cjm_...",
     "nama": "A. N. Drean",
+    "kategoriId": "ckg_...",
+    "desaId": "cds_...",
+    "kelompokId": "ckl_...",
     "desa": { "nama": "PELITA" },
     "kelompok": { "nama": "PAGAR DRUM" }
   }
@@ -245,8 +251,9 @@ Jamaah mengisi izin/sakit melalui link publik.
   3. `slugPublik` harus valid dan `linkPublikAktif = true`
   4. Jadwal harus berstatus `"Buka"`
   5. Jamaah harus ada di database
-  6. Satu jamaah satu absensi per jadwal (jika sudah ada, ditolak)
-  7. `sumber` diisi `"PUBLIK"`, `dicatatOleh = null`
+  6. Jamaah harus sesuai cakupan jadwal: kelompok (tingkat Kelompok), desa (tingkat Desa), dan kategori yang diizinkan
+  7. Satu jamaah satu absensi per jadwal (jika sudah ada, ditolak)
+  8. `sumber` diisi `"PUBLIK"`, `dicatatOleh = null`
 - **Response (200):**
 ```json
 {
