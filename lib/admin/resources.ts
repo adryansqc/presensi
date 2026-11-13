@@ -1202,6 +1202,8 @@ async function penggunaResource(scope: Scope): Promise<ResourceConfig> {
     searchKeys: ["name", "email", "role", "wilayah"],
     list: async () => {
       const rows = await prisma.user.findMany({
+        // Akun sistem (hidden) tidak pernah tampil di daftar Pengguna.
+        where: { hidden: false },
         orderBy: { createdAt: "desc" },
         select: {
           id: true,
@@ -1258,6 +1260,15 @@ async function penggunaResource(scope: Scope): Promise<ResourceConfig> {
     update: async (id, input) => {
       assertMasterDataWritable(scope, "pengguna");
 
+      const akun = await prisma.user.findUnique({
+        where: { id },
+        select: { id: true, hidden: true },
+      });
+      if (!akun) throw new Error("Pengguna tidak ditemukan.");
+      if (akun.hidden) {
+        throw new Error("Akun ini tidak dapat diubah.");
+      }
+
       const email = requireString(input, "email", "Email").toLowerCase();
       const existing = await prisma.user.findUnique({ where: { email } });
       if (existing && existing.id !== id) {
@@ -1285,6 +1296,16 @@ async function penggunaResource(scope: Scope): Promise<ResourceConfig> {
     },
     remove: async (id) => {
       assertMasterDataWritable(scope, "pengguna");
+
+      const akun = await prisma.user.findUnique({
+        where: { id },
+        select: { id: true, hidden: true },
+      });
+      if (!akun) throw new Error("Pengguna tidak ditemukan.");
+      if (akun.hidden) {
+        throw new Error("Akun ini tidak dapat dihapus.");
+      }
+
       return prisma.user.delete({ where: { id } });
     },
   };

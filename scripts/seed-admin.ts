@@ -24,6 +24,8 @@ async function main() {
       name: "Administrator",
       password: hashed,
       role: "Super_Admin",
+      // Akun administrator sistem tidak ditampilkan di daftar Pengguna.
+      hidden: true,
     },
   });
 

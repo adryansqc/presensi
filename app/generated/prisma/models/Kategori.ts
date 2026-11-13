@@ -420,10 +420,6 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type KategoriCreateNestedOneWithoutJamaahInput = {
   create?: Prisma.XOR<Prisma.KategoriCreateWithoutJamaahInput, Prisma.KategoriUncheckedCreateWithoutJamaahInput>
   connectOrCreate?: Prisma.KategoriCreateOrConnectWithoutJamaahInput

@@ -182,11 +182,11 @@ export default function AbsensiManager() {
             Tandai kehadiran jamaah pada sesi yang sedang dibuka.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <select
             value={selectedJadwalId}
             onChange={(e) => handleSelectJadwal(e.target.value)}
-            className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500"
+            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 sm:w-auto"
           >
             {jadwalList.map((j) => (
               <option key={j.id} value={j.id}>
@@ -205,7 +205,7 @@ export default function AbsensiManager() {
         </div>
       </div>
 
-      <div className="flex gap-2 text-xs">
+      <div className="flex flex-wrap gap-2 text-xs">
         <span className="px-2 py-1 rounded bg-emerald-50 text-emerald-700">Hadir: {hadirCount}</span>
         <span className="px-2 py-1 rounded bg-amber-50 text-amber-700">Izin: {izinCount}</span>
         <span className="px-2 py-1 rounded bg-red-50 text-red-700">Sakit: {sakitCount}</span>
@@ -215,8 +215,14 @@ export default function AbsensiManager() {
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <p className="flex items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-4 py-2 text-[11px] text-slate-500 sm:hidden">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+            <path d="M8 7 4 12l4 5M16 7l4 5-4 5" />
+          </svg>
+          Geser tabel ke samping untuk melihat kolom lainnya.
+        </p>
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-4 py-3">Nama</th>
@@ -229,16 +235,16 @@ export default function AbsensiManager() {
             <tbody className="divide-y divide-slate-100">
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center">
+                  <td colSpan={5} className="sticky left-0 bg-white px-4 py-12 text-center">
                     <p className="text-sm font-medium text-slate-700">Belum ada data jamaah</p>
                   </td>
                 </tr>
               )}
               {rows.map((r) => (
                 <tr key={r.jamaahId || r.namaJamaah} className="transition hover:bg-slate-50/70">
-                  <td className="px-4 py-3 text-slate-700 font-medium">{r.namaJamaah}</td>
-                  <td className="px-4 py-3 text-slate-700">{r.kelompok}</td>
-                  <td className="px-4 py-3 text-slate-700">{r.desa}</td>
+                  <td className="px-4 py-3 text-slate-700 font-medium whitespace-nowrap">{r.namaJamaah}</td>
+                  <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{r.kelompok}</td>
+                  <td className="px-4 py-3 text-slate-700 whitespace-nowrap">{r.desa}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-1">
                       <button
@@ -282,7 +288,7 @@ export default function AbsensiManager() {
                       value={r.keterangan}
                       onChange={(e) => updateKeterangan(r.jamaahId, e.target.value)}
                       placeholder="Keterangan..."
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500"
+                      className="w-full min-w-[160px] rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500"
                     />
                   </td>
                 </tr>

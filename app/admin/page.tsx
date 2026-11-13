@@ -67,7 +67,8 @@ export default async function AdminDashboardPage() {
     prisma.jamaah.count(),
     prisma.jadwal.count(),
     prisma.presensi.count(),
-    prisma.user.count(),
+    // Akun sistem (hidden) tidak dihitung sebagai pengguna yang dikelola.
+    prisma.user.count({ where: { hidden: false } }),
     prisma.desa.findMany({
       orderBy: { nama: "asc" },
       include: { _count: { select: { kelompok: true, jamaah: true } } },
@@ -272,7 +273,7 @@ export default async function AdminDashboardPage() {
             </Link>
           </div>
           <div className="mt-4 overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
+            <table className="w-full min-w-[420px] text-left text-sm">
               <thead className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                 <tr>
                   <th className="pb-2 pr-4">Jamaah</th>
@@ -283,7 +284,7 @@ export default async function AdminDashboardPage() {
               <tbody className="divide-y divide-slate-100">
                 {presensiTerbaru.map((item) => (
                   <tr key={item.id}>
-                    <td className="py-2.5 pr-4 font-medium text-slate-700">{item.namaJamaah}</td>
+                    <td className="py-2.5 pr-4 font-medium text-slate-700 whitespace-nowrap">{item.namaJamaah}</td>
                     <td className="py-2.5 pr-4 text-slate-500">
                       {dateFormatter.format(item.jadwal.tanggal)} • {item.jadwal.jenisPengajian}
                     </td>

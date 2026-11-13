@@ -34,6 +34,7 @@ export type UserMinAggregateOutputType = {
   role: string | null
   desaId: string | null
   kelompokId: string | null
+  hidden: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +49,7 @@ export type UserMaxAggregateOutputType = {
   role: string | null
   desaId: string | null
   kelompokId: string | null
+  hidden: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +64,7 @@ export type UserCountAggregateOutputType = {
   role: number
   desaId: number
   kelompokId: number
+  hidden: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -78,6 +81,7 @@ export type UserMinAggregateInputType = {
   role?: true
   desaId?: true
   kelompokId?: true
+  hidden?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -92,6 +96,7 @@ export type UserMaxAggregateInputType = {
   role?: true
   desaId?: true
   kelompokId?: true
+  hidden?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +111,7 @@ export type UserCountAggregateInputType = {
   role?: true
   desaId?: true
   kelompokId?: true
+  hidden?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -193,6 +199,7 @@ export type UserGroupByOutputType = {
   role: string
   desaId: string | null
   kelompokId: string | null
+  hidden: boolean
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -228,6 +235,7 @@ export type UserWhereInput = {
   role?: Prisma.StringFilter<"User"> | string
   desaId?: Prisma.StringNullableFilter<"User"> | string | null
   kelompokId?: Prisma.StringNullableFilter<"User"> | string | null
+  hidden?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   accounts?: Prisma.AccountListRelationFilter
@@ -248,6 +256,7 @@ export type UserOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   desaId?: Prisma.SortOrderInput | Prisma.SortOrder
   kelompokId?: Prisma.SortOrderInput | Prisma.SortOrder
+  hidden?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
@@ -271,6 +280,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.StringFilter<"User"> | string
   desaId?: Prisma.StringNullableFilter<"User"> | string | null
   kelompokId?: Prisma.StringNullableFilter<"User"> | string | null
+  hidden?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   accounts?: Prisma.AccountListRelationFilter
@@ -291,6 +301,7 @@ export type UserOrderByWithAggregationInput = {
   role?: Prisma.SortOrder
   desaId?: Prisma.SortOrderInput | Prisma.SortOrder
   kelompokId?: Prisma.SortOrderInput | Prisma.SortOrder
+  hidden?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -311,6 +322,7 @@ export type UserScalarWhereWithAggregatesInput = {
   role?: Prisma.StringWithAggregatesFilter<"User"> | string
   desaId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   kelompokId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  hidden?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -323,6 +335,7 @@ export type UserCreateInput = {
   image?: string | null
   password?: string | null
   role?: string
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -343,6 +356,7 @@ export type UserUncheckedCreateInput = {
   role?: string
   desaId?: string | null
   kelompokId?: string | null
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -359,6 +373,7 @@ export type UserUpdateInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
@@ -379,6 +394,7 @@ export type UserUncheckedUpdateInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -397,6 +413,7 @@ export type UserCreateManyInput = {
   role?: string
   desaId?: string | null
   kelompokId?: string | null
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -409,6 +426,7 @@ export type UserUpdateManyMutationInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -423,6 +441,7 @@ export type UserUncheckedUpdateManyInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -437,6 +456,7 @@ export type UserCountOrderByAggregateInput = {
   role?: Prisma.SortOrder
   desaId?: Prisma.SortOrder
   kelompokId?: Prisma.SortOrder
+  hidden?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -451,6 +471,7 @@ export type UserMaxOrderByAggregateInput = {
   role?: Prisma.SortOrder
   desaId?: Prisma.SortOrder
   kelompokId?: Prisma.SortOrder
+  hidden?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -465,6 +486,7 @@ export type UserMinOrderByAggregateInput = {
   role?: Prisma.SortOrder
   desaId?: Prisma.SortOrder
   kelompokId?: Prisma.SortOrder
+  hidden?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -499,6 +521,10 @@ export type NullableStringFieldUpdateOperationsInput = {
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -657,6 +683,7 @@ export type UserCreateWithoutAccountsInput = {
   image?: string | null
   password?: string | null
   role?: string
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -676,6 +703,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   role?: string
   desaId?: string | null
   kelompokId?: string | null
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -707,6 +735,7 @@ export type UserUpdateWithoutAccountsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -726,6 +755,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -741,6 +771,7 @@ export type UserCreateWithoutSessionsInput = {
   image?: string | null
   password?: string | null
   role?: string
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -760,6 +791,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   role?: string
   desaId?: string | null
   kelompokId?: string | null
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -791,6 +823,7 @@ export type UserUpdateWithoutSessionsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
@@ -810,6 +843,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -825,6 +859,7 @@ export type UserCreateWithoutDesaInput = {
   image?: string | null
   password?: string | null
   role?: string
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -843,6 +878,7 @@ export type UserUncheckedCreateWithoutDesaInput = {
   password?: string | null
   role?: string
   kelompokId?: string | null
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -890,6 +926,7 @@ export type UserScalarWhereInput = {
   role?: Prisma.StringFilter<"User"> | string
   desaId?: Prisma.StringNullableFilter<"User"> | string | null
   kelompokId?: Prisma.StringNullableFilter<"User"> | string | null
+  hidden?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
 }
@@ -902,6 +939,7 @@ export type UserCreateWithoutKelompokInput = {
   image?: string | null
   password?: string | null
   role?: string
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -920,6 +958,7 @@ export type UserUncheckedCreateWithoutKelompokInput = {
   password?: string | null
   role?: string
   desaId?: string | null
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -962,6 +1001,7 @@ export type UserCreateWithoutJadwalDibuatInput = {
   image?: string | null
   password?: string | null
   role?: string
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -981,6 +1021,7 @@ export type UserUncheckedCreateWithoutJadwalDibuatInput = {
   role?: string
   desaId?: string | null
   kelompokId?: string | null
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -1012,6 +1053,7 @@ export type UserUpdateWithoutJadwalDibuatInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
@@ -1031,6 +1073,7 @@ export type UserUncheckedUpdateWithoutJadwalDibuatInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -1046,6 +1089,7 @@ export type UserCreateWithoutPresensiDicatatInput = {
   image?: string | null
   password?: string | null
   role?: string
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -1065,6 +1109,7 @@ export type UserUncheckedCreateWithoutPresensiDicatatInput = {
   role?: string
   desaId?: string | null
   kelompokId?: string | null
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -1096,6 +1141,7 @@ export type UserUpdateWithoutPresensiDicatatInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
@@ -1115,6 +1161,7 @@ export type UserUncheckedUpdateWithoutPresensiDicatatInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -1131,6 +1178,7 @@ export type UserCreateManyDesaInput = {
   password?: string | null
   role?: string
   kelompokId?: string | null
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1143,6 +1191,7 @@ export type UserUpdateWithoutDesaInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
@@ -1161,6 +1210,7 @@ export type UserUncheckedUpdateWithoutDesaInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -1178,6 +1228,7 @@ export type UserUncheckedUpdateManyWithoutDesaInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1191,6 +1242,7 @@ export type UserCreateManyKelompokInput = {
   password?: string | null
   role?: string
   desaId?: string | null
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1203,6 +1255,7 @@ export type UserUpdateWithoutKelompokInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
@@ -1221,6 +1274,7 @@ export type UserUncheckedUpdateWithoutKelompokInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -1238,6 +1292,7 @@ export type UserUncheckedUpdateManyWithoutKelompokInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   desaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1310,6 +1365,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   desaId?: boolean
   kelompokId?: boolean
+  hidden?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
@@ -1331,6 +1387,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   desaId?: boolean
   kelompokId?: boolean
+  hidden?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   desa?: boolean | Prisma.User$desaArgs<ExtArgs>
@@ -1347,6 +1404,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   desaId?: boolean
   kelompokId?: boolean
+  hidden?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   desa?: boolean | Prisma.User$desaArgs<ExtArgs>
@@ -1363,11 +1421,12 @@ export type UserSelectScalar = {
   role?: boolean
   desaId?: boolean
   kelompokId?: boolean
+  hidden?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "password" | "role" | "desaId" | "kelompokId" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "password" | "role" | "desaId" | "kelompokId" | "hidden" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
@@ -1406,6 +1465,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     role: string
     desaId: string | null
     kelompokId: string | null
+    hidden: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -1846,6 +1906,7 @@ export interface UserFieldRefs {
   readonly role: Prisma.FieldRef<"User", 'String'>
   readonly desaId: Prisma.FieldRef<"User", 'String'>
   readonly kelompokId: Prisma.FieldRef<"User", 'String'>
+  readonly hidden: Prisma.FieldRef<"User", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }

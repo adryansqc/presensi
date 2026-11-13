@@ -17,6 +17,7 @@ model User {
   role          String    @default("user") // Super_Admin, Admin_CAI, Desa, Kelompok
   desaId        String?   // untuk user dengan role "Desa"
   kelompokId    String?   // untuk user dengan role "Kelompok"
+  hidden        Boolean   @default(false) // akun sistem: disembunyikan dari daftar Pengguna
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]

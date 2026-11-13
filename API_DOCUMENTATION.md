@@ -392,6 +392,7 @@ Model yang ditambah/ubah:
 | Model | Field Baru | Keterangan |
 |-------|------------|------------|
 | `User` | `desa`, `kelompok`, `presensiDicatat`, `jadwalDibuat` | Relasi wilayah dan audit trail |
+| `User` | `hidden` | Akun sistem disembunyikan dari daftar Pengguna |
 | `Jadwal` | `slugPublik`, `linkPublikAktif`, `dibuatOleh`, `ditutupPada` | Link publik & status sesi |
 | `Presensi` | `sumber`, `dicatatOleh`, `lintasKelompok` | Sumber absensi dan pelanggaran kelompok |
 
@@ -400,6 +401,24 @@ Run migrasi:
 npx prisma migrate dev --name absensi
 npx prisma generate
 ```
+
+---
+
+## 🙈 Akun Sistem Tersembunyi
+
+Model `User` punya flag `hidden` (default `false`). Akun dengan `hidden = true`:
+
+- Tidak pernah tampil di `GET /api/admin/pengguna` maupun tabel `/admin/pengguna`.
+- Tidak ikut dihitung pada kartu statistik "Pengguna" di dashboard.
+- Tidak bisa diubah (`PUT`) maupun dihapus (`DELETE`) — API mengembalikan `400` dengan pesan
+  `"Akun ini tidak dapat diubah."` / `"Akun ini tidak dapat dihapus."`.
+
+Akun ini tetap bisa login dan tetap punya seluruh hak akses sesuai role-nya.
+Yang disembunyikan hanya kemunculannya di daftar pengguna, agar akun administrator
+sistem tidak ikut dikelola lewat menu Pengguna.
+
+Akun bawaan hasil `scripts/seed-admin.ts` (`admin@jambikota1.local`) ditandai `hidden = true`
+secara otomatis.
 
 ---
 

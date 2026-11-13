@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSwal } from "@/components/ui/SwalProvider";
 
@@ -49,6 +49,40 @@ const STATUS_CONFIG: Record<StatusValue, { label: string; color: string; bg: str
   Sakit: { label: "S", color: "text-red-700", bg: "bg-red-100", ring: "ring-red-200", border: "border-red-200" },
 };
 
+function isStatusValue(value: string | null | undefined): value is StatusValue {
+  return value === "Hadir" || value === "Izin" || value === "Sakit";
+}
+
+/** Status kehadiran yang sudah tersimpan di server, untuk seed state awal. */
+function statusTersimpan(
+  jamaah: JamaahRow[],
+  presensiMap: Record<string, PresensiEntry>
+): Record<string, StatusValue> {
+  const status: Record<string, StatusValue> = {};
+  for (const j of jamaah) {
+    const existing = presensiMap[j.id];
+    if (isStatusValue(existing?.status)) {
+      status[j.id] = existing.status;
+    }
+  }
+  return status;
+}
+
+/** Keterangan yang sudah tersimpan di server, untuk seed state awal. */
+function keteranganTersimpan(
+  jamaah: JamaahRow[],
+  presensiMap: Record<string, PresensiEntry>
+): Record<string, string> {
+  const keterangan: Record<string, string> = {};
+  for (const j of jamaah) {
+    const existing = presensiMap[j.id];
+    if (existing?.keterangan) {
+      keterangan[j.id] = existing.keterangan;
+    }
+  }
+  return keterangan;
+}
+
 export default function PresensiDetailManager({
   jadwal,
   jamaah,
@@ -60,25 +94,29 @@ export default function PresensiDetailManager({
 }) {
   const swal = useSwal();
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusMap, setStatusMap] = useState<Record<string, StatusValue>>({});
-  const [keteranganMap, setKeteranganMap] = useState<Record<string, string>>({});
+  const [statusMap, setStatusMap] = useState<Record<string, StatusValue>>(() =>
+    statusTersimpan(jamaah, presensiMap)
+  );
+  const [keteranganMap, setKeteranganMap] = useState<Record<string, string>>(() =>
+    keteranganTersimpan(jamaah, presensiMap)
+  );
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    const next: Record<string, StatusValue> = {};
-    const nextKet: Record<string, string> = {};
-    for (const j of jamaah) {
-      const existing = presensiMap[j.id];
-      if (existing?.status === "Hadir" || existing?.status === "Izin" || existing?.status === "Sakit") {
-        next[j.id] = existing.status as StatusValue;
-      }
-      if (existing?.keterangan) {
-        nextKet[j.id] = existing.keterangan;
-      }
-    }
-    setStatusMap(next);
-    setKeteranganMap(nextKet);
-  }, [jamaah, presensiMap]);
+  // Reset state saat data dari server berubah. Disesuaikan saat render (bukan
+  // di dalam effect) agar tidak memicu cascading render — pola resmi React
+  // "adjusting state when a prop changes". Identitas prop `jamaah` dan
+  // `presensiMap` dipakai sebagai penanda karena keduanya objek baru setiap
+  // kali server mengirim ulang data.
+  const [terakhir, setTerakhir] = useState<{
+    daftar: JamaahRow[];
+    data: Record<string, PresensiEntry>;
+  }>({ daftar: jamaah, data: presensiMap });
+
+  if (terakhir.daftar !== jamaah || terakhir.data !== presensiMap) {
+    setTerakhir({ daftar: jamaah, data: presensiMap });
+    setStatusMap(statusTersimpan(jamaah, presensiMap));
+    setKeteranganMap(keteranganTersimpan(jamaah, presensiMap));
+  }
 
   const filteredJamaah = useMemo(() => {
     const needle = searchQuery.trim().toLowerCase();
@@ -257,7 +295,7 @@ export default function PresensiDetailManager({
             Tandai status kehadiran jamaah dengan memilih Hadir / Izin / Sakit.
           </p>
         </div>
-        <div className="flex w-full sm:w-auto items-end gap-2 sm:items-center">
+        <div className="flex w-full sm:w-auto flex-col gap-2 sm:flex-row sm:items-end sm:items-center">
           {jadwal.statusBuka === "Buka" && (
             <button
               type="button"
@@ -342,21 +380,28 @@ export default function PresensiDetailManager({
       )}
 
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+        <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex flex-col gap-2 sm:flex-row sm:items-center">
           <input
             type="text"
             placeholder="Cari nama jamaah, kelompok, desa, atau kategori..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500"
+            className="w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 sm:flex-1"
           />
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-slate-500 whitespace-nowrap">
             {totalCount} jamaah
           </span>
         </div>
 
+        <p className="flex items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-4 py-2 text-[11px] text-slate-500 sm:hidden">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+            <path d="M8 7 4 12l4 5M16 7l4 5-4 5" />
+          </svg>
+          Geser tabel ke samping untuk melihat kolom lainnya.
+        </p>
+
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left">
+          <table className="w-full min-w-[560px] text-left">
             <thead className="bg-slate-50">
               <tr>
                 <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 w-10">No.</th>
@@ -368,7 +413,7 @@ export default function PresensiDetailManager({
             <tbody className="divide-y divide-slate-100">
               {grouped.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-12 text-center">
+                  <td colSpan={4} className="sticky left-0 bg-white px-4 py-12 text-center">
                     <p className="text-sm font-medium text-slate-700">Tidak ada jamaah yang cocok dengan pencarian.</p>
                   </td>
                 </tr>
@@ -377,7 +422,7 @@ export default function PresensiDetailManager({
                   <React.Fragment key={`${desa}|${kelompok}`}>
                     <tr>
                       <td colSpan={4} className="px-4 py-2 bg-emerald-50 border-b border-emerald-100">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-3">
                           <div className="font-semibold text-sm text-slate-900">{desa}</div>
                           <span className="text-xs text-emerald-600 font-medium">{kelompok}</span>
                         </div>
@@ -388,7 +433,7 @@ export default function PresensiDetailManager({
                       return (
                         <tr key={j.id} className="transition hover:bg-slate-50/70">
                           <td className="px-4 py-3 text-sm text-slate-500">{gIdx + 1}.{items.indexOf(j) + 1}</td>
-                          <td className="px-4 py-3 text-sm font-medium text-slate-900">{j.nama}</td>
+                          <td className="px-4 py-3 text-sm font-medium text-slate-900 whitespace-nowrap">{j.nama}</td>
                           <td className="px-4 py-3 text-center">
                             {renderStatusButtons(j.id, current)}
                           </td>
@@ -399,7 +444,7 @@ export default function PresensiDetailManager({
                               value={keteranganMap[j.id] ?? ""}
                               onChange={(e) => updateKeterangan(j.id, e.target.value)}
                               disabled={!current}
-                              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 disabled:bg-slate-50 disabled:text-slate-400"
+                              className="w-full min-w-[160px] rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 disabled:bg-slate-50 disabled:text-slate-400"
                             />
                           </td>
                         </tr>
@@ -412,7 +457,7 @@ export default function PresensiDetailManager({
           </table>
         </div>
 
-        <div className="px-4 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div className="px-4 py-3 border-t border-slate-200 bg-slate-50 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-xs">
             <span className="px-2 py-1 rounded bg-emerald-50 text-emerald-700 font-medium">
               Ditandai: {totalMarked}

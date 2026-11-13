@@ -131,58 +131,66 @@ export default function PresensiJadwalList({ tingkat }: { tingkat: string }) {
         })}
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <table className="min-w-full text-left">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Tanggal</th>
-              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Jenis Pengajian</th>
-              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Waktu</th>
-              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Tingkat</th>
-              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Lokasi</th>
-              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Status</th>
-              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {filtered.length === 0 ? (
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <p className="flex items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-4 py-2 text-[11px] text-slate-500 sm:hidden">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+            <path d="M8 7 4 12l4 5M16 7l4 5-4 5" />
+          </svg>
+          Geser tabel ke samping untuk melihat kolom lainnya.
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] text-left">
+            <thead className="bg-slate-50">
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center">
-                  <p className="text-sm font-medium text-slate-700">Tidak ada jadwal yang ditemukan.</p>
-                </td>
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Tanggal</th>
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Jenis Pengajian</th>
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Waktu</th>
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Tingkat</th>
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Lokasi</th>
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-right">Aksi</th>
               </tr>
-            ) : (
-              filtered.map((j) => (
-                <tr key={j.id} className="transition hover:bg-slate-50/70">
-                  <td className="px-4 py-3 text-sm text-slate-700">{formatTanggal(j.tanggal)}</td>
-                  <td className="px-4 py-3 text-sm font-medium text-slate-900">{j.jenisPengajian}</td>
-                  <td className="px-4 py-3 text-sm text-slate-700">{j.jamMulai} - {j.jamSelesai}</td>
-                  <td className="px-4 py-3 text-sm text-slate-700">
-                    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${
-                      j.tingkat === "Daerah"
-                        ? "border-indigo-200 text-indigo-700 bg-indigo-50"
-                        : j.tingkat === "Desa"
-                        ? "border-amber-200 text-amber-700 bg-amber-50"
-                        : "border-emerald-200 text-emerald-700 bg-emerald-50"
-                    }`}>
-                      {j.tingkat}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-700">{lokasiText(j)}</td>
-                  <td className="px-4 py-3 text-sm text-slate-700">{statusBadge(j.statusBuka)}</td>
-                  <td className="px-4 py-3 text-sm text-right">
-                    <Link
-                      href={`/admin/presensi/${j.id}`}
-                      className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
-                    >
-                      Lihat &amp; Absensi
-                    </Link>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="sticky left-0 bg-white px-4 py-12 text-center">
+                    <p className="text-sm font-medium text-slate-700">Tidak ada jadwal yang ditemukan.</p>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filtered.map((j) => (
+                  <tr key={j.id} className="transition hover:bg-slate-50/70">
+                    <td className="px-4 py-3 text-sm text-slate-700">{formatTanggal(j.tanggal)}</td>
+                    <td className="px-4 py-3 text-sm font-medium text-slate-900">{j.jenisPengajian}</td>
+                    <td className="px-4 py-3 text-sm text-slate-700">{j.jamMulai} - {j.jamSelesai}</td>
+                    <td className="px-4 py-3 text-sm text-slate-700">
+                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${
+                        j.tingkat === "Daerah"
+                          ? "border-indigo-200 text-indigo-700 bg-indigo-50"
+                          : j.tingkat === "Desa"
+                          ? "border-amber-200 text-amber-700 bg-amber-50"
+                          : "border-emerald-200 text-emerald-700 bg-emerald-50"
+                      }`}>
+                        {j.tingkat}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-700">{lokasiText(j)}</td>
+                    <td className="px-4 py-3 text-sm text-slate-700">{statusBadge(j.statusBuka)}</td>
+                    <td className="px-4 py-3 text-sm text-right">
+                      <Link
+                        href={`/admin/presensi/${j.id}`}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                      >
+                        Lihat &amp; Absensi
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

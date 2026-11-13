@@ -53,7 +53,7 @@ export default function CheckboxSearch({
       ? 'none'
       : 'partial';
 
-  const isSelected = (id: string) => selected.includes(id);
+  const isSelected = useCallback((id: string) => selected.includes(id), [selected]);
 
   const toggle = useCallback(
     (id: string) => {
