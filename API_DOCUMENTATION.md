@@ -130,6 +130,72 @@ Generate link publik untuk absensi mandiri jamaah.
 
 ---
 
+## 👥 Jamaah per Kelompok
+
+Endpoint untuk mengelola anggota jamming pada satu kelompok tertentu. Dipakai oleh
+halaman `/admin/kelompok/[kelompokId]`.
+
+Cakupan wilayah diverifikasi: Administrators Desa hanya boleh diakses untuk kelompok
+di desanya, Admin Kelompok hanya untuk kelompoknya sendiri.
+
+### `GET /api/admin/kelompok/[kelompokId]/jamaah`
+Mendaftar anggota jamming pada kelompok tersebut.
+
+- **Auth:** Diperlukan (`jamaah.view`)
+- **Response:**
+```json
+[
+  {
+    "id": "cjm...",
+    "nama": "A. N. Drean",
+    "kategoriId": "ckg...",
+    "kategoriNama": "Bapak",
+    "noWa": "08123456789",
+    "statusAktif": "Aktif"
+  }
+]
+```
+
+---
+
+### `POST /api/admin/kelompok/[kelompokId]/jamaah`
+Menambah anggota jamming baru pada kelompok tersebut.
+
+- **Auth:** Diperlukan (`jamaah.create`)
+- **Body:**
+```json
+{
+  "nama": "A. N. Drean",
+  "kategoriId": "ckg...",
+  "noWa": "08123456789",
+  "statusAktif": "Aktif"
+}
+```
+- **Aturan:**
+  - `kelompokId` dan `desaId` otomatis mengikuti kelompok pada URL (tidak bisa dipindah dari sini)
+  - `kategoriId` harus merujuk kategori yang aktif
+  - `statusAktif` harus salah satu: `Aktif`, `Pindah`, `Tidak Aktif`
+
+---
+
+### `PUT /api/admin/kelompok/[kelompokId]/jamaah/[jamaahId]`
+Mengubah data anggota jamming pada kelompok tersebut.
+
+- **Auth:** Diperlukan (`jamaah.edit`)
+- **Body:** sama seperti `POST` di atas.
+- **Aturan:** Data harus sudah menjadi anggota kelompok tersebut, jika tidak akan
+  ditolak dengan pesan `"Jamaah ini bukan anggota kelompok tersebut."`.
+
+---
+
+### `DELETE /api/admin/kelombok/[kelompokId]/jamaah/[jamaahId]`
+Menghapus anggota jamming pada kelompok tersebut.
+
+- **Auth:** Diperlukan (`jamaah.delete`)
+- **Aturan:** Data harus sudah menjadi anggota kelompok tersebut.
+
+---
+
 ## ✍️ Presensi (Pengurus)
 
 ### `GET /api/admin/presensi?jadwalId=...`

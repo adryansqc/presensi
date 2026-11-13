@@ -538,6 +538,170 @@ async function jamaahResource(scope: Scope): Promise<ResourceConfig> {
   };
 }
 
+/**
+ * Resource Jamaah yang dibatasi ke satu kelompok.
+ *
+ * Dipakai oleh halaman detail kelompok (/admin/kelompok/[kelompokId]) sehingga
+ * pengguna bisa melihat, menambah, mengubah, dan menghapus anggota kelompok
+ * tersebut tanpa bisa memindahkan anggota ke kelompok lain.
+ */
+export async function kelompokJamaahResource(
+  kelompokId: string,
+  scope: Scope
+): Promise<ResourceConfig | null> {
+  const kelompok = await prisma.kelompok.findUnique({
+    where: { id: kelompokId },
+    select: {
+      id: true,
+      nama: true,
+      desaId: true,
+      desa: { select: { nama: true } },
+    },
+  });
+
+  if (!kelompok) return null;
+
+  // Kelompok harus berada di dalam cakupan wilayah akun.
+  assertWithinScope(
+    scope,
+    { desaId: kelompok.desaId, kelompokId: kelompok.id },
+    "jamaah"
+  );
+
+  const daftarKategori = await prisma.kategori.findMany({
+    where: { aktif: true },
+    orderBy: [{ urutan: "asc" }, { nama: "asc" }],
+    select: { id: true, nama: true },
+  });
+
+  const fields: FieldDef[] = [
+    {
+      name: "nama",
+      label: "Nama Lengkap",
+      type: "text",
+      required: true,
+      placeholder: "Nama jamaah",
+    },
+    {
+      name: "kategoriId",
+      label: "Kategori",
+      type: "select",
+      required: true,
+      placeholder: "Pilih kategori",
+      options: daftarKategori.map((item) => ({
+        value: item.id,
+        label: item.nama,
+      })),
+    },
+    {
+      name: "noWa",
+      label: "Nomor WhatsApp",
+      type: "text",
+      placeholder: "628xxxxxxxxxx",
+    },
+    {
+      name: "statusAktif",
+      label: "Status",
+      type: "select",
+      required: true,
+      defaultValue: "Aktif",
+      options: ["Aktif", "Pindah", "Tidak Aktif"].map((status) => ({
+        value: status,
+        label: status,
+      })),
+    },
+  ];
+
+  const kategoriIds = new Set(daftarKategori.map((item) => item.id));
+
+  const JamaahData = (input: CrudInput) => {
+    const kategoriId = requireString(input, "kategoriId", "Kategori");
+    if (!kategoriIds.has(kategoriId)) {
+      throw new Error("Kategori tidak ditemukan.");
+    }
+
+    const statusAktif = optionalString(input, "statusAktif") ?? "Aktif";
+    if (!["Aktif", "Pindah", "Tidak Aktif"].includes(statusAktif)) {
+      throw new Error("Status tidak valid.");
+    }
+
+    return {
+      nama: requireString(input, "nama", "Nama jamaah"),
+      kategoriId,
+      noWa: optionalString(input, "noWa"),
+      statusAktif,
+    };
+  };
+
+  return {
+    key: "jamaah",
+    label: "Jamaah",
+    singular: "Jamaah",
+    description: `Daftar jamaah pada kelompok ${kelompok.nama} (${kelompok.desa.nama}).`,
+    columns: [
+      { key: "nama", label: "Nama" },
+      { key: "kategoriNama", label: "Kategori" },
+      { key: "noWa", label: "No. WhatsApp" },
+      { key: "statusAktif", label: "Status", type: "badge" },
+    ],
+    fields,
+    searchKeys: ["nama", "kategoriNama", "noWa"],
+    list: async () => {
+      const rows = await prisma.jamaah.findMany({
+        where: { kelompokId: kelompok.id },
+        orderBy: { nama: "asc" },
+        include: { kategori: { select: { nama: true } } },
+      });
+      return rows.map((row) => ({
+        id: row.id,
+        nama: row.nama,
+        kategoriId: row.kategoriId,
+        kategoriNama: row.kategori.nama,
+        noWa: row.noWa,
+        statusAktif: row.statusAktif,
+      }));
+    },
+    create: async (input) => {
+      const data = JamaahData(input);
+      return prisma.jamaah.create({
+        data: {
+          ...data,
+          desaId: kelompok.desaId,
+          kelompokId: kelompok.id,
+        },
+      });
+    },
+    update: async (id, input) => {
+      const existing = await prisma.jamaah.findUnique({
+        where: { id },
+        select: { id: true, kelompokId: true },
+      });
+      if (!existing) throw new Error("Jamaah tidak ditemukan.");
+      if (existing.kelompokId !== kelompok.id) {
+        throw new Error("Jamaah ini bukan anggota kelompok tersebut.");
+      }
+
+      const data = JamaahData(input);
+      return prisma.jamaah.update({
+        where: { id },
+        data,
+      });
+    },
+    remove: async (id) => {
+      const existing = await prisma.jamaah.findUnique({
+        where: { id },
+        select: { id: true, kelompokId: true },
+      });
+      if (!existing) throw new Error("Jamaah tidak ditemukan.");
+      if (existing.kelompokId !== kelompok.id) {
+        throw new Error("Jamaah ini bukan anggota kelompok tersebut.");
+      }
+
+      return prisma.jamaah.delete({ where: { id } });
+    },
+  };
+}
+
 async function jadwalResource(scope: Scope): Promise<ResourceConfig> {
   const [daftarDesa, daftarKelompok, daftarKategori] = await Promise.all([
     prisma.desa.findMany({

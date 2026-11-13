@@ -21,6 +21,11 @@ type CrudManagerProps = {
   canDelete?: boolean;
   importUrl?: string;
   importLabel?: string;
+  /**
+   * Tautan tambahan per baris, mis. untuk membuka daftar milik baris tersebut.
+   * `titleTemplate` boleh memuat placeholder `{nama}` yang diganti dengan nama baris.
+   */
+  rowLink?: { base: string; label: string; titleTemplate?: string };
 };
 
 function prettify(value: string) {
@@ -114,6 +119,7 @@ export default function CrudManager({
   canDelete = true,
   importUrl,
   importLabel = "Impor CSV",
+  rowLink,
 }: CrudManagerProps) {
   const [rows, setRows] = useState<Row[]>(initialRows);
   const [query, setQuery] = useState("");
@@ -239,6 +245,24 @@ export default function CrudManager({
 
   const renderRowActions = (row: Row) => (
     <>
+      {rowLink && (
+        <a
+          href={`${rowLink.base}/${row.id}`}
+          className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+          title={(rowLink.titleTemplate ?? rowLink.label).replace(
+            "{nama}",
+            String(row.nama ?? "")
+          )}
+          aria-label={rowLink.label}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+            <circle cx="9" cy="8" r="3" />
+            <path d="M3.5 20a5.5 5.5 0 0 1 11 0" />
+            <circle cx="17" cy="9" r="2.5" />
+            <path d="M14.5 20a4.5 4.5 0 0 1 7 0" />
+          </svg>
+        </a>
+      )}
       {canEdit && (
         <button
           type="button"

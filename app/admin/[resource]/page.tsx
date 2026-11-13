@@ -46,6 +46,8 @@ export default async function AdminResourcePage({
 
   const rows = await config.list(scope);
 
+  // Halaman kelompok bisa drill-down ke daftar Jamaah anggota kelompok tersebut.
+  const canViewJamaah = await roleHasPermission(role, "jamaah.view");
   return (
     <CrudManager
       resource={config.key}
@@ -61,6 +63,15 @@ export default async function AdminResourcePage({
       canEdit={canEdit}
       canDelete={canDelete}
       importUrl={resource === "jamaah" ? "/admin/jamaah/import" : undefined}
+      rowLink={
+        resource === "kelompok" && canViewJamaah
+          ? {
+              base: "/admin/kelompok",
+              label: "Lihat daftar Jamaah",
+              titleTemplate: "Lihat daftar Jamaah {nama}",
+            }
+          : undefined
+      }
     />
   );
 }
