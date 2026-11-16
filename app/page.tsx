@@ -33,7 +33,7 @@ export default function Home() {
                 href="/login"
                 className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition"
               >
-                Masuk Administrator
+                Login
               </Link>
             </div>
           </div>
