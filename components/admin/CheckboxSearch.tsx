@@ -91,14 +91,13 @@ export default function CheckboxSearch({
           checked={selectAll === 'all'}
           onChange={handleSelectAll}
           disabled={disabled || filtered.length === 0}
-          className={`h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 shrink-0 ${
+          className={`h-4 w-4 rounded border border-slate-300 text-emerald-600 focus:ring-emerald-500 shrink-0 ${
             selectAll === 'partial'
-              ? 'bg-white'
+              ? 'bg-white border-amber-500'
               : selectAll === 'all'
                 ? 'bg-emerald-600 border-emerald-600 text-emerald-600'
                 : 'bg-white border-slate-300 text-slate-500'
           }`}
-          style={{ appearance: 'none' }}
         />
         <span className="text-sm font-medium text-slate-700">
           {selectAll === 'all' ? 'Batal Semua' : 'Pilih Semua'}
@@ -147,7 +146,7 @@ export default function CheckboxSearch({
                   checked={checked}
                   onChange={() => toggle(item.id)}
                   disabled={disabled}
-                  className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 h-4 w-4 shrink-0"
+                  className="h-4 w-4 rounded border border-slate-300 text-emerald-600 focus:ring-emerald-500 shrink-0"
                 />
                 <span className={checked ? "text-slate-900 font-medium" : "text-slate-700"}>
                   {item.label}

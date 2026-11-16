@@ -442,13 +442,13 @@ export default function PublicAbsenPage({
                 {rekap.rincianDesa.length === 0 ? (
                   <p className="text-sm text-slate-500 text-center py-4">Belum ada data rincian.</p>
                 ) : (
-                  rekap.rincianDesa.map((d) => {
+                  rekap.rincianDesa.map((d, desaIdx) => {
                     const desaHadir = d.kelompok.reduce((acc, k) => acc + k.hadir, 0);
                     const desaIzin = d.kelompok.reduce((acc, k) => acc + k.izin, 0);
                     const desaSakit = d.kelompok.reduce((acc, k) => acc + k.sakit, 0);
                     const desaTotal = d.kelompok.reduce((acc, k) => acc + k.total, 0);
                     return (
-                      <div key={d.desa} className="overflow-hidden rounded-xl border border-slate-200">
+                      <div key={`desa-${desaIdx}`} className="overflow-hidden rounded-xl border border-slate-200">
                         <div className="bg-emerald-50 px-4 py-3 border-b border-emerald-100">
                           <div className="flex items-center justify-between">
                             <div className="font-semibold text-sm text-slate-900">{d.desa}</div>
@@ -469,8 +469,8 @@ export default function PublicAbsenPage({
                           </div>
                         </div>
                         <div className="divide-y divide-slate-100">
-                          {d.kelompok.map((k) => (
-                            <div key={k.kelompok} className="flex items-center justify-between px-4 py-3 text-sm">
+                          {d.kelompok.map((k, kIdx) => (
+                            <div key={`kelompok-${kIdx}`} className="flex items-center justify-between px-4 py-3 text-sm">
                               <div>
                                 <span className="text-slate-700 font-medium">{k.kelompok}</span>
                               </div>

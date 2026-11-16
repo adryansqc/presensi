@@ -827,11 +827,11 @@ export default function JadwalManager({
               {jadwalList.map((j) => (
                 <tr key={j.id} className="transition hover:bg-slate-50/70">
                   <td className="px-4 py-3 text-slate-700">{formatDate(j.tanggal)}</td>
-                  <td className="px-4 py-3 text-slate-700">{j.jenisPengajian}</td>
+                  <td className="px-4 py-3 text-slate-700 truncate max-w-[160px]" title={j.jenisPengajian}>{j.jenisPengajian}</td>
                   <td className="px-4 py-3 text-slate-700">{j.jamMulai} - {j.jamSelesai}</td>
                   <td className="px-4 py-3 text-slate-700">{j.tingkat}</td>
-                  <td className="px-4 py-3 text-slate-700 text-sm">{tampilkanKategori(j)}</td>
-                  <td className="px-4 py-3 text-slate-700 text-sm">{tampilkanKelompok(j)}</td>
+                  <td className="px-4 py-3 text-slate-700 text-sm truncate max-w-[160px]" title={tampilkanKategori(j)}>{tampilkanKategori(j)}</td>
+                  <td className="px-4 py-3 text-slate-700 text-sm truncate max-w-[160px]" title={tampilkanKelompok(j)}>{tampilkanKelompok(j)}</td>
                   <td className="px-4 py-3 text-center">
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ${

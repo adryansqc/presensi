@@ -21,9 +21,14 @@ export async function GET(
       where: { jadwalId },
       orderBy: [{ createdAt: "desc" }],
       include: {
-        jamaah: { select: { nama: true, desa: { select: { nama: true } }, kelompok: { select: { nama: true } } } },
+        jamaah: { select: { nama: true, desaId: true, kelompokId: true, desa: { select: { nama: true } }, kelompok: { select: { nama: true } } } },
       },
     });
+
+    const allDesa = await prisma.desa.findMany({ select: { id: true, nama: true } });
+    const allKelompok = await prisma.kelompok.findMany({ select: { id: true, nama: true } });
+    const desaLookup = new Map(allDesa.map((d) => [d.id, d.nama]));
+    const kelompokLookup = new Map(allKelompok.map((k) => [k.id, k.nama]));
 
     const total = presensi.length;
     const hadir = presensi.filter((p) => p.status === "Hadir").length;
@@ -31,12 +36,19 @@ export async function GET(
     const sakit = presensi.filter((p) => p.status === "Sakit").length;
     const sumberPublik = presensi.filter((p) => p.sumber === "PUBLIK").length;
 
-    const desaMap = new Map<string, Map<string, { hadir: number; izin: number; sakit: number; total: number }>>();
+    const grouped = new Map<string, Map<string, { hadir: number; izin: number; sakit: number; total: number }>>();
     for (const p of presensi) {
-      const dNama = p.jamaah?.desa?.nama ?? "Tidak diketahui";
-      const kNama = p.jamaah?.kelompok?.nama ?? "Tidak diketahui";
-      if (!desaMap.has(dNama)) desaMap.set(dNama, new Map());
-      const kelompokMap = desaMap.get(dNama)!;
+      let dNama: string;
+      let kNama: string;
+      if (p.jamaah) {
+        dNama = (p.jamaah.desa?.nama ?? desaLookup.get(p.jamaah.desaId) ?? "").trim() || "Tidak diketahui";
+        kNama = (p.jamaah.kelompok?.nama ?? kelompokLookup.get(p.jamaah.kelompokId) ?? "").trim() || "Tidak diketahui";
+      } else {
+        dNama = (desaLookup.get(p.desaId) ?? "").trim() || "Tidak diketahui";
+        kNama = (kelompokLookup.get(p.kelompokId) ?? "").trim() || "Tidak diketahui";
+      }
+      if (!grouped.has(dNama)) grouped.set(dNama, new Map());
+      const kelompokMap = grouped.get(dNama)!;
       if (!kelompokMap.has(kNama)) kelompokMap.set(kNama, { hadir: 0, izin: 0, sakit: 0, total: 0 });
       const stats = kelompokMap.get(kNama)!;
       stats.total++;
@@ -45,7 +57,7 @@ export async function GET(
       if (p.status === "Sakit") stats.sakit++;
     }
 
-    const rincianDesa = Array.from(desaMap.entries()).map(([desa, kelompokMap]) => ({
+    const rincianDesa = Array.from(grouped.entries()).map(([desa, kelompokMap]) => ({
       desa,
       kelompok: Array.from(kelompokMap.entries()).map(([kelompok, stats]) => ({ kelompok, ...stats })),
     }));

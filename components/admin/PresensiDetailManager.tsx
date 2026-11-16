@@ -220,8 +220,146 @@ export default function PresensiDetailManager({
   const totalMarked = Object.keys(statusMap).length;
   const totalCount = filteredJamaah.length;
 
+  const hitung = useMemo(() => {
+    const hadir = Object.values(statusMap).filter((s) => s === "Hadir").length;
+    const izin = Object.values(statusMap).filter((s) => s === "Izin").length;
+    const sakit = Object.values(statusMap).filter((s) => s === "Sakit").length;
+    const belum = totalCount - hadir - izin - sakit;
+    return { hadir, izin, sakit, belum };
+  }, [statusMap, totalCount]);
+
   const [publicLink, setPublicLink] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
+
+  const cetakHTML = () => {
+    const rows = grouped.map(({ desa, kelompok, items }) => {
+      const rowsHtml = items
+        .map((j, idx) => {
+          const s = getStatus(j.id);
+          const cfg = s ? STATUS_CONFIG[s] : null;
+          return `
+            <tr>
+              <td style="border:1px solid #cbd5e1;padding:7px 10px;font-size:12px;text-align:center;">${idx + 1}</td>
+              <td style="border:1px solid #cbd5e1;padding:7px 10px;font-size:12px;">${j.nama}</td>
+              <td style="border:1px solid #cbd5e1;padding:7px 10px;font-size:12px;text-align:center;">${cfg ? cfg.label : "-"}</td>
+              <td style="border:1px solid #cbd5e1;padding:7px 10px;font-size:12px;">${keteranganMap[j.id] ?? ""}</td>
+            </tr>
+          `;
+        })
+        .join("");
+      return `
+        <tr>
+          <td colspan="4" style="border:1px solid #cbd5e1;padding:8px 12px;font-size:13px;font-weight:600;color:#047857;background:#f0fdf4;">${desa} — ${kelompok}</td>
+        </tr>
+        ${rowsHtml}
+      `;
+    }).join("");
+
+    const statsHtml = `
+      <table style="width:100%;border-collapse:collapse;margin-bottom:18px;">
+        <tr>
+          <td style="border:1px solid #cbd5e1;padding:10px;text-align:center;background:#f0fdf4;color:#047857;font-weight:700;"><div style="font-size:11px;opacity:0.8;">Hadir</div><div style="font-size:16px;">${hitung.hadir}</div></td>
+          <td style="border:1px solid #cbd5e1;padding:10px;text-align:center;background:#fffbeb;color:#92400e;font-weight:700;"><div style="font-size:11px;opacity:0.8;">Izin</div><div style="font-size:16px;">${hitung.izin}</div></td>
+          <td style="border:1px solid #cbd5e1;padding:10px;text-align:center;background:#fef2f2;color:#991b1b;font-weight:700;"><div style="font-size:11px;opacity:0.8;">Sakit</div><div style="font-size:16px;">${hitung.sakit}</div></td>
+          <td style="border:1px solid #cbd5e1;padding:10px;text-align:center;background:#f1f5f9;color:#475569;font-weight:700;"><div style="font-size:11px;opacity:0.8;">Belum</div><div style="font-size:16px;">${hitung.belum}</div></td>
+          <td style="border:1px solid #cbd5e1;padding:10px;text-align:center;background:#eef2ff;color:#4338ca;font-weight:700;"><div style="font-size:11px;opacity:0.8;">Total</div><div style="font-size:16px;">${totalCount}</div></td>
+        </tr>
+      </table>
+    `;
+
+    return `
+      <html>
+        <head>
+          <title>Laporan Presensi - ${jadwal.jenisPengajian}</title>
+          <style>
+            @page { size: A4; margin: 14mm 12mm; }
+            * { box-sizing: border-box; }
+            body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 11.5px; color: #334155; line-height: 1.4; margin: 0; }
+            .header { border-bottom: 3px solid #047857; padding-bottom: 12px; margin-bottom: 16px; }
+            .header h1 { font-size: 20px; margin: 0 0 4px 0; color: #0f172a; font-weight: 700; }
+            .header .sub { font-size: 11px; color: #64748b; margin: 2px 0; }
+            .meta { display: flex; gap: 12px; font-size: 10px; color: #64748b; margin-bottom: 14px; flex-wrap: wrap; }
+            .meta span { background: #f1f5f9; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
+            table.data { width: 100%; border-collapse: collapse; }
+            table.data th { background: #f8fafc; border: 1px solid #cbd5e1; padding: 8px 10px; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; text-align: left; }
+            table.data td { border: 1px solid #cbd5e1; padding: 7px 10px; font-size: 11px; vertical-align: top; }
+            table.data tr:nth-child(even) td { background: #f8fafc; }
+            .group-row td { background: #f0fdf4 !important; color: #047857; font-weight: 700; font-size: 11.5px; }
+            .footer { margin-top: 18px; font-size: 9px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+            .noprint { display: none !important; }
+            @media print {
+              .noprint { display: none !important; }
+              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Laporan Presensi</h1>
+            <div class="sub">${jadwal.jenisPengajian}</div>
+          </div>
+          <div class="meta">
+            <span>${jadwal.tanggal} • ${jadwal.jamMulai} - ${jadwal.jamSelesai}</span>
+            <span>Tingkat: ${jadwal.tingkat}</span>
+            <span>Lokasi: ${jadwal.lokasi}</span>
+            <span>Status Sesi: ${jadwal.statusBuka}</span>
+          </div>
+          ${statsHtml}
+          <table class="data">
+            <thead>
+              <tr>
+                <th style="width:40px;">No.</th>
+                <th>Nama Jamaah</th>
+                <th style="width:90px;text-align:center;">Status</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+          <div class="footer">Dicetak dari Sistem Presensi Jambi Kota 1 — ${new Date().toLocaleDateString("id-ID")}</div>
+          <script>window.print();</script>
+        </body>
+      </html>
+    `;
+  };
+
+  const handleCetakPDF = () => {
+    const html = cetakHTML();
+    const win = window.open("", "_blank");
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
+  };
+
+  const handleDownloadExcel = () => {
+    import("xlsx").then((XLSX) => {
+      const rows: Record<string, unknown>[] = [];
+      let no = 1;
+      for (const { desa, kelompok, items } of grouped) {
+        for (const j of items) {
+          const s = getStatus(j.id);
+          const statusLabel = s ? STATUS_CONFIG[s].label : "-";
+          rows.push({
+            "No.": no++,
+            Desa: desa,
+            Kelompok: kelompok,
+            "Nama Jamaah": j.nama,
+            Status: statusLabel,
+            Keterangan: keteranganMap[j.id] ?? "",
+          });
+        }
+      }
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Presensi");
+
+      const namaFile = `presensi-${jadwal.jenisPengajian.replace(/\s+/g, "_")}-${jadwal.tanggal}.xlsx`;
+      XLSX.writeFile(wb, namaFile);
+    });
+  };
 
   const handleBagikan = useCallback(async () => {
     setSharing(true);
@@ -345,6 +483,61 @@ export default function PresensiDetailManager({
               {jadwal.statusBuka === "Buka" ? "● Buka" : "○ Tutup"}
             </span>
           </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="bg-emerald-50 rounded-xl p-4 text-center border border-emerald-100">
+          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700 mb-1">Hadir</p>
+          <p className="text-2xl font-bold text-slate-900">{hitung.hadir}</p>
+        </div>
+        <div className="bg-amber-50 rounded-xl p-4 text-center border border-amber-100">
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-700 mb-1">Izin</p>
+          <p className="text-2xl font-bold text-slate-900">{hitung.izin}</p>
+        </div>
+        <div className="bg-red-50 rounded-xl p-4 text-center border border-red-100">
+          <p className="text-xs font-semibold uppercase tracking-wider text-red-700 mb-1">Sakit</p>
+          <p className="text-2xl font-bold text-slate-900">{hitung.sakit}</p>
+        </div>
+        <div className="bg-slate-50 rounded-xl p-4 text-center border border-slate-200">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Belum</p>
+          <p className="text-2xl font-bold text-slate-900">{hitung.belum}</p>
+        </div>
+        <div className="bg-indigo-50 rounded-xl p-4 text-center border border-indigo-100">
+          <p className="text-xs font-semibold uppercase tracking-wider text-indigo-700 mb-1">Total</p>
+          <p className="text-2xl font-bold text-slate-900">{totalCount}</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-end">
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          <span className="font-medium">Rentang data:</span>
+          <span>{jadwal.tanggal}</span>
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleCetakPDF}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-100"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Cetak PDF
+          </button>
+          <button
+            type="button"
+            onClick={handleDownloadExcel}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5 text-sm font-semibold text-green-700 shadow-sm transition hover:bg-green-100"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Unduh Excel (.xlsx)
+          </button>
         </div>
       </div>
 

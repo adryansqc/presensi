@@ -14,13 +14,15 @@
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
     "@types/bcryptjs": "^2.4.6",
+    "@types/xlsx": "^0.0.35",
     "bcryptjs": "^3.0.3",
     "next": "16.4.6",
     "next-auth": "^4.24.15",
     "pg": "^8.23.1",
     "prisma": "^7.10.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
