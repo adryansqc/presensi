@@ -408,7 +408,6 @@ export default function PresensiDetailManager({
       })}
     </div>
   );
-
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -426,7 +425,6 @@ export default function PresensiDetailManager({
             Tandai status kehadiran jamaah dengan memilih Hadir / Izin / Sakit.
           </p>
         </div>
-        <div className="flex w-full sm:w-auto flex-col gap-2 sm:flex-row sm:items-end sm:items-center">
           {jadwal.statusBuka === "Buka" && (
             <button
               type="button"
@@ -437,17 +435,17 @@ export default function PresensiDetailManager({
               {sharing ? "Membuat..." : "Bagikan Link Publik"}
             </button>
           )}
-          <button
-            type="button"
-            disabled={saving || totalMarked === 0}
-            onClick={handleSave}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving ? "Menyimpan..." : "Simpan Presensi"}
-          </button>
+          <div className="fixed bottom-6 right-6 z-50 bg-white shadow-lg">
+            <button
+              type="button"
+              disabled={saving || totalMarked === 0}
+              onClick={handleSave}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? "Menyimpan..." : "Simpan Presensi"}
+            </button>
+          </div>
         </div>
-      </div>
-
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div className="bg-slate-50 rounded-xl p-4">
