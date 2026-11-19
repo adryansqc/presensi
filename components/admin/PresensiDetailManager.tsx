@@ -177,39 +177,32 @@ export default function PresensiDetailManager({
     }
     setSaving(true);
     try {
-      const errors: string[] = [];
-      for (const [id, status] of entries) {
+      const items = entries.map(([id, status]) => {
         const j = jamaah.find((x) => x.id === id);
-        if (!j) continue;
-        try {
-          const res = await fetch("/api/admin/presensi", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              jadwalId: jadwal.id,
-              jamaahId: j.id,
-              namaJamaah: j.nama,
-              kategoriId: "",
-              desaId: j.desaId || "",
-              kelompokId: j.kelompokId || "",
-              status,
-              keterangan: keteranganMap[id] || undefined,
-            }),
-          });
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            errors.push(`${j.nama}: ${err.error || "Gagal simpan"}`);
-          }
-        } catch {
-          errors.push(`${j.nama}: Gagal terhubung ke server.`);
-        }
-      }
+        if (!j) return null;
+        return {
+          jadwalId: jadwal.id,
+          jamaahId: j.id,
+          namaJamaah: j.nama,
+          kategoriId: "",
+          desaId: j.desaId || "",
+          kelompokId: j.kelompokId || "",
+          status,
+          keterangan: keteranganMap[id] || undefined,
+        };
+      }).filter(Boolean);
 
-      if (errors.length > 0) {
-        await swal.error("Beberapa gagal tersimpan", errors.join("\n"));
-      } else {
-        await swal.success("Berhasil disimpan", "Data presensi jamaah telah diperbarui.");
+      const res = await fetch("/api/admin/presensi/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jadwalId: jadwal.id, items }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        await swal.error("Gagal menyimpan", data.error || "Terjadi kesalahan server.");
+        return;
       }
+      await swal.success("Berhasil disimpan", `Data presensi ${data.count ?? items.length} jamaah telah diperbarui.`);
     } catch {
       await swal.error("Gagal menyimpan", "Tidak dapat menghubungi server.");
     } finally {

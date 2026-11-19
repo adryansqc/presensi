@@ -53,3 +53,9 @@ Command order when changing the DB schema: edit `prisma/schema.prisma` → `npx 
 - Server actions/components under `app/(auth)`, `app/absen`, `app/admin`, `app/dashboard`; shared UI in `components/`.
 - Role values: `Super_Admin`, `Admin_CAI`, `Desa`, `Kelompok`; `User.hidden = true` hides accounts from user lists (`API_DOCUMENTATION.md`).
 - `.env`, `.next/`, `out/`, `build/`, `*.tsbuildinfo`, `next-env.d.ts` are gitignored.
+
+## Presensi (performa penyimpanan)
+
+- `PresensiDetailManager.handleSave` (components/admin/PresensiDetailManager.tsx) sekarang mengirim **satu request bulk** ke `POST /api/admin/presensi/bulk` dengan semua jamaah, bukan satu `fetch` berurutan per orang. Jangan kembali ke loop per-orang — itu menyebabkan N×(4–5 kueri DB ke Neon) dan terasa sangat lama.
+- Endpoint bulk `app/api/admin/presensi/bulk/route.ts` memproses create/update dalam satu `prisma.$transaction`, hanya ~4 kueri DB terlepas dari jumlah orang.
+- Endpoint tunggal `app/api/admin/presensi/route.ts` (POST) masih ada dan digunakan untuk satu orang, tapi lebih lambat dari bulk saat banyak data.
