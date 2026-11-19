@@ -6,11 +6,11 @@ import bcrypt from "bcryptjs";
 
 const handler = NextAuth(authOptions);
 
-export async function GET(req: NextRequest) {
-  return handler.GET(req);
-}
+export const GET = handler;
 
-export async function POST(req: NextRequest) {
+type NextAuthContext = { params: Promise<{ nextauth?: string[] }> };
+
+export async function POST(req: NextRequest, context: NextAuthContext) {
   const { pathname } = new URL(req.url);
 
   // Intercept mobile login yang mengharapkan JSON response
@@ -62,5 +62,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return handler.POST(req);
+  return handler(req, context);
 }
