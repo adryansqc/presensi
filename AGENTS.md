@@ -32,8 +32,8 @@ Command order when changing the DB schema: edit `prisma/schema.prisma` → `npx 
 
 ## Environment
 
-- `.env` exists locally with real credentials (`DATABASE_URL` on Neon, `NEXTAUTH_SECRET`, `NEXTAUTH_URL=http://localhost:3000`).
-- `.env*` is gitignored — do not commit it. Required vars: `DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`.
+- `.env` exists locally with real credentials (Neon `DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL=http://localhost:3000`). Do not commit actual values.
+- `.env*` is gitignored. Required vars: `DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`.
 
 ## Auth
 
