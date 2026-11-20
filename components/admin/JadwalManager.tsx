@@ -46,10 +46,12 @@ type CreateForm = {
 export default function JadwalManager({
   canCreate = false,
   canEdit = false,
+  canDuplicate = false,
   canDelete = false,
 }: {
   canCreate?: boolean;
   canEdit?: boolean;
+  canDuplicate?: boolean;
   canDelete?: boolean;
 }) {
   const [jadwalList, setJadwalList] = useState<Jadwal[]>([]);
@@ -331,6 +333,31 @@ export default function JadwalManager({
       await refreshData();
     } catch {
       await swal.error("Gagal menghapus", "Tidak dapat menghubungi server.");
+    }
+  }
+
+  async function handleDuplikat(id: string) {
+    const ok = await swal.confirm({
+      title: "Duplikat jadwal ini?",
+      text: "Jadwal baru akan dibuat dengan pengaturan yang sama (status awal: Tutup).",
+      confirmText: "Ya, duplikat",
+      cancelText: "Batal",
+    });
+    if (!ok) return;
+
+    try {
+      const res = await fetch(`/api/admin/jadwal/${id}/duplicate`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        await swal.error("Gagal duplikasi", typeof data?.error === "string" ? data.error : "");
+        return;
+      }
+      await swal.success("Jadwal diduplikasi", "Jadwal baru telah dibuat dengan pengaturan yang sama.");
+      await refreshData();
+    } catch {
+      await swal.error("Gagal duplikasi", "Tidak dapat menghubungi server.");
     }
   }
 
@@ -916,6 +943,21 @@ export default function JadwalManager({
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                        </button>
+                      )}
+                      {canDuplicate && (
+                        <button
+                          type="button"
+                          onClick={() => handleDuplikat(j.id)}
+                          className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                          title="Duplikat Jadwal"
+                          aria-label="Duplikat jadwal"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <rect x="2" y="2" width="13" height="13" rx="2" ry="2" />
+                            <path d="M2 15V5M2 12h13M14 2v13M14 15h13" />
                           </svg>
                         </button>
                       )}
